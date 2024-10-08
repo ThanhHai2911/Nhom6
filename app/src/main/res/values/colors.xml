@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="meBlack">#272726</color>
+    <color name="pink">#D91656</color>
+    <color name="pink_nhat">#FFCDD2</color>
+    <color name="bottom_nav_selected">#0000FF</color> <!-- Màu xanh cho mục được chọn -->
+    <color name="bottom_nav_unselected">#808080</color> <!-- Màu xám cho mục không được chọn -->
+</resources>

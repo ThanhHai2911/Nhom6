@@ -1,0 +1,41 @@
+package com.example.xemphim.API;
+
+import com.example.xemphim.model.ChiTietPhim;
+import com.example.xemphim.response.MovieResponse;
+import com.example.xemphim.response.SeriesResponse;
+
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+
+public interface ApiService {
+    @GET("danh-sach/phim-moi-cap-nhat")
+    Call<MovieResponse> getMovies(@Query("page") int page);
+
+    @GET("v1/api/tim-kiem")
+    Call<SeriesResponse> searchMovies(@Query("keyword") String keyword, @Query("limit") int limit);
+
+
+    @GET("v1/api/danh-sach/phim-bo")
+    Call<SeriesResponse> getSeries();
+
+    @GET("phim/{slug}")
+    Call<ChiTietPhim> getMovieDetail(@Path("slug") String slug);
+
+    @GET("v1/api/danh-sach/tv-shows")
+    Call<SeriesResponse> getTVShow();
+
+    @GET("v1/api/danh-sach/phim-le")
+    Call<SeriesResponse> getPhimLe();
+
+    @GET("v1/api/danh-sach/hoat-hinh")
+    Call<SeriesResponse> getHoatHinh();
+
+    @GET("v1/api/the-loai/tinh-cam")
+    Call<SeriesResponse> getTheLoai();
+
+    @GET("v1/api/quoc-gia/{slug}")
+    Call<SeriesResponse> getQuocGia(@Path("slug") String slug);
+}
+
