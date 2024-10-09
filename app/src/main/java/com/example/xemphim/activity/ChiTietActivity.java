@@ -65,6 +65,7 @@ public class ChiTietActivity extends AppCompatActivity {
                 // Khởi động activity phát video
                 Intent intent = new Intent(this, XemPhimActivity.class);
                 intent.putExtra("movie_link", movieLink);  // Truyền link phim
+                intent.putExtra("slug", movieSlug);
                 startActivity(intent);
             } else {
                 Toast.makeText(ChiTietActivity.this, "Link phim không khả dụng", Toast.LENGTH_SHORT).show();

@@ -9,7 +9,7 @@
     app:cardElevation="4dp"
     app:cardBackgroundColor="@android:color/transparent">
 
-    <TextView
+    <Button
         android:id="@+id/btn_episodesName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         app:cornerRadius="15dp"
-        android:background="#F45A8F"
+        android:backgroundTint="#F45A8F"
         app:elevation="0dp"/>
 
 </androidx.cardview.widget.CardView>

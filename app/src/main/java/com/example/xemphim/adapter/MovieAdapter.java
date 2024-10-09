@@ -2,6 +2,7 @@ package com.example.xemphim.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -45,12 +46,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 .load(movie.getPoster_url())
                 .into(holder.binding.moviePoster);
 
-        // Thêm sự kiện click vào phim
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ChiTietActivity.class);
-            intent.putExtra("slug", movie.getSlug()); // Truyền slug qua Intent
-            context.startActivity(intent);
-        });
+
 
         /// Luu Position mới cho Holder
         final int pos = position;
@@ -62,23 +58,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return movies.size();
     }
 
-    public static class MovieViewHolder extends RecyclerView.ViewHolder {
+    public class MovieViewHolder extends RecyclerView.ViewHolder {
         ItemMovieBinding binding;
         int position;
-
         public MovieViewHolder(@NonNull ItemMovieBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 
-            // Xử lý sự kiện click cho item
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (recyclerViewItemClickListener != null) {
-                        recyclerViewItemClickListener.onItemClick(view, position);
-
-                    }
-                }
+            itemView.setOnClickListener(view -> {
+                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                Movie movie = movies.get(position);
+                intent.putExtra("slug", movie.getSlug());
+                view.getContext().startActivity(intent);
             });
         }
     }

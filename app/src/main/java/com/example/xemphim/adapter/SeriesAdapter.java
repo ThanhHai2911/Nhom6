@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.example.xemphim.activity.ChiTietActivity;
 import com.example.xemphim.databinding.ItemSeriesBinding;
+import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.Series;
 
 public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.SeriesViewHolder> {
@@ -47,12 +48,6 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.SeriesView
         Glide.with(context)  // Sử dụng context đã được cung cấp
                 .load(series.getPosterUrl())
                 .into(holder.binding.moviePoster);
-        // Thêm sự kiện click vào phim
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ChiTietActivity.class);
-            intent.putExtra("slug", series.getSlug()); // Truyền slug qua Intent
-            context.startActivity(intent);
-        });
 
         /// Luu Position mới cho Holder
         final int pos = position;
@@ -65,7 +60,7 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.SeriesView
     }
 
     // ViewHolder class
-    public static class SeriesViewHolder extends RecyclerView.ViewHolder {
+    public class SeriesViewHolder extends RecyclerView.ViewHolder {
         ItemSeriesBinding binding;
         int position;
 
@@ -73,14 +68,12 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.SeriesView
             super(binding.getRoot());
             this.binding = binding;
 
-            // Xử lý sự kiện click cho item
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (recyclerViewItemClickListener != null) {
-                        recyclerViewItemClickListener.onItemClick(view, position);
-                    }
-                }
+            //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+            itemView.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                Series series = seriesList.get(position);
+                intent.putExtra("slug", series.getSlug());
+                view.getContext().startActivity(intent);
             });
         }
 

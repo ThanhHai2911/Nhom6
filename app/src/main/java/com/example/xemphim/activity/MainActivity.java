@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
         binding.recyclerViewtvShow.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.recyclerViewphimle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.recyclerViewphimhoathinh.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        binding.recyclerViewTheLoai.setLayoutManager(new GridLayoutManager(MainActivity.this, 4));
     }
 
     private void loadMovies() {
@@ -305,6 +304,10 @@ public class MainActivity extends AppCompatActivity {
                 swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
+    }
+
+    public void laydulieu() {
+
     }
 
 

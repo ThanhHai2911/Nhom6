@@ -70,24 +70,24 @@ public class XemPhimActivity extends AppCompatActivity {
     public void setEvent() {
         initializePlayer();
         // Thiết lập sự kiện cho nút toàn màn hình
-        btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         movieSlug = getIntent().getStringExtra("slug");
+        btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
-        loadMovieDetails(movieSlug);
+        loadMovieDetails();
     }
 
     private void initializePlayer() {
-
         String movieLink = getIntent().getStringExtra("movie_link");
-        if (movieLink != null) {
+        if (exoPlayer == null) {
             exoPlayer = new ExoPlayer.Builder(this).build();
             binding.playerView.setPlayer(exoPlayer); // Sử dụng View Binding để gán player
             binding.playerView.setKeepScreenOn(true);
+
             // Thêm listener để lắng nghe lỗi
             exoPlayer.addListener(new Player.Listener() {
                 @Override
                 public void onPlayerError(PlaybackException error) {
-                    Toast.makeText(XemPhimActivity.this, "Phim lỗi vui lòng báo cáo cho admin or xem phim khác: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(XemPhimActivity.this, "Phim lỗi vui lòng báo cáo cho admin hoặc xem phim khác: " + error.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -99,46 +99,38 @@ public class XemPhimActivity extends AppCompatActivity {
             // Thêm video vào player
             exoPlayer.setMediaSource(hlsMediaSource);
             exoPlayer.prepare();
-
-        } else {
-            Toast.makeText(this, "Link phim không hợp lệ", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void toggleFullScreen() {
+        long currentPosition = exoPlayer.getCurrentPosition(); // Lưu lại thời điểm hiện tại của video
+
         if (isFullScreen) {
-            // Chuyển sang chế độ dọc
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            updatePlayerView(); // Cập nhật lại view khi ở chế độ dọc
         } else {
             // Chuyển sang chế độ ngang
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
             binding.playerView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT
             ));
         }
-        isFullScreen = !isFullScreen;
-    }
 
-    private void updatePlayerView() {
-        // Cập nhật layout cho PlayerView khi không ở chế độ toàn màn hình
-        binding.playerView.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                200 // Chiều cao mặc định
-        ));
-        binding.playerView.requestLayout(); // Yêu cầu cập nhật layout
+        isFullScreen = !isFullScreen;
+
+        // Tiếp tục phát video từ thời điểm trước khi thay đổi layout
+        exoPlayer.seekTo(currentPosition);
     }
-    private void loadMovieDetails(String slug) {
-        Call<ChiTietPhim> call = apiService.getMovieDetail(slug);
+    private void loadMovieDetails() {
+        Call<ChiTietPhim> call = apiService.getMovieDetail(movieSlug);
         call.enqueue(new Callback<ChiTietPhim>() {
             @Override
             public void onResponse(Call<ChiTietPhim> call, Response<ChiTietPhim> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ChiTietPhim movieDetails = response.body();
                     List<LinkPhim> tapPhim = movieDetails.getEpisodes();
-
+                    binding.tvMovieTitle.setText(movieDetails.getMovie().getName());
                     if (tapPhim != null && !tapPhim.isEmpty()) {
                         serverDataList.clear();
                         for (LinkPhim episode : tapPhim) {
@@ -151,6 +143,7 @@ public class XemPhimActivity extends AppCompatActivity {
                         tapPhimAdapter = new TapPhimAdapter(XemPhimActivity.this, serverDataList, linkM3u8 -> {
                             Intent intent = new Intent(XemPhimActivity.this, XemPhimActivity.class);
                             intent.putExtra("movie_link", linkM3u8);
+                            intent.putExtra("slug", movieSlug);
                             startActivity(intent);
                         });
 
@@ -182,7 +175,6 @@ public class XemPhimActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT
             ));
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            updatePlayerView();
         }
     }
 

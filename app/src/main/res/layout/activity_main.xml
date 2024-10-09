@@ -151,10 +151,6 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/layout_header"
         app:menu="@menu/menu">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewTheLoai"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>
