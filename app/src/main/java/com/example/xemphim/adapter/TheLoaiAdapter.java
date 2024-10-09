@@ -39,9 +39,6 @@ public class TheLoaiAdapter extends RecyclerView.Adapter<TheLoaiAdapter.ViewHold
         Series.Category series = categories.get(position);
         holder.binding.tvTheLoai.setText(series.getName()); // Sử dụng binding để truy cập các phần tử giao diện
 
-        // Thiết lập sự kiện click
-     //   holder.itemView.setOnClickListener(v -> listener.onItemClick(series));
-
     }
 
     @Override
