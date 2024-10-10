@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "675010417043",
+    "firebase_url": "https://phimchill-6ac97-default-rtdb.firebaseio.com",
+    "project_id": "phimchill-6ac97",
+    "storage_bucket": "phimchill-6ac97.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675010417043:android:0e2700fecac7d33a589866",
+        "android_client_info": {
+          "package_name": "com.example.xemphim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG2c4bwI8tbON8b2AJMpdwxOmf96aRBcM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
