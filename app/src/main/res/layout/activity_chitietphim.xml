@@ -226,7 +226,6 @@
             android:textSize="25sp">
 
         </Button>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvTapPhim"
             android:layout_width="match_parent"

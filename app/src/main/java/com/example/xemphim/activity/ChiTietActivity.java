@@ -78,7 +78,6 @@ public class ChiTietActivity extends AppCompatActivity {
     }
 
     private void loadMovieDetails(String slug) {
-
         // Ensure apiService is initialized before calling this
         Call<MovieDetail> call = apiService.getMovieDetail(slug);
         call.enqueue(new Callback<MovieDetail>() {
