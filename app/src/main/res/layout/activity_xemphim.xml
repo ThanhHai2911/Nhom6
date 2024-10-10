@@ -19,7 +19,6 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
             android:contentDescription="Fullscreen"
-            android:background="?android:selectableItemBackgroundBorderless"
             android:src="@drawable/ic_fullscreen" />
 
 
