@@ -21,6 +21,8 @@ import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.Series;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +95,10 @@ public class MainActivity extends AppCompatActivity {
         loadPhimLe();
         loadPhimHoatHinh();
 
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
 
+        myRef.setValue("Hello, World!");
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
