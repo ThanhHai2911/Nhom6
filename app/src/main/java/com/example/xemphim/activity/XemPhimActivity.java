@@ -96,6 +96,19 @@ public class XemPhimActivity extends AppCompatActivity {
         }
     }
 
+    private void playEpisode(String episodeLink) {
+        if (exoPlayer != null) {
+            // Prepare a new media source for the new episode
+            DefaultHttpDataSource.Factory dataSourceFactory = new DefaultHttpDataSource.Factory();
+            HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(MediaItem.fromUri(episodeLink));
+
+            exoPlayer.setMediaSource(hlsMediaSource);
+            exoPlayer.prepare();
+            exoPlayer.play(); // Start playback immediately
+        }
+    }
+
     private void toggleFullScreen() {
         long currentPosition = exoPlayer.getCurrentPosition(); // Lưu lại thời điểm hiện tại của video
 
@@ -139,12 +152,12 @@ public class XemPhimActivity extends AppCompatActivity {
                         tapPhimAdapter.setRecyclerViewItemClickListener(new TapPhimAdapter.OnRecyclerViewItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
-                                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
-                                Intent intent = new Intent(view.getContext(), XemPhimActivity.class);
-                                MovieDetail.Episode.ServerData tapphim = serverDataList.get(position);
-                                intent.putExtra("movie_link", tapphim.getLinkM3u8());
-                                intent.putExtra("slug", tapphim.getSlug());
-                                view.getContext().startActivity(intent);
+                                // Get the link for the selected episode
+                                MovieDetail.Episode.ServerData selectedEpisode = serverDataList.get(position);
+                                String newMovieLink = selectedEpisode.getLinkM3u8();
+
+                                // Load and play the selected episode
+                                playEpisode(newMovieLink);
                             }
                         });
 
