@@ -1,6 +1,7 @@
 package com.example.xemphim.activity;
 
 import android.content.Intent;
+import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -114,21 +115,25 @@ public class XemPhimActivity extends AppCompatActivity {
 
         if (isFullScreen) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT); // Chuyển về chế độ phù hợp với kích thước
+            // Đặt lại LayoutParams khi thoát toàn màn hình (phụ thuộc vào layout cha)
+            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    200 // hoặc giá trị chiều cao mong muốn
+            ));
         } else {
             // Chuyển sang chế độ ngang
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
-            binding.playerView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
+            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL); // Chế độ toàn màn hình
+            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT
             ));
         }
 
-        isFullScreen = !isFullScreen;
-
-        // Tiếp tục phát video từ thời điểm trước khi thay đổi layout
-        exoPlayer.seekTo(currentPosition);
+        isFullScreen = !isFullScreen; // Đổi trạng thái fullscreen
     }
+
     private void loadMovieDetails() {
         Call<MovieDetail> call = apiService.getMovieDetail(movieSlug);
         call.enqueue(new Callback<MovieDetail>() {
