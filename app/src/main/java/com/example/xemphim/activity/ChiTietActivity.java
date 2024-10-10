@@ -94,6 +94,44 @@ public class ChiTietActivity extends AppCompatActivity {
                     binding.textViewYear.setText(String.valueOf(movie.getYear()));
                     binding.textViewActors.setText(TextUtils.join(", ", movie.getActor()));
                     binding.textViewDirector.setText(TextUtils.join(", ", movie.getDirector()));
+                    List<String> directores = movie.getDirector();
+                    String directory = "";
+
+                    // Kiểm tra nếu danh sách không null và không rỗng
+                    if (directores != null && !directores.isEmpty()) {
+                        // Sử dụng TextUtils để nối các chuỗi
+                        directory = TextUtils.join(", ", directores);
+                    }
+
+                    // Gán giá trị vào TextView
+                    binding.tvCountry.setText(directory);
+
+                    List<MovieDetail.MovieItem.Country> countries = movie.getCountry();
+                    if (countries != null && !countries.isEmpty()) {
+                        // Duyệt qua danh sách thể loại và ghép tên của chúng thành chuỗi
+                        List<String> countryNames = new ArrayList<>();
+                        for (MovieDetail.MovieItem.Country country : countries) {
+                            countryNames.add(country.getName());
+                        }
+                        // Chuyển danh sách tên thể loại thành chuỗi, ngăn cách bởi dấu phẩy
+                        String countryText = TextUtils.join(", ", countryNames);
+                        // Hiển thị chuỗi thể loại lên TextView
+                        binding.tvCountry.setText(countryText);
+                    }
+
+                    List<MovieDetail.MovieItem.Category> categories = movie.getCategory();
+                    if (categories != null && !categories.isEmpty()) {
+                        // Duyệt qua danh sách thể loại và ghép tên của chúng thành chuỗi
+                        List<String> categoryNames = new ArrayList<>();
+                        for (MovieDetail.MovieItem.Category category : categories) {
+                            categoryNames.add(category.getName());
+                        }
+                        // Chuyển danh sách tên thể loại thành chuỗi, ngăn cách bởi dấu phẩy
+                        String categoryText = TextUtils.join(", ", categoryNames);
+                        // Hiển thị chuỗi thể loại lên TextView
+                        binding.categoryName.setText(categoryText);
+                    }
+
 
                     // Tải poster bằng Glide (poster image and thumbnail)
                     Glide.with(ChiTietActivity.this)
@@ -137,7 +175,7 @@ public class ChiTietActivity extends AppCompatActivity {
                             movieLink = firstServerData.getLinkM3u8();
                             Log.d("MovieDetailActivity", "Link phim tập 1: " + movieLink);
                         }
-                        loadTieuDe(movie);
+
                         tapPhimAdapter.notifyDataSetChanged();
                     } else {
                         Toast.makeText(ChiTietActivity.this, "Không có tập phim nào", Toast.LENGTH_SHORT).show();
@@ -155,13 +193,7 @@ public class ChiTietActivity extends AppCompatActivity {
             }
         });
     }
-    private void loadTieuDe(MovieDetail.MovieItem phim) {
-        binding.textViewTitle.setText(phim.getName());
-        binding.textViewYear.setText("Năm sản xuất: " + phim.getYear());
-        binding.textViewActors.setText("Diễn viên: " + phim.getActor());
-        binding.textViewDirector.setText("Đạo diễn: " + phim.getDirector());
-        binding.textViewDescription.setText("Nội dung phim: " + phim.getContent());
-    }
+
 
 
 
