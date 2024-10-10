@@ -68,12 +68,23 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.SeriesView
             super(binding.getRoot());
             this.binding = binding;
 
-            //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
-            itemView.setOnClickListener(view -> {
-                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
-                Series series = seriesList.get(position);
-                intent.putExtra("slug", series.getSlug());
-                view.getContext().startActivity(intent);
+
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    recyclerViewItemClickListener.onItemClick(view, position);
+//                }
+//            });
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+                    Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                    Series phimbo = seriesList.get(position);
+                    intent.putExtra("slug", phimbo.getSlug());
+                    view.getContext().startActivity(intent);
+                }
             });
         }
 

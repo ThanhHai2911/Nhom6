@@ -65,12 +65,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             super(binding.getRoot());
             this.binding = binding;
 
-            itemView.setOnClickListener(view -> {
-                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
-                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
-                Movie movie = movies.get(position);
-                intent.putExtra("slug", movie.getSlug());
-                view.getContext().startActivity(intent);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    recyclerViewItemClickListener.onItemClick(view, position);
+                }
             });
         }
     }

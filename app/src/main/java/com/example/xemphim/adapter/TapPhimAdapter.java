@@ -1,13 +1,11 @@
 package com.example.xemphim.adapter;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.xemphim.activity.XemPhimActivity;
 import com.example.xemphim.databinding.ItemTapphimBinding;
 import com.example.xemphim.model.MovieDetail;
 
@@ -16,21 +14,15 @@ import java.util.List;
 public class TapPhimAdapter extends RecyclerView.Adapter<TapPhimAdapter.ViewHolder> {
     private Activity context;
     private List<MovieDetail.Episode.ServerData> listTapPhim;
-    private OnEpisodeClickListener onEpisodeClickListener;
+    private static OnRecyclerViewItemClickListener recyclerViewItemClickListener;
 
-    public TapPhimAdapter(Activity context, List<MovieDetail.Episode.ServerData> movies, OnEpisodeClickListener onEpisodeClickListener) {
-        this.onEpisodeClickListener = onEpisodeClickListener;
-        this.listTapPhim = movies;
+    public TapPhimAdapter(Activity context, List<MovieDetail.Episode.ServerData> listTapPhim) {
+        this.listTapPhim = listTapPhim;
         this.context = context;
     }
-
-    public interface OnEpisodeClickListener {
-        void onEpisodeClick(String linkM3u8);
+    public void setRecyclerViewItemClickListener(OnRecyclerViewItemClickListener listener) {
+        recyclerViewItemClickListener = listener;
     }
-    public void setOnEpisodeClickListener(OnEpisodeClickListener onEpisodeClickListener) {
-        this.onEpisodeClickListener = onEpisodeClickListener;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,7 +33,7 @@ public class TapPhimAdapter extends RecyclerView.Adapter<TapPhimAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MovieDetail.Episode.ServerData tapphim = listTapPhim.get(position);
-        holder.binding.btnEpisodesName.setText(tapphim.getName()); // Thiết lập tên tập phim cho đúng mục
+        holder.binding.tvTapPhim.setText(tapphim.getName()); // Thiết lập tên tập phim cho đúng mục
 
         /// Luu Position mới cho Holder
         final int pos = position;
@@ -59,18 +51,18 @@ public class TapPhimAdapter extends RecyclerView.Adapter<TapPhimAdapter.ViewHold
         public ViewHolder(@NonNull ItemTapphimBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            // Xử lý sự kiện khi người dùng nhấn vào tập phim
-            binding.btnEpisodesName.setOnClickListener(v -> {
-                MovieDetail.Episode.ServerData tapphim = listTapPhim.get(position);
-                if (onEpisodeClickListener != null) {
-                    onEpisodeClickListener.onEpisodeClick(tapphim.getLinkM3u8());
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    recyclerViewItemClickListener.onItemClick(view, position);
                 }
-                // Optionally, you could start the new activity directly here if you prefer
-                Intent intent = new Intent(context, XemPhimActivity.class);
-                intent.putExtra("movie_link", tapphim.getLinkM3u8());
-                intent.putExtra("slug", tapphim.getSlug());
-                context.startActivity(intent);
             });
         }
     }
+    // Interface để xử lý sự kiện click
+    public interface OnRecyclerViewItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
 }

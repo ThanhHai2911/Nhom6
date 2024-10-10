@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#C7CDC7"
+    android:background="#C3555555"
     android:padding="10dp">
 
     <LinearLayout
@@ -14,6 +14,7 @@
             android:id="@+id/imageViewthumburl"
             android:layout_width="match_parent"
             android:layout_height="242dp"
+            android:src="@drawable/thumb_url"
             android:scaleType="centerCrop" />
 
         <LinearLayout
@@ -27,7 +28,8 @@
                 android:layout_width="148dp"
                 android:layout_height="217dp"
                 android:elevation="8dp"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/poster_url"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -37,51 +39,179 @@
 
                 <TextView
                     android:id="@+id/textViewTitle"
-                    android:layout_width="222dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
-                    android:layout_marginTop="16dp"
-                    android:textColor="@android:color/black"
-                    android:textSize="25sp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="Biệt đội đánh thuê 4"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/textViewYear"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="2dp"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Thời lượng: " />
+
+                    <TextView
+                        android:id="@+id/tv_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="4dp"
+                        android:text="103 phút "
+
+                        android:textColor="#9CFFFFFF"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="2dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Quốc gia: " />
+
+                    <TextView
+                        android:id="@+id/tv_country"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="4dp"
+                        android:text="Việt Nam "
+                        android:textColor="#9CFFFFFF"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@android:color/black"
-                    android:layout_gravity="start"/>
+                    android:layout_marginVertical="2dp"
+                    android:orientation="horizontal"
+                    android:paddingBottom="7dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Năm sản xuất: " />
 
-                <TextView
-                    android:id="@+id/textViewDirector"
+                    <TextView
+                        android:id="@+id/textViewYear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="4dp"
+                        android:text="2024"
+                        android:textColor="#9CFFFFFF"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="4dp"
-                    android:textColor="@android:color/black"
-                    android:textSize="20sp" />
+                    android:layout_marginVertical="2dp"
+                    android:orientation="horizontal"
+                    android:paddingBottom="7dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Tác giả: " />
+
+                    <TextView
+                        android:id="@+id/textViewDirector"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_marginTop="4dp"
+                        android:text="Nguyễn Hảo"
+                        android:textColor="#9CFFFFFF"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="2dp"
+                    android:orientation="horizontal"
+                    android:paddingBottom="7dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Thể Loại: " />
+
+                    <TextView
+                        android:id="@+id/category_name"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/textview_border"
+                        android:paddingHorizontal="5dp"
+                        android:text="Hành động, Hài hước, Kịch"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+
 
 
             </LinearLayout>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textColor="@color/white"
+                android:text="Diễn viên: "
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/textViewActors"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:text=""
+                android:textColor="#9CFFFFFF"
+                android:textSize="20sp" />
+        </LinearLayout>
+
         <TextView
-            android:id="@+id/textViewActors"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="4dp"
-            android:text="Diễn viên: "
-            android:textColor="@android:color/black"
-            android:textSize="20sp" />
-
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="30dp"
+            android:text="Nội dung phim"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
         <TextView
             android:id="@+id/textViewDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
-            android:text="Nội dung phim: "
-            android:textColor="@android:color/black"
+            android:text=""
+            android:textColor="#9CFFFFFF"
             android:textSize="20sp" />
 
         <Button
