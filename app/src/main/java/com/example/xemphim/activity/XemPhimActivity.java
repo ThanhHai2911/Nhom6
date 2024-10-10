@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -14,14 +12,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.bumptech.glide.Glide;
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityXemphimBinding; // Import View Binding
-import com.example.xemphim.model.ChiTietPhim;
-import com.example.xemphim.model.LinkPhim;
-import com.example.xemphim.model.Movie;
+import com.example.xemphim.model.MovieDetail;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
@@ -33,8 +28,6 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.ssl.X509ExtendedKeyManager;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,7 +38,7 @@ public class XemPhimActivity extends AppCompatActivity {
     private ImageButton btnFullScreen;
     private boolean isFullScreen = false;
     private TapPhimAdapter tapPhimAdapter;
-    private List<LinkPhim> serverDataList = new ArrayList<>();
+    private List<MovieDetail.Episode.ServerData> serverDataList = new ArrayList<>();
     private String movieLink;
     private ApiService apiService;
     private String movieSlug;
@@ -123,18 +116,18 @@ public class XemPhimActivity extends AppCompatActivity {
         exoPlayer.seekTo(currentPosition);
     }
     private void loadMovieDetails() {
-        Call<ChiTietPhim> call = apiService.getMovieDetail(movieSlug);
-        call.enqueue(new Callback<ChiTietPhim>() {
+        Call<MovieDetail> call = apiService.getMovieDetail(movieSlug);
+        call.enqueue(new Callback<MovieDetail>() {
             @Override
-            public void onResponse(Call<ChiTietPhim> call, Response<ChiTietPhim> response) {
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ChiTietPhim movieDetails = response.body();
-                    List<LinkPhim> tapPhim = movieDetails.getEpisodes();
+                    MovieDetail movieDetails = response.body();
+                    List<MovieDetail.Episode> tapPhim = movieDetails.getEpisodes();
                     binding.tvMovieTitle.setText(movieDetails.getMovie().getName());
                     if (tapPhim != null && !tapPhim.isEmpty()) {
                         serverDataList.clear();
-                        for (LinkPhim episode : tapPhim) {
-                            List<LinkPhim> data = episode.getServerData();
+                        for (MovieDetail.Episode episode : tapPhim) {
+                            List<MovieDetail.Episode.ServerData> data = episode.getServerData();
                             if (data != null) {
                                 serverDataList.addAll(data);
                             }
@@ -159,7 +152,7 @@ public class XemPhimActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ChiTietPhim> call, Throwable t) {
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Toast.makeText(XemPhimActivity.this, "Failed to load movie details", Toast.LENGTH_SHORT).show();
             }
         });

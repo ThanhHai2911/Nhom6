@@ -15,9 +15,7 @@ import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityChitietphimBinding;
-import com.example.xemphim.model.ChiTietPhim;
-import com.example.xemphim.model.LinkPhim;
-import com.example.xemphim.model.Movie;
+import com.example.xemphim.model.MovieDetail;
 
 
 import retrofit2.Call;
@@ -31,7 +29,7 @@ import java.util.List;
 
 public class ChiTietActivity extends AppCompatActivity {
     private String movieSlug;
-    private List<LinkPhim> serverDataList = new ArrayList<>();
+    private List<MovieDetail.Episode.ServerData> serverDataList = new ArrayList<>();
     private RecyclerView rcvTapPhim;
     private ActivityChitietphimBinding binding;
     private ApiService apiService;
@@ -77,13 +75,13 @@ public class ChiTietActivity extends AppCompatActivity {
     private void loadMovieDetails(String slug) {
 
         // Ensure apiService is initialized before calling this
-        Call<ChiTietPhim> call = apiService.getMovieDetail(slug);
-        call.enqueue(new Callback<ChiTietPhim>() {
+        Call<MovieDetail> call = apiService.getMovieDetail(slug);
+        call.enqueue(new Callback<MovieDetail>() {
             @Override
-            public void onResponse(Call<ChiTietPhim> call, Response<ChiTietPhim> response) {
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // Get movie details from the response
-                    Movie movie = response.body().getMovie();  // Assuming the response returns a Movie object
+                    MovieDetail.MovieItem movie = response.body().getMovie();  // Assuming the response returns a Movie object
 
                     // Hiển thị thông tin phim using ViewBinding
                     binding.textViewTitle.setText(movie.getName());
@@ -94,20 +92,20 @@ public class ChiTietActivity extends AppCompatActivity {
 
                     // Tải poster bằng Glide (poster image and thumbnail)
                     Glide.with(ChiTietActivity.this)
-                            .load(movie.getThumb_url())
+                            .load(movie.getThumbUrl())
                             .into(binding.imageViewthumburl);  // Use correct binding ID
 
                     Glide.with(ChiTietActivity.this)
-                            .load(movie.getPoster_url())
+                            .load(movie.getPosterUrl())
                             .into(binding.imageViewPoster);  // Use correct binding ID
 
                     // Lấy danh sách các tập phim
-                    List<LinkPhim> tapPhim = response.body().getEpisodes();
+                    List<MovieDetail.Episode> tapPhim = response.body().getEpisodes();
                     if (tapPhim != null && !tapPhim.isEmpty()) {
                         // Lưu danh sách các tập phim
                         serverDataList.clear(); // Xóa danh sách cũ
-                        for (LinkPhim episode : tapPhim) {
-                            List<LinkPhim> data = episode.getServerData();
+                        for (MovieDetail.Episode episode : tapPhim) {
+                            List<MovieDetail.Episode.ServerData> data = episode.getServerData();
                             if (data != null) {
                                 serverDataList.addAll(data); // Thêm tất cả các tập phim vào danh sách
                             }
@@ -128,7 +126,7 @@ public class ChiTietActivity extends AppCompatActivity {
                         rcvTapPhim.setAdapter(tapPhimAdapter);
 
                         // Lấy link của tập đầu tiên
-                        LinkPhim firstServerData = serverDataList.get(0);
+                        MovieDetail.Episode.ServerData firstServerData = serverDataList.get(0);
                         if (firstServerData != null) {
                             movieLink = firstServerData.getLinkM3u8();
                             Log.d("MovieDetailActivity", "Link phim tập 1: " + movieLink);
@@ -145,12 +143,12 @@ public class ChiTietActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ChiTietPhim> call, Throwable t) {
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Toast.makeText(ChiTietActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
-    private void loadTieuDe(Movie phim) {
+    private void loadTieuDe(MovieDetail.MovieItem phim) {
         binding.textViewTitle.setText(phim.getName());
         binding.textViewYear.setText("Năm sản xuất: " + phim.getYear());
         binding.textViewActors.setText("Diễn viên: " + phim.getActor());

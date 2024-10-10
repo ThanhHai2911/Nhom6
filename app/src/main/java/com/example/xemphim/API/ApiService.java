@@ -1,6 +1,6 @@
 package com.example.xemphim.API;
 
-import com.example.xemphim.model.ChiTietPhim;
+import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
 
@@ -21,7 +21,7 @@ public interface ApiService {
     Call<SeriesResponse> getSeries();
 
     @GET("phim/{slug}")
-    Call<ChiTietPhim> getMovieDetail(@Path("slug") String slug);
+    Call<MovieDetail> getMovieDetail(@Path("slug") String slug);
 
     @GET("v1/api/danh-sach/tv-shows")
     Call<SeriesResponse> getTVShow();

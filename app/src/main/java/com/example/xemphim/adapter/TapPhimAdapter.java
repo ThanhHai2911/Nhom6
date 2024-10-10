@@ -8,19 +8,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.activity.XemPhimActivity;
-import com.example.xemphim.databinding.ItemMovieBinding;
 import com.example.xemphim.databinding.ItemTapphimBinding;
-import com.example.xemphim.model.LinkPhim;
-import com.example.xemphim.model.Movie;
+import com.example.xemphim.model.MovieDetail;
 
 import java.util.List;
 
 public class TapPhimAdapter extends RecyclerView.Adapter<TapPhimAdapter.ViewHolder> {
     private Activity context;
-    private List<LinkPhim> listTapPhim;
+    private List<MovieDetail.Episode.ServerData> listTapPhim;
     private OnEpisodeClickListener onEpisodeClickListener;
 
-    public TapPhimAdapter(Activity context, List<LinkPhim> movies, OnEpisodeClickListener onEpisodeClickListener) {
+    public TapPhimAdapter(Activity context, List<MovieDetail.Episode.ServerData> movies, OnEpisodeClickListener onEpisodeClickListener) {
         this.onEpisodeClickListener = onEpisodeClickListener;
         this.listTapPhim = movies;
         this.context = context;
@@ -42,7 +40,7 @@ public class TapPhimAdapter extends RecyclerView.Adapter<TapPhimAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        LinkPhim tapphim = listTapPhim.get(position);
+        MovieDetail.Episode.ServerData tapphim = listTapPhim.get(position);
         holder.binding.btnEpisodesName.setText(tapphim.getName()); // Thiết lập tên tập phim cho đúng mục
 
         /// Luu Position mới cho Holder
@@ -63,7 +61,7 @@ public class TapPhimAdapter extends RecyclerView.Adapter<TapPhimAdapter.ViewHold
             this.binding = binding;
             // Xử lý sự kiện khi người dùng nhấn vào tập phim
             binding.btnEpisodesName.setOnClickListener(v -> {
-                LinkPhim tapphim = listTapPhim.get(position);
+                MovieDetail.Episode.ServerData tapphim = listTapPhim.get(position);
                 if (onEpisodeClickListener != null) {
                     onEpisodeClickListener.onEpisodeClick(tapphim.getLinkM3u8());
                 }
