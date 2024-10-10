@@ -3,6 +3,7 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -13,9 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
+import com.example.xemphim.adapter.SeriesAdapter;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityChitietphimBinding;
+import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
+import com.example.xemphim.model.Series;
 
 
 import retrofit2.Call;
@@ -35,6 +39,7 @@ public class ChiTietActivity extends AppCompatActivity {
     private ApiService apiService;
     private TapPhimAdapter tapPhimAdapter;
     private String movieLink;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,16 +115,17 @@ public class ChiTietActivity extends AppCompatActivity {
                                 serverDataList.addAll(data); // Thêm tất cả các tập phim vào danh sách
                             }
                         }
-
+                        tapPhimAdapter = new TapPhimAdapter(ChiTietActivity.this, serverDataList);
                         // Cập nhật RecyclerView với danh sách tập phim
-                        // Cập nhật RecyclerView với danh sách tập phim
-                        tapPhimAdapter = new TapPhimAdapter(ChiTietActivity.this, serverDataList, new TapPhimAdapter.OnEpisodeClickListener() {
+                        tapPhimAdapter.setRecyclerViewItemClickListener(new TapPhimAdapter.OnRecyclerViewItemClickListener() {
                             @Override
-                            public void onEpisodeClick(String linkM3u8) {
-                                // Khi người dùng click vào tập phim
-                                Intent intent = new Intent(ChiTietActivity.this, XemPhimActivity.class);
-                                intent.putExtra("movie_link", linkM3u8);
-                                startActivity(intent);
+                            public void onItemClick(View view, int position) {
+                                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+                                Intent intent = new Intent(view.getContext(), XemPhimActivity.class);
+                                MovieDetail.Episode.ServerData tapphim = serverDataList.get(position);
+                                intent.putExtra("movie_link", tapphim.getLinkM3u8());
+                                intent.putExtra("slug", tapphim.getSlug());
+                                view.getContext().startActivity(intent);
                             }
                         });
 
@@ -132,6 +138,7 @@ public class ChiTietActivity extends AppCompatActivity {
                             Log.d("MovieDetailActivity", "Link phim tập 1: " + movieLink);
                         }
                         loadTieuDe(movie);
+                        tapPhimAdapter.notifyDataSetChanged();
                     } else {
                         Toast.makeText(ChiTietActivity.this, "Không có tập phim nào", Toast.LENGTH_SHORT).show();
                     }

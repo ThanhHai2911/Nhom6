@@ -9,8 +9,8 @@
     app:cardElevation="4dp"
     app:cardBackgroundColor="@android:color/transparent">
 
-    <Button
-        android:id="@+id/btn_episodesName"
+    <TextView
+        android:id="@+id/tvTapPhim"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Tập 001"
@@ -22,7 +22,7 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         app:cornerRadius="15dp"
-        android:backgroundTint="#F45A8F"
+        android:background="#F45A8F"
         app:elevation="0dp"/>
 
 </androidx.cardview.widget.CardView>

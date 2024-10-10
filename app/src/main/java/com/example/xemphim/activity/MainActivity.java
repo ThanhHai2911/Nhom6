@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private String movieSlug;
     private PopupWindow popupWindow;
+    private MovieAdapter movieAdapter;
+    private SeriesAdapter seriesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
         swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
-        movieSlug = getIntent().getStringExtra("slug");
         swipeRefreshLayout.setOnRefreshListener(() -> {
             loadMovies(); // Tải lại danh sách phim
             loadSeries(); // Tải lại danh sach phim bo
@@ -99,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference myRef = database.getReference("message");
 
         myRef.setValue("Hello, World!");
+
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
          // Nạp menu
@@ -195,7 +198,20 @@ public class MainActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<Movie> movies = response.body().getItems();
-                    binding.recyclerViewMovies.setAdapter(new MovieAdapter(MainActivity.this, movies));
+                    // Khởi tạo MovieAdapter
+                    movieAdapter = new MovieAdapter(MainActivity.this, movies);
+                    // Thiết lập sự kiện click cho từng item
+                    movieAdapter.setRecyclerViewItemClickListener(new MovieAdapter.OnRecyclerViewItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+                            Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                            Movie movie = movies.get(position);
+                            intent.putExtra("slug", movie.getSlug());
+                            view.getContext().startActivity(intent);
+                        }
+                    });
+                    binding.recyclerViewMovies.setAdapter(movieAdapter);
                 }
             }
 
@@ -311,9 +327,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void laydulieu() {
-
-    }
 
 
 

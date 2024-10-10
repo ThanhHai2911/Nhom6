@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -133,11 +134,18 @@ public class XemPhimActivity extends AppCompatActivity {
                             }
                         }
 
-                        tapPhimAdapter = new TapPhimAdapter(XemPhimActivity.this, serverDataList, linkM3u8 -> {
-                            Intent intent = new Intent(XemPhimActivity.this, XemPhimActivity.class);
-                            intent.putExtra("movie_link", linkM3u8);
-                            intent.putExtra("slug", movieSlug);
-                            startActivity(intent);
+                        tapPhimAdapter = new TapPhimAdapter(XemPhimActivity.this, serverDataList);
+                        // Cập nhật RecyclerView với danh sách tập phim
+                        tapPhimAdapter.setRecyclerViewItemClickListener(new TapPhimAdapter.OnRecyclerViewItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+                                Intent intent = new Intent(view.getContext(), XemPhimActivity.class);
+                                MovieDetail.Episode.ServerData tapphim = serverDataList.get(position);
+                                intent.putExtra("movie_link", tapphim.getLinkM3u8());
+                                intent.putExtra("slug", tapphim.getSlug());
+                                view.getContext().startActivity(intent);
+                            }
                         });
 
                         binding.rcvTapPhim.setAdapter(tapPhimAdapter);
