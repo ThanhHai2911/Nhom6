@@ -17,6 +17,15 @@ public class MovieDetail {
     @SerializedName("episodes")
     private List<Episode> episodes;
 
+    public MovieDetail(String movieId, String movieTitle, String episodeCurrent, String posterUrl, String linkM3u8) {
+        this.movie = new MovieItem();
+        this.movie.setId(movieId);
+        this.movie.setName(movieTitle);
+        this.movie.setEpisodeCurrent(episodeCurrent);
+        this.movie.setPosterUrl(posterUrl);
+        this.movie.setThumbUrl(linkM3u8);
+    }
+
     // Getters and setters
 
     public boolean isStatus() {
