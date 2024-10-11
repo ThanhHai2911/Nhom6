@@ -1,6 +1,5 @@
 package com.example.xemphim.activity;
 
-import android.content.Intent;
 import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -69,6 +68,7 @@ public class XemPhimActivity extends AppCompatActivity {
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
+
     }
 
     private void initializePlayer() {
@@ -142,7 +142,10 @@ public class XemPhimActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieDetail movieDetails = response.body();
                     List<MovieDetail.Episode> tapPhim = movieDetails.getEpisodes();
+                    String movieTitle = movieDetails.getMovie().getName();
+                    String episodeName = getIntent().getStringExtra("episodeCurrent");
                     binding.tvMovieTitle.setText(movieDetails.getMovie().getName());
+                    binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
                     if (tapPhim != null && !tapPhim.isEmpty()) {
                         serverDataList.clear();
                         for (MovieDetail.Episode episode : tapPhim) {
@@ -157,11 +160,13 @@ public class XemPhimActivity extends AppCompatActivity {
                         tapPhimAdapter.setRecyclerViewItemClickListener(new TapPhimAdapter.OnRecyclerViewItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
-                                // Get the link for the selected episode
                                 MovieDetail.Episode.ServerData selectedEpisode = serverDataList.get(position);
                                 String newMovieLink = selectedEpisode.getLinkM3u8();
+                                //Hien thi ten tap phim  dang xem
+                                String movieTitle = movieDetails.getMovie().getName();
+                                String episodeName = selectedEpisode.getName();
+                                binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
 
-                                // Load and play the selected episode
                                 playEpisode(newMovieLink);
                             }
                         });

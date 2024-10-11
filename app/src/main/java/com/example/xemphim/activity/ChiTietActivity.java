@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,11 +35,11 @@ import java.util.List;
 public class ChiTietActivity extends AppCompatActivity {
     private String movieSlug;
     private List<MovieDetail.Episode.ServerData> serverDataList = new ArrayList<>();
-    private RecyclerView rcvTapPhim;
     private ActivityChitietphimBinding binding;
     private ApiService apiService;
     private TapPhimAdapter tapPhimAdapter;
     private String movieLink;
+    private MovieDetail.Episode.ServerData movieDetails;
 
 
     @Override
@@ -47,12 +48,6 @@ public class ChiTietActivity extends AppCompatActivity {
         binding = ActivityChitietphimBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setEvent();
-        setContol();
-    }
-    private void setContol() {
-        rcvTapPhim = binding.rcvTapPhim;
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
-        rcvTapPhim.setLayoutManager(layoutManager);
     }
 
     private void setEvent() {
@@ -65,10 +60,12 @@ public class ChiTietActivity extends AppCompatActivity {
 //        // Xử lý sự kiện click nút xem phim
         binding.btnXemPhim.setOnClickListener(view -> {
             if (movieLink != null && !movieLink.isEmpty()) {
+                String episodeCurrent = serverDataList.get(0).getName();
                 // Khởi động activity phát video
                 Intent intent = new Intent(this, XemPhimActivity.class);
                 intent.putExtra("movie_link", movieLink);  // Truyền link phim
                 intent.putExtra("slug", movieSlug);
+                intent.putExtra("episodeCurrent", episodeCurrent);
                 startActivity(intent);
             } else {
                 Toast.makeText(ChiTietActivity.this, "Link phim không khả dụng", Toast.LENGTH_SHORT).show();
@@ -78,6 +75,7 @@ public class ChiTietActivity extends AppCompatActivity {
     }
 
     private void loadMovieDetails(String slug) {
+        binding.progressBar.setVisibility(View.VISIBLE);
         // Ensure apiService is initialized before calling this
         Call<MovieDetail> call = apiService.getMovieDetail(slug);
         call.enqueue(new Callback<MovieDetail>() {
@@ -166,8 +164,6 @@ public class ChiTietActivity extends AppCompatActivity {
                             }
                         });
 
-                        rcvTapPhim.setAdapter(tapPhimAdapter);
-
                         // Lấy link của tập đầu tiên
                         MovieDetail.Episode.ServerData firstServerData = serverDataList.get(0);
                         if (firstServerData != null) {
@@ -176,6 +172,9 @@ public class ChiTietActivity extends AppCompatActivity {
                         }
 
                         tapPhimAdapter.notifyDataSetChanged();
+
+                        binding.progressBar.setVisibility(View.GONE);
+                        binding.scvChitiet.setVisibility(View.VISIBLE);
                     } else {
                         Toast.makeText(ChiTietActivity.this, "Không có tập phim nào", Toast.LENGTH_SHORT).show();
                     }
@@ -189,6 +188,7 @@ public class ChiTietActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Toast.makeText(ChiTietActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                binding.progressBar.setVisibility(View.GONE);
             }
         });
     }
