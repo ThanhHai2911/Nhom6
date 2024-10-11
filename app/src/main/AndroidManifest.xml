@@ -15,15 +15,6 @@
         android:theme="@style/Theme.AppXemPhim"
         tools:targetApi="31">
         <activity
-            android:name=".activity.PhimYeuThich"
-            android:exported="false" />
-        <activity
-            android:name=".activity.LichSuXemPhim"
-            android:exported="false" />
-        <activity
-            android:name=".activity.CaiDat"
-            android:exported="false" />
-        <activity
             android:name=".activity.DangKyActivity"
             android:exported="false" />
         <activity

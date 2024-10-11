@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -43,7 +44,7 @@ import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -62,10 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
         apiService = ApiClient.getClient().create(ApiService.class);
         // Thiết lập ActionBar và DrawerLayout
-        setSupportActionBar(binding.toobar1);
+        setSupportActionBar(binding.toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, binding.drawerlayout, binding.toobar1,
+                this, binding.drawerlayout, binding.toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close
         );
 
@@ -96,13 +97,42 @@ public class MainActivity extends AppCompatActivity {
         loadPhimLe();
         loadPhimHoatHinh();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-
-        myRef.setValue("Hello, World!");
+        navigationBottom();
 
     }
+    private void navigationBottom() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
+        // Đặt item mặc định được chọn là màn hình Home
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+
+        // Xử lý sự kiện chọn item của Bottom Navigation
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent = null;
+                if (item.getItemId() == R.id.nav_home) {
+                    intent = new Intent(MainActivity.this, MainActivity.class);
+                } else if (item.getItemId() == R.id.nav_vip) {
+                    intent = new Intent(MainActivity.this, VipActivity.class);
+                } else if (item.getItemId() == R.id.nav_download) {
+                    intent = new Intent(MainActivity.this, DownLoadActivity.class);
+                } else if (item.getItemId() == R.id.nav_profile) {
+                    intent = new Intent(MainActivity.this, ProfileActivity.class);
+
+                }
+                // Pass the selected item to the new Activity
+                if (intent != null) {
+                    intent.putExtra("selected_item_id", item.getItemId());
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);  // No animation for smooth transition
+                    return true;
+                }
+                return false;
+
+            }
+        });
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
          // Nạp menu
