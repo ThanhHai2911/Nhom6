@@ -39,7 +39,7 @@ public class ChiTietActivity extends AppCompatActivity {
     private ApiService apiService;
     private TapPhimAdapter tapPhimAdapter;
     private String movieLink;
-    private MovieDetail.Episode.ServerData movieDetails;
+    private MovieDetail.MovieItem movieDetails;
 
 
     @Override
@@ -60,6 +60,7 @@ public class ChiTietActivity extends AppCompatActivity {
 //        // Xử lý sự kiện click nút xem phim
         binding.btnXemPhim.setOnClickListener(view -> {
             if (movieLink != null && !movieLink.isEmpty()) {
+               // saveWatchedMovie(movieDetails.getId(), movieDetails.getName(), movieDetails.getEpisodeCurrent(), movieDetails.getPosterUrl(), movieLink);
                 String episodeCurrent = serverDataList.get(0).getName();
                 // Khởi động activity phát video
                 Intent intent = new Intent(this, XemPhimActivity.class);
@@ -73,6 +74,24 @@ public class ChiTietActivity extends AppCompatActivity {
         });
 
     }
+
+//    private void saveWatchedMovie(String movieId, String movieTitle, String episodeCurrent, String posterUrl,String linkM3u8) {
+//        // Get a reference to the Firebase Firestore or Realtime Database
+//        FirebaseFirestore db = FirebaseFirestore.getInstance(); // For Firestore
+//        // DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("watched_movies"); // For Realtime Database
+//
+//        MovieDetail watchedMovie = new MovieDetail(movieId,movieTitle, episodeCurrent, posterUrl, linkM3u8);
+//
+//        // Save to Firestore
+//        db.collection("watched_movies").document(movieId) // Use movieId as document ID to avoid duplicates
+//                .set(watchedMovie)
+//                .addOnSuccessListener(aVoid -> {
+//                    Log.d("Firestore", "DocumentSnapshot successfully written!");
+//                })
+//                .addOnFailureListener(e -> {
+//                    Log.w("Firestore", "Error writing document", e);
+//                });
+//    }
 
     private void loadMovieDetails(String slug) {
         binding.progressBar.setVisibility(View.VISIBLE);

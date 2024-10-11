@@ -8,6 +8,7 @@
     android:background="@drawable/hinhnen">
 
     <ImageView
+        android:id="@+id/ic_back"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="-5dp"
@@ -57,16 +58,17 @@
             android:padding="10dp"
             android:drawableStart="@drawable/baseline_people_24"/>
         <EditText
-            android:id="@+id/edtSDT"
+            android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:background="@drawable/edittext_border"
             android:backgroundTint="#CCCCCC"
-            android:hint=" Số Điện Thoại"
-            android:inputType="text"
+            android:hint=" Email"
+            android:inputType="textEmailAddress"
             android:padding="10dp"
-            android:drawableStart="@drawable/baseline_phone_24"/>
+            android:drawableStart="@drawable/baseline_email_24"/>
+
 
         <!-- Password Input -->
         <EditText
