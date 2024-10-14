@@ -52,7 +52,7 @@
         <activity android:name=".activity.ChiTietActivity" />
         <activity android:name=".activity.XemPhimActivity" />
         <activity android:name=".activity.LichSuXemActivity" />
-        <activity android:name=".activity.ThanhToanActivity"/>
+        <activity android:name=".activity.FavoriteMoviesActivity" />
     </application>
 
 </manifest>

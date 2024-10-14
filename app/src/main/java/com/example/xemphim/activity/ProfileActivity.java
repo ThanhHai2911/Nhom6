@@ -86,6 +86,14 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        binding.dsYeuThich.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Chuyển đến FavoriteMoviesActivity
+                Intent intent = new Intent(ProfileActivity.this, FavoriteMoviesActivity.class);
+                startActivity(intent);
+            }
+        });
         setupBottomNavigation();
         loadWatchHistory();
     }
