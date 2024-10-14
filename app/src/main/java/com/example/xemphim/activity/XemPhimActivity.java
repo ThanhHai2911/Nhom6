@@ -17,6 +17,7 @@ import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityXemphimBinding; // Import View Binding
+import com.example.xemphim.model.FavoriteMovie;
 import com.example.xemphim.model.MovieDetail;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
@@ -25,6 +26,8 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +46,8 @@ public class XemPhimActivity extends AppCompatActivity {
     private String movieLink;
     private ApiService apiService;
     private String movieSlug;
+    private ImageButton btnAddToFavorites; // Thêm biến cho nút yêu thích
+    private DatabaseReference favoritesRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +63,16 @@ public class XemPhimActivity extends AppCompatActivity {
     public void setControl() {
         // Gán View cho các biến
         btnFullScreen = binding.btnFullScreen; // Gán nút toàn màn hình
+        btnAddToFavorites = binding.btnAddToFavorites;
         binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 4)); // Thiết lập RecyclerView
+        favoritesRef = FirebaseDatabase.getInstance().getReference("favorites");
     }
 
     public void setEvent() {
         initializePlayer();
         // Thiết lập sự kiện cho nút toàn màn hình
         movieSlug = getIntent().getStringExtra("slug");
+        btnAddToFavorites.setOnClickListener(v -> addToFavorites());
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
@@ -108,6 +116,18 @@ public class XemPhimActivity extends AppCompatActivity {
             exoPlayer.prepare();
             exoPlayer.play(); // Start playback immediately
         }
+    }
+    private void addToFavorites() {
+        // Lấy thông tin phim hiện tại
+        String movieId = movieSlug; // Hoặc bất kỳ ID nào bạn có cho phim
+        String movieTitle = binding.tvMovieTitle.getText().toString();
+        String movieLink = serverDataList.get(0).getLinkM3u8(); // Link tập phim đầu tiên
+        FavoriteMovie favoriteMovie = new FavoriteMovie(movieId, movieTitle, movieLink, movieSlug);
+
+        // Lưu vào Firebase
+        favoritesRef.child(movieId).setValue(favoriteMovie)
+                .addOnSuccessListener(aVoid -> Toast.makeText(XemPhimActivity.this, "Đã thêm vào yêu thích!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void toggleFullScreen() {
