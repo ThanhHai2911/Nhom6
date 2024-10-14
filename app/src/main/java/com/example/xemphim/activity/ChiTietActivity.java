@@ -1,6 +1,7 @@
 package com.example.xemphim.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -28,6 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
@@ -37,9 +39,12 @@ import retrofit2.Response;
 
 import android.text.TextUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ChiTietActivity extends AppCompatActivity {
@@ -51,15 +56,20 @@ public class ChiTietActivity extends AppCompatActivity {
     private String movieLink;
     private MovieDetail.MovieItem movieDetails;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private DatabaseReference usersRef = database.getReference("users");
     private FirebaseAuth mAuth;
-
+    private String idUser;
+    private  String nameUser;
+    private String emailUser;
+    private int idLoaiND;
+    private DatabaseReference lichSuXemRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChitietphimBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
+        laythongtinUser();
         setEvent();
     }
 
@@ -76,7 +86,7 @@ public class ChiTietActivity extends AppCompatActivity {
 
                 String episodeCurrent = serverDataList.get(0).getName();
                 // Lưu lịch sử xem phim
-                saveWatchHistory(movieSlug, movieLink, episodeCurrent);
+                luuLichSuXem(movieSlug);
                 // Khởi động activity phát video
                 Intent intent = new Intent(this, XemPhimActivity.class);
                 intent.putExtra("movie_link", movieLink);  // Truyền link phim
@@ -89,56 +99,69 @@ public class ChiTietActivity extends AppCompatActivity {
         });
     }
 
-    private void saveWatchHistory(String movieSlug, String movieLink, String episodeCurrent) {
-        // Get the current authenticated user
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Toast.makeText(this, "Please log in to save your watch history.", Toast.LENGTH_SHORT).show();
+    private void luuLichSuXem(String movieSlug) {
+        if (idUser == null || movieSlug == null) {
+            Toast.makeText(ChiTietActivity.this, "Không thể lưu lịch sử, thiếu thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Get user ID
-        String userId = user.getUid();
-
-        // Reference to the user's watch history in Firebase
-        DatabaseReference userHistoryRef = FirebaseDatabase.getInstance()
-                .getReference("LichSuXem")
-                .child(userId); // Using user ID to organize history
-
-        // Query to check if the movie already exists
-        userHistoryRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+        // Query để kiểm tra xem slug đã tồn tại cho user này chưa
+        Query query = lichSuXemRef.orderByChild("id_user").equalTo(idUser);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // If the movie already exists, update it
-                if (snapshot.exists()) {
-                    for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
-                        // Update the existing movie data
-                        movieSnapshot.getRef().updateChildren(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(ChiTietActivity.this, "Watch history updated!", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(ChiTietActivity.this, "Failed to update watch history.", Toast.LENGTH_SHORT).show();
-                                });
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean exists = false;
+
+                // Duyệt qua các bản ghi lịch sử xem phim của user
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String existingSlug = snapshot.child("slug").getValue(String.class);
+                    if (existingSlug != null && existingSlug.equals(movieSlug)) {
+                        exists = true; // Slug đã tồn tại
+                        break;
                     }
+                }
+
+                if (exists) {
+                    // Slug đã tồn tại, không thêm lịch sử xem phim mới
+                    Toast.makeText(ChiTietActivity.this, "Phim này đã có trong lịch sử xem của bạn", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Prepare the movie data to be saved
-                    userHistoryRef.push().setValue(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(ChiTietActivity.this, "Watch history saved!", Toast.LENGTH_SHORT).show();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(ChiTietActivity.this, "Failed to save watch history.", Toast.LENGTH_SHORT).show();
-                            });
+                    // Slug chưa tồn tại, tiến hành thêm mới
+                    addNewMovieHistory(movieSlug);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ChiTietActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(ChiTietActivity.this, "Lỗi khi kiểm tra lịch sử", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    // Hàm để thêm mới lịch sử xem phim nếu slug chưa tồn tại
+    private void addNewMovieHistory(String movieSlug) {
+        // Tạo ID mới cho lịch sử xem phim
+        String idLichSuXem = lichSuXemRef.push().getKey();
+
+        // Tạo thời gian xem phim (watched_at)
+        String watchedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        // Tạo bản ghi lịch sử xem phim
+        Map<String, Object> lichSuXem = new HashMap<>();
+        lichSuXem.put("id_user", idUser);
+        lichSuXem.put("slug", movieSlug); // slug của phim
+        lichSuXem.put("watched_at", watchedAt);
+
+        // Lưu vào Firebase dưới node `LichSuXem`
+        lichSuXemRef.child(idLichSuXem).setValue(lichSuXem)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(ChiTietActivity.this, "Lưu lịch sử xem phim thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ChiTietActivity.this, "Lưu lịch sử xem phim thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 
     // Helper method to create the movie data map
     private Map<String, Object> createMovieDataMap(String movieSlug, String movieLink, String episodeCurrent, String userId) {
@@ -150,7 +173,14 @@ public class ChiTietActivity extends AppCompatActivity {
         return movieData;
     }
 
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+        nameUser = sharedPreferences.getString("name", null);
+        emailUser  = sharedPreferences.getString("email", null);
+        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
 
+    }
 
     private void loadMovieDetails(String slug) {
         binding.progressBar.setVisibility(View.VISIBLE);
