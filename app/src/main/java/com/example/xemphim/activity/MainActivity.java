@@ -23,6 +23,7 @@ import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.Series;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -43,6 +44,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private MovieAdapter movieAdapter;
     private SeriesAdapter seriesAdapter;
     private String idUser;
-    private String nameUser;
+    private  String nameUser;
     private String emailUser;
     private int idLoaiND;
 
@@ -67,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         // truy cập thông tin người dùng.
         laythongtinUser();
-
         Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
+        updateUser();
+
         apiService = ApiClient.getClient().create(ApiService.class);
         // Thiết lập ActionBar và DrawerLayout
         setSupportActionBar(binding.toolbar);
@@ -117,6 +120,19 @@ public class MainActivity extends AppCompatActivity {
         emailUser  = sharedPreferences.getString("email", null);
         idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
 
+    }
+    private void updateUser(){
+        // Tham chiếu đến NavigationView
+        NavigationView navigationView = findViewById(R.id.navigationView);  // Giả sử NavigationView có id là nav_view
+
+        // Lấy header view từ NavigationView
+        View headerView = navigationView.getHeaderView(0);
+
+        // Tham chiếu đến TextView trong header view
+        TextView textView = headerView.findViewById(R.id.tvTenNguoiDung); // Thay bằng id của TextView trong layout_header
+
+        // Thay đổi nội dung TextView
+        textView.setText(nameUser);
     }
     private void navigationBottom() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
