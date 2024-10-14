@@ -14,7 +14,6 @@ import com.example.xemphim.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class DownLoadActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

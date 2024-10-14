@@ -71,5 +71,5 @@
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="selected"
-        android:background="@color/meBlack"/>
+        android:background="@color/bottom_nav_unselected"/>
 </FrameLayout>

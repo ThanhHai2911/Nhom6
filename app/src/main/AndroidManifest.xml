@@ -51,6 +51,7 @@
         </activity>
         <activity android:name=".activity.ChiTietActivity" />
         <activity android:name=".activity.XemPhimActivity" />
+        <activity android:name=".activity.LichSuXemActivity" />
     </application>
 
 </manifest>
