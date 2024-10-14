@@ -2,6 +2,7 @@ package com.example.xemphim.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -21,6 +22,13 @@ import com.example.xemphim.databinding.ActivityChitietphimBinding;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.Series;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 import retrofit2.Call;
@@ -30,7 +38,9 @@ import retrofit2.Response;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChiTietActivity extends AppCompatActivity {
     private String movieSlug;
@@ -40,6 +50,9 @@ public class ChiTietActivity extends AppCompatActivity {
     private TapPhimAdapter tapPhimAdapter;
     private String movieLink;
     private MovieDetail.MovieItem movieDetails;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference usersRef = database.getReference("users");
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -60,8 +73,10 @@ public class ChiTietActivity extends AppCompatActivity {
 //        // Xử lý sự kiện click nút xem phim
         binding.btnXemPhim.setOnClickListener(view -> {
             if (movieLink != null && !movieLink.isEmpty()) {
-               // saveWatchedMovie(movieDetails.getId(), movieDetails.getName(), movieDetails.getEpisodeCurrent(), movieDetails.getPosterUrl(), movieLink);
+
                 String episodeCurrent = serverDataList.get(0).getName();
+                // Lưu lịch sử xem phim
+                saveWatchHistory(movieSlug, movieLink, episodeCurrent);
                 // Khởi động activity phát video
                 Intent intent = new Intent(this, XemPhimActivity.class);
                 intent.putExtra("movie_link", movieLink);  // Truyền link phim
@@ -72,26 +87,70 @@ public class ChiTietActivity extends AppCompatActivity {
                 Toast.makeText(ChiTietActivity.this, "Link phim không khả dụng", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
-//    private void saveWatchedMovie(String movieId, String movieTitle, String episodeCurrent, String posterUrl,String linkM3u8) {
-//        // Get a reference to the Firebase Firestore or Realtime Database
-//        FirebaseFirestore db = FirebaseFirestore.getInstance(); // For Firestore
-//        // DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("watched_movies"); // For Realtime Database
-//
-//        MovieDetail watchedMovie = new MovieDetail(movieId,movieTitle, episodeCurrent, posterUrl, linkM3u8);
-//
-//        // Save to Firestore
-//        db.collection("watched_movies").document(movieId) // Use movieId as document ID to avoid duplicates
-//                .set(watchedMovie)
-//                .addOnSuccessListener(aVoid -> {
-//                    Log.d("Firestore", "DocumentSnapshot successfully written!");
-//                })
-//                .addOnFailureListener(e -> {
-//                    Log.w("Firestore", "Error writing document", e);
-//                });
-//    }
+    private void saveWatchHistory(String movieSlug, String movieLink, String episodeCurrent) {
+        // Get the current authenticated user
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Please log in to save your watch history.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get user ID
+        String userId = user.getUid();
+
+        // Reference to the user's watch history in Firebase
+        DatabaseReference userHistoryRef = FirebaseDatabase.getInstance()
+                .getReference("LichSuXem")
+                .child(userId); // Using user ID to organize history
+
+        // Query to check if the movie already exists
+        userHistoryRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // If the movie already exists, update it
+                if (snapshot.exists()) {
+                    for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
+                        // Update the existing movie data
+                        movieSnapshot.getRef().updateChildren(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(ChiTietActivity.this, "Watch history updated!", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(ChiTietActivity.this, "Failed to update watch history.", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                } else {
+                    // Prepare the movie data to be saved
+                    userHistoryRef.push().setValue(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(ChiTietActivity.this, "Watch history saved!", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(ChiTietActivity.this, "Failed to save watch history.", Toast.LENGTH_SHORT).show();
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ChiTietActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Helper method to create the movie data map
+    private Map<String, Object> createMovieDataMap(String movieSlug, String movieLink, String episodeCurrent, String userId) {
+        Map<String, Object> movieData = new HashMap<>();
+        movieData.put("slug", movieSlug);
+        movieData.put("link", movieLink);
+        movieData.put("episode", episodeCurrent);
+        movieData.put("userId", userId); // Save the user ID
+        return movieData;
+    }
+
+
 
     private void loadMovieDetails(String slug) {
         binding.progressBar.setVisibility(View.VISIBLE);

@@ -1,5 +1,6 @@
 package com.example.xemphim.activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -54,13 +55,20 @@ public class MainActivity extends AppCompatActivity {
     private PopupWindow popupWindow;
     private MovieAdapter movieAdapter;
     private SeriesAdapter seriesAdapter;
+    private String idUser;
+    private String nameUser;
+    private String emailUser;
+    private int idLoaiND;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        // truy cập thông tin người dùng.
+        laythongtinUser();
 
+        Toast.makeText(MainActivity.this, "Xin chào" + nameUser, Toast.LENGTH_SHORT).show();
         apiService = ApiClient.getClient().create(ApiService.class);
         // Thiết lập ActionBar và DrawerLayout
         setSupportActionBar(binding.toolbar);
@@ -98,6 +106,16 @@ public class MainActivity extends AppCompatActivity {
         loadPhimHoatHinh();
 
         navigationBottom();
+
+
+
+    }
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+        nameUser = sharedPreferences.getString("name", null);
+        emailUser  = sharedPreferences.getString("email", null);
+        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
 
     }
     private void navigationBottom() {

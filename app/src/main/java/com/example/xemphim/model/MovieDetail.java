@@ -17,6 +17,10 @@ public class MovieDetail {
     @SerializedName("episodes")
     private List<Episode> episodes;
 
+    public MovieDetail() {
+        // Required for Firebase
+    }
+
     public MovieDetail(String movieId, String movieTitle, String episodeCurrent, String posterUrl, String linkM3u8) {
         this.movie = new MovieItem();
         this.movie.setId(movieId);
@@ -596,4 +600,5 @@ public class MovieDetail {
             }
         }
     }
+
 }
