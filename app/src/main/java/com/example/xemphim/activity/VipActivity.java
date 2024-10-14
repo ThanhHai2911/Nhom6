@@ -35,7 +35,7 @@ public class VipActivity extends AppCompatActivity {
                 } else if (item.getItemId() == R.id.nav_download) {
                     intent = new Intent(VipActivity.this, DownLoadActivity.class);
                 } else if (item.getItemId() == R.id.nav_profile) {
-                    intent = new Intent(VipActivity.this, ProfileActivity.class);
+                    intent = new Intent(VipActivity.this, TrangCaNhan.class);
 
                 }
                 // Pass the selected item to the new Activity

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +23,7 @@ import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.Series;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -39,12 +41,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -60,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+                // Thiết lập màu sắc cho thanh trạng thái
+        Window window = getWindow();
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
+
+        // Thiết lập màu sắc cho thanh điều hướng
+        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
 
         apiService = ApiClient.getClient().create(ApiService.class);
         // Thiết lập ActionBar và DrawerLayout
@@ -118,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (item.getItemId() == R.id.nav_download) {
                     intent = new Intent(MainActivity.this, DownLoadActivity.class);
                 } else if (item.getItemId() == R.id.nav_profile) {
-                    intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    intent = new Intent(MainActivity.this, TrangCaNhan.class);
 
                 }
                 // Pass the selected item to the new Activity

@@ -4,17 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
+import com.example.xemphim.R;
 import com.example.xemphim.adapter.SeriesAdapter;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityChitietphimBinding;
@@ -47,7 +50,17 @@ public class ChiTietActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChitietphimBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setMauTrangThai();
         setEvent();
+    }
+
+    private void setMauTrangThai() {
+        // Thiết lập màu sắc cho thanh trạng thái
+        Window window = getWindow();
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
+
+        // Thiết lập màu sắc cho thanh điều hướng
+        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
     }
 
     private void setEvent() {
