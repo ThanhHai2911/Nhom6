@@ -1,7 +1,11 @@
 package com.example.xemphim.activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -12,17 +16,22 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.xemphim.R;
 
 public class VipActivity extends AppCompatActivity {
-
+    Button vip_plan_button;
+    private String idUser;
+    private  String nameUser;
+    private String emailUser;
+    private int idLoaiND;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_vip);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-
+        vip_plan_button = findViewById(R.id.vip_plan_button);
         // Đặt item mặc định được chọn là màn hình Home
         bottomNavigationView.setSelectedItemId(R.id.nav_vip);
-
+        laythongtinUser();
+        Toast.makeText(VipActivity.this, "Xin chào " + idUser, Toast.LENGTH_SHORT).show();
         // Xử lý sự kiện chọn item của Bottom Navigation
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -49,5 +58,23 @@ public class VipActivity extends AppCompatActivity {
 
             }
         });
+
+        vip_plan_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(VipActivity.this, ThanhToanActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+    }
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+        nameUser = sharedPreferences.getString("name", null);
+        emailUser  = sharedPreferences.getString("email", null);
+        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
+
     }
 }

@@ -3,6 +3,7 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
 import com.example.xemphim.model.LoaiNguoiDung;
+import com.example.xemphim.model.TrangThai;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -85,6 +87,8 @@ public class DangKyActivity extends AppCompatActivity {
 //
 //        // Thêm loại người dùng vào Firebase
 //        addLoaiNguoiDung();
+
+
     }
     private void addLoaiNguoiDung() {
         // Tạo các loại người dùng
@@ -227,5 +231,6 @@ public class DangKyActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }
