@@ -1,7 +1,6 @@
 package com.example.xemphim.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -43,11 +42,7 @@ public class ProfileActivity extends AppCompatActivity {
     private LichSuXemAdapter lichSuXemAdapter;
     private List<MovieDetail.MovieItem> watchedMoviesList;
     private DatabaseReference databaseReference;
-    private String idUser;
-    private  String nameUser;
-    private String emailUser;
-    private int idLoaiND;
-    private TextView tvTenNguoiDung, tvEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,36 +56,18 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
     public void setControl(){
-        tvTenNguoiDung = findViewById(R.id.tvTenNguoiDung);
-        tvEmail = findViewById(R.id.tvEmail);
-
-
-
         // Initialize Firebase Database reference
         databaseReference = FirebaseDatabase.getInstance().getReference("watched_movies"); // Ensure the path is correct
 
         watchedMoviesList = new ArrayList<>();
         binding.rcvLichSu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.rcvLichSu.setAdapter(lichSuXemAdapter);
-
     }
     public void setEven(){
-        laythongtinUser();
-        Toast.makeText(ProfileActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
-        tvTenNguoiDung.setText(nameUser);
-        tvEmail.setText(emailUser);
         binding.btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
-                startActivity(intent);
-            }
-        });
-        binding.dsYeuThich.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Chuyển đến FavoriteMoviesActivity
-                Intent intent = new Intent(ProfileActivity.this, FavoriteMoviesActivity.class);
                 startActivity(intent);
             }
         });
@@ -133,14 +110,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void laythongtinUser(){
-        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        idUser = sharedPreferences.getString("id_user", null);
-        nameUser = sharedPreferences.getString("name", null);
-        emailUser  = sharedPreferences.getString("email", null);
-        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
 
-    }
 
 
     private void setupBottomNavigation() {
