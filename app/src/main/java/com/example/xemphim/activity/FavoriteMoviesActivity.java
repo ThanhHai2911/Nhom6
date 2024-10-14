@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
-import com.example.xemphim.adapter.FavoriteAdapter;
+
 import com.example.xemphim.adapter.MovieAdapter;
 import com.example.xemphim.databinding.ActivityFavoriteMoviesBinding;
 import com.example.xemphim.databinding.ActivityMainBinding;
