@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.adapter.ThongTinLichSuAdapter;
 import com.example.xemphim.databinding.ActivityLichSuXemBinding;
 import com.example.xemphim.databinding.ActivityProfileBinding;
+import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,7 +36,7 @@ import java.util.List;
 public class LichSuXemActivity extends AppCompatActivity {
     private ActivityLichSuXemBinding binding;
     private LichSuAdapter lichSuAdapter;
-    private List<MovieDetail.MovieItem> watchedMoviesList;
+    private List<Movie> watchedMoviesList;
     private DatabaseReference databaseReference;
 
     @Override
@@ -74,9 +76,21 @@ public class LichSuXemActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 watchedMoviesList.clear(); // Clear the previous list
                 for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
-                    MovieDetail.MovieItem movieItem = movieSnapshot.getValue(MovieDetail.MovieItem.class);
+                    Movie movieItem = movieSnapshot.getValue(Movie.class);
                     if (movieItem != null) {
                         watchedMoviesList.add(movieItem); // Add to the list
+                        lichSuAdapter = new LichSuAdapter(LichSuXemActivity.this, watchedMoviesList);
+                        // Thiết lập sự kiện click cho từng item
+                        lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+                                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                                Movie movie = watchedMoviesList.get(position);
+                                intent.putExtra("slug", movie.getSlug());
+                                view.getContext().startActivity(intent);
+                            }
+                        });
                     }
                 }
                 // Set the adapter with the new data

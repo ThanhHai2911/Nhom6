@@ -10,16 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.xemphim.databinding.ItemLichsuBinding;
 import com.example.xemphim.databinding.ItemLichsuxemBinding;
+import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 
 import java.util.List;
 
 public class LichSuAdapter extends RecyclerView.Adapter<LichSuAdapter.MovieViewHolder> {
     private Activity context;
-    private List<MovieDetail.MovieItem> movies;
+    private List<Movie> movies;
     private static OnRecyclerViewItemClickListener recyclerViewItemClickListener;
 
-    public LichSuAdapter(Activity context, List<MovieDetail.MovieItem> movies) {
+    public LichSuAdapter(Activity context, List<Movie> movies) {
         this.context = context;
         this.movies = movies;
     }
@@ -37,12 +38,12 @@ public class LichSuAdapter extends RecyclerView.Adapter<LichSuAdapter.MovieViewH
 
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
-        MovieDetail.MovieItem movie = movies.get(position);
+        Movie movie = movies.get(position);
         holder.binding.movieTitle.setText(movie.getName());
 
         // Sử dụng Glide để load hình ảnh
         Glide.with(context)  // Sử dụng context đã được cung cấp
-                .load(movie.getPosterUrl())
+                .load(movie.getPoster_url())
                 .into(holder.binding.moviePoster);
 
 

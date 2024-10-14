@@ -14,6 +14,9 @@ public class Movie {
     private List<String> actor;
     private List<String> director;
 
+    public Movie() {
+    }
+
     private Modified modified;
 
     public String getSlug() {

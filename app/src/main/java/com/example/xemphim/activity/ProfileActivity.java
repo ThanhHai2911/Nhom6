@@ -2,6 +2,7 @@ package com.example.xemphim.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,10 +14,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.bumptech.glide.Glide;
+import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
+import com.example.xemphim.adapter.MovieAdapter;
+import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.adapter.ThongTinLichSuAdapter;
 import com.example.xemphim.databinding.ActivityProfileBinding;
+import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
+import com.example.xemphim.response.MovieResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,11 +36,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ProfileActivity extends AppCompatActivity {
     private ActivityProfileBinding binding;
     private ThongTinLichSuAdapter thongTinLichSuAdapter;
     private List<MovieDetail.MovieItem> watchedMoviesList;
     private DatabaseReference databaseReference;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,10 +93,9 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Reference to the user's watch history in Firebase
         DatabaseReference userHistoryRef = FirebaseDatabase.getInstance()
                 .getReference("LichSuXem")
-                .child(user.getUid()); // Using user ID to get the user's history
+                .child(user.getUid());
 
         userHistoryRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -93,13 +104,30 @@ public class ProfileActivity extends AppCompatActivity {
                 for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
                     MovieDetail.MovieItem movieItem = movieSnapshot.getValue(MovieDetail.MovieItem.class);
                     if (movieItem != null) {
-                        watchedMoviesList.add(movieItem); // Add to the list
+                        watchedMoviesList.add(movieItem);
                     }
                 }
-                // Set the adapter with the new data
+
                 thongTinLichSuAdapter = new ThongTinLichSuAdapter(ProfileActivity.this, watchedMoviesList);
+                thongTinLichSuAdapter.setRecyclerViewItemClickListener((view, position) -> {
+                    MovieDetail.MovieItem movie = watchedMoviesList.get(position);
+                    // Assume the movie has a method to get the current episode; adjust as needed
+                    String currentEpisode = movie.getEpisodeCurrent();
+
+                    // Update the Firebase with the new episode
+                    userHistoryRef.child(movie.getSlug()).child("episode").setValue(currentEpisode)
+                            .addOnSuccessListener(aVoid -> {
+                                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                                intent.putExtra("slug", movie.getSlug());
+                                view.getContext().startActivity(intent);
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(ProfileActivity.this, "Failed to update episode.", Toast.LENGTH_SHORT).show();
+                            });
+                });
+
+                // Set the adapter with the updated list and click listener
                 binding.rcvLichSu.setAdapter(thongTinLichSuAdapter);
-                thongTinLichSuAdapter.notifyDataSetChanged(); // Notify the adapter of data changes
             }
 
             @Override
@@ -108,6 +136,8 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 
 
@@ -140,7 +170,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
-
 
     @Override
     protected void onResume() {

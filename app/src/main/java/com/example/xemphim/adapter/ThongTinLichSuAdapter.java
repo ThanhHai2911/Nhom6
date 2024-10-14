@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.xemphim.databinding.ItemLichsuxemBinding;
+import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 
 import java.util.List;

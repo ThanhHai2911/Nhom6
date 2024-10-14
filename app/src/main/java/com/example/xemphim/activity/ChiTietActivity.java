@@ -75,6 +75,8 @@ public class ChiTietActivity extends AppCompatActivity {
             if (movieLink != null && !movieLink.isEmpty()) {
 
                 String episodeCurrent = serverDataList.get(0).getName();
+
+
                 // Lưu lịch sử xem phim
                 saveWatchHistory(movieSlug, movieLink, episodeCurrent);
                 // Khởi động activity phát video
@@ -97,13 +99,10 @@ public class ChiTietActivity extends AppCompatActivity {
             return;
         }
 
-        // Get user ID
-        String userId = user.getUid();
-
         // Reference to the user's watch history in Firebase
         DatabaseReference userHistoryRef = FirebaseDatabase.getInstance()
                 .getReference("LichSuXem")
-                .child(userId); // Using user ID to organize history
+                .child(user.getUid()); // Use user ID to keep track of their history
 
         // Query to check if the movie already exists
         userHistoryRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -113,7 +112,7 @@ public class ChiTietActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
                         // Update the existing movie data
-                        movieSnapshot.getRef().updateChildren(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
+                        movieSnapshot.getRef().updateChildren(createMovieDataMap(movieSlug, movieLink, episodeCurrent))
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(ChiTietActivity.this, "Watch history updated!", Toast.LENGTH_SHORT).show();
                                 })
@@ -123,7 +122,7 @@ public class ChiTietActivity extends AppCompatActivity {
                     }
                 } else {
                     // Prepare the movie data to be saved
-                    userHistoryRef.push().setValue(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
+                    userHistoryRef.push().setValue(createMovieDataMap(movieSlug, movieLink, episodeCurrent))
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(ChiTietActivity.this, "Watch history saved!", Toast.LENGTH_SHORT).show();
                             })
@@ -141,14 +140,16 @@ public class ChiTietActivity extends AppCompatActivity {
     }
 
     // Helper method to create the movie data map
-    private Map<String, Object> createMovieDataMap(String movieSlug, String movieLink, String episodeCurrent, String userId) {
+    private Map<String, Object> createMovieDataMap(String movieSlug, String movieLink, String episodeCurrent) {
         Map<String, Object> movieData = new HashMap<>();
         movieData.put("slug", movieSlug);
         movieData.put("link", movieLink);
         movieData.put("episode", episodeCurrent);
-        movieData.put("userId", userId); // Save the user ID
         return movieData;
     }
+
+
+
 
 
 
@@ -270,6 +271,8 @@ public class ChiTietActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 
 

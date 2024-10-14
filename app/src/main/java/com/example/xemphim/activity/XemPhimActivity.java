@@ -1,5 +1,6 @@
 package com.example.xemphim.activity;
 
+import android.support.annotation.NonNull;
 import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -26,11 +27,18 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -77,6 +85,7 @@ public class XemPhimActivity extends AppCompatActivity {
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
+
 
     }
     private void addToFavorites() {
@@ -187,7 +196,7 @@ public class XemPhimActivity extends AppCompatActivity {
                                 String movieTitle = movieDetails.getMovie().getName();
                                 String episodeName = selectedEpisode.getName();
                                 binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
-
+                                saveWatchHistory(movieSlug, movieLink, episodeName);
                                 playEpisode(newMovieLink);
                             }
                         });
@@ -208,6 +217,67 @@ public class XemPhimActivity extends AppCompatActivity {
                 Toast.makeText(XemPhimActivity.this, "Failed to load movie details", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void saveWatchHistory(String movieSlug, String movieLink, String episodeCurrent) {
+        // Get the current authenticated user
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Please log in to save your watch history.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get user ID
+        String userId = user.getUid();
+
+        // Reference to the user's watch history in Firebase
+        DatabaseReference userHistoryRef = FirebaseDatabase.getInstance()
+                .getReference("LichSuXem")
+                .child(userId); // Using user ID to organize history
+
+        // Query to check if the movie already exists
+        userHistoryRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // If the movie already exists, update it
+                if (snapshot.exists()) {
+                    for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
+                        // Update the existing movie data
+                        movieSnapshot.getRef().updateChildren(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(XemPhimActivity.this, "Watch history updated!", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(XemPhimActivity.this, "Failed to update watch history.", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                } else {
+                    // Prepare the movie data to be saved
+                    userHistoryRef.push().setValue(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(XemPhimActivity.this, "Watch history saved!", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(XemPhimActivity.this, "Failed to save watch history.", Toast.LENGTH_SHORT).show();
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(XemPhimActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Helper method to create the movie data map
+    private Map<String, Object> createMovieDataMap(String movieSlug, String movieLink, String episodeCurrent, String userId) {
+        Map<String, Object> movieData = new HashMap<>();
+        movieData.put("slug", movieSlug);
+        movieData.put("link", movieLink);
+        movieData.put("episode", episodeCurrent);
+        movieData.put("userId", userId); // Save the user ID
+        return movieData;
     }
 
 
