@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         // truy cập thông tin người dùng.
         laythongtinUser();
 
-        Toast.makeText(MainActivity.this, "Xin chào" + nameUser, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
         apiService = ApiClient.getClient().create(ApiService.class);
         // Thiết lập ActionBar và DrawerLayout
         setSupportActionBar(binding.toolbar);

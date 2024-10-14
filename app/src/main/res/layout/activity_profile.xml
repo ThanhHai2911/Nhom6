@@ -156,7 +156,7 @@
                         android:textColor="#FFFFFF"
                         />
                     <TextView
-                        android:id="@+id/Xemtatca"
+                        android:id="@+id/tvXemtatca"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Xem tất cả"

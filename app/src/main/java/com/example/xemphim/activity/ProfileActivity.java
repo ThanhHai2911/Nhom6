@@ -6,24 +6,16 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.xemphim.R;
-import com.example.xemphim.adapter.LichSuXemAdapter;
-import com.example.xemphim.adapter.MovieAdapter;
-import com.example.xemphim.adapter.TheLoaiAdapter;
+import com.example.xemphim.adapter.ThongTinLichSuAdapter;
 import com.example.xemphim.databinding.ActivityProfileBinding;
-import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +31,7 @@ import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
     private ActivityProfileBinding binding;
-    private LichSuXemAdapter lichSuXemAdapter;
+    private ThongTinLichSuAdapter thongTinLichSuAdapter;
     private List<MovieDetail.MovieItem> watchedMoviesList;
     private DatabaseReference databaseReference;
 
@@ -61,13 +53,20 @@ public class ProfileActivity extends AppCompatActivity {
 
         watchedMoviesList = new ArrayList<>();
         binding.rcvLichSu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        binding.rcvLichSu.setAdapter(lichSuXemAdapter);
+        binding.rcvLichSu.setAdapter(thongTinLichSuAdapter);
     }
     public void setEven(){
         binding.btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
+                startActivity(intent);
+            }
+        });
+        binding.tvXemtatca.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ProfileActivity.this, LichSuXemActivity.class);
                 startActivity(intent);
             }
         });
@@ -98,9 +97,9 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 }
                 // Set the adapter with the new data
-                lichSuXemAdapter = new LichSuXemAdapter(ProfileActivity.this, watchedMoviesList);
-                binding.rcvLichSu.setAdapter(lichSuXemAdapter);
-                lichSuXemAdapter.notifyDataSetChanged(); // Notify the adapter of data changes
+                thongTinLichSuAdapter = new ThongTinLichSuAdapter(ProfileActivity.this, watchedMoviesList);
+                binding.rcvLichSu.setAdapter(thongTinLichSuAdapter);
+                thongTinLichSuAdapter.notifyDataSetChanged(); // Notify the adapter of data changes
             }
 
             @Override

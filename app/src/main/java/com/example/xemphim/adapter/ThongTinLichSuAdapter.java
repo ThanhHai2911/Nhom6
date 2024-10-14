@@ -9,17 +9,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.xemphim.databinding.ItemLichsuxemBinding;
-import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 
 import java.util.List;
 
-public class LichSuXemAdapter extends RecyclerView.Adapter<LichSuXemAdapter.MovieViewHolder> {
+public class ThongTinLichSuAdapter extends RecyclerView.Adapter<ThongTinLichSuAdapter.MovieViewHolder> {
     private Activity context;
     private List<MovieDetail.MovieItem> movies;
     private static OnRecyclerViewItemClickListener recyclerViewItemClickListener;
 
-    public LichSuXemAdapter(Activity context, List<MovieDetail.MovieItem> movies) {
+    public ThongTinLichSuAdapter(Activity context, List<MovieDetail.MovieItem> movies) {
         this.context = context;
         this.movies = movies;
     }
