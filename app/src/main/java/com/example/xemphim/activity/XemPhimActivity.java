@@ -1,6 +1,5 @@
 package com.example.xemphim.activity;
 
-import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -8,23 +7,26 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import androidx.media3.ui.PlayerView;
 import android.widget.Toast;
 
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.media3.common.Player;
+import androidx.media3.common.util.UnstableApi;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.adapter.TapPhimAdapter;
-import com.example.xemphim.databinding.ActivityXemphimBinding; // Import View Binding
+import com.example.xemphim.databinding.ActivityXemphimBinding;
 import com.example.xemphim.model.MovieDetail;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.ui.AspectRatioFrameLayout;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -34,10 +36,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+@OptIn(markerClass = UnstableApi.class)
 public class XemPhimActivity extends AppCompatActivity {
-    private ActivityXemphimBinding binding; // Khai báo View Binding
-    private ExoPlayer exoPlayer; // ExoPlayer để phát video
+    private ActivityXemphimBinding binding;
+    private ExoPlayer exoPlayer;
     private ImageButton btnFullScreen;
     private boolean isFullScreen = false;
     private TapPhimAdapter tapPhimAdapter;
@@ -45,48 +47,42 @@ public class XemPhimActivity extends AppCompatActivity {
     private String movieLink;
     private ApiService apiService;
     private String movieSlug;
-    private ImageButton btnAddToFavorites; // Thêm biến cho nút yêu thích
+    private ImageButton btnAddToFavorites;
     private DatabaseReference favoritesRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityXemphimBinding.inflate(getLayoutInflater()); // Khởi tạo View Binding
-        setContentView(binding.getRoot()); // Đặt layout cho Activity
+        binding = ActivityXemphimBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         setControl();
         setEvent();
-
     }
 
     public void setControl() {
-        // Gán View cho các biến
-        btnFullScreen = binding.btnFullScreen; // Gán nút toàn màn hình
-        btnAddToFavorites = binding.btnAddToFavorites; // Gán nút yêu thích
-        binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 4)); // Thiết lập RecyclerView
-        // Khởi tạo Firebase Database
-        favoritesRef = FirebaseDatabase.getInstance().getReference("favorites"); // Thay "favorites" bằng tên bảng của bạn
+        btnFullScreen = binding.btnFullScreen;
+        btnAddToFavorites = binding.btnAddToFavorites;
+        binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 4));
+        favoritesRef = FirebaseDatabase.getInstance().getReference("favorites");
     }
 
     public void setEvent() {
         initializePlayer();
-        // Thiết lập sự kiện cho nút toàn màn hình
         movieSlug = getIntent().getStringExtra("slug");
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
-
     }
-
-
+    @OptIn(markerClass = UnstableApi.class)
     private void initializePlayer() {
         String movieLink = getIntent().getStringExtra("movie_link");
         if (exoPlayer == null) {
             exoPlayer = new ExoPlayer.Builder(this).build();
-            binding.playerView.setPlayer(exoPlayer); // Sử dụng View Binding để gán player
-            binding.playerView.setKeepScreenOn(true);
+            PlayerView playerView = binding.playerView; // Đảm bảo đây là PlayerView từ Media3
+            playerView.setPlayer(exoPlayer); // Thiết lập player cho PlayerView
+            playerView.setKeepScreenOn(true);
 
-            // Thêm listener để lắng nghe lỗi
             exoPlayer.addListener(new Player.Listener() {
                 @Override
                 public void onPlayerError(PlaybackException error) {
@@ -94,27 +90,19 @@ public class XemPhimActivity extends AppCompatActivity {
                 }
             });
 
-            // Tạo HlsMediaSource
-            DefaultHttpDataSource.Factory dataSourceFactory = new DefaultHttpDataSource.Factory();
-            HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(movieLink));
-
-            // Thêm video vào player
-            exoPlayer.setMediaSource(hlsMediaSource);
+            // Tạo MediaItem từ đường dẫn video
+            MediaItem mediaItem = MediaItem.fromUri(movieLink);
+            exoPlayer.setMediaItem(mediaItem);
             exoPlayer.prepare();
         }
     }
 
     private void playEpisode(String episodeLink) {
         if (exoPlayer != null) {
-            // Prepare a new media source for the new episode
-            DefaultHttpDataSource.Factory dataSourceFactory = new DefaultHttpDataSource.Factory();
-            HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(episodeLink));
-
-            exoPlayer.setMediaSource(hlsMediaSource);
+            MediaItem mediaItem = MediaItem.fromUri(episodeLink);
+            exoPlayer.setMediaItem(mediaItem);
             exoPlayer.prepare();
-            exoPlayer.play(); // Start playback immediately
+            exoPlayer.play();
         }
     }
 
@@ -123,19 +111,19 @@ public class XemPhimActivity extends AppCompatActivity {
 
         if (isFullScreen) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT); // Chuyển về chế độ phù hợp với kích thước
+            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL); // Chuyển về chế độ phù hợp với kích thước
             // Đặt lại LayoutParams khi thoát toàn màn hình (phụ thuộc vào layout cha)
             binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    200 // hoặc giá trị chiều cao mong muốn
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    250 // hoặc giá trị chiều cao mong muốn
             ));
         } else {
             // Chuyển sang chế độ ngang
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL); // Chế độ toàn màn hình
             binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
             ));
         }
 
@@ -164,26 +152,22 @@ public class XemPhimActivity extends AppCompatActivity {
                         }
 
                         tapPhimAdapter = new TapPhimAdapter(XemPhimActivity.this, serverDataList);
-                        // Cập nhật RecyclerView với danh sách tập phim
                         tapPhimAdapter.setRecyclerViewItemClickListener(new TapPhimAdapter.OnRecyclerViewItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
                                 MovieDetail.Episode.ServerData selectedEpisode = serverDataList.get(position);
                                 String newMovieLink = selectedEpisode.getLinkM3u8();
-                                //Hien thi ten tap phim  dang xem
                                 String movieTitle = movieDetails.getMovie().getName();
                                 String episodeName = selectedEpisode.getName();
                                 binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
-
                                 playEpisode(newMovieLink);
                             }
                         });
 
                         binding.rcvTapPhim.setAdapter(tapPhimAdapter);
 
-                        // Play the first episode automatically
                         movieLink = serverDataList.get(0).getLinkM3u8();
-                        initializePlayer(); // Initialize player with the first episode
+                        initializePlayer();
                     } else {
                         Toast.makeText(XemPhimActivity.this, "Không có tập phim nào", Toast.LENGTH_SHORT).show();
                     }
@@ -197,8 +181,6 @@ public class XemPhimActivity extends AppCompatActivity {
         });
     }
 
-
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -207,7 +189,6 @@ public class XemPhimActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT
             ));
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
         }
     }
 
@@ -215,7 +196,7 @@ public class XemPhimActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (exoPlayer != null) {
-            exoPlayer.release();  // Giải phóng ExoPlayer khi Activity bị hủy
+            exoPlayer.release();
             exoPlayer = null;
         }
     }
@@ -224,7 +205,7 @@ public class XemPhimActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         if (exoPlayer != null) {
-            exoPlayer.pause(); // Tạm dừng video khi Activity không còn hiển thị
+            exoPlayer.pause();
         }
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
@@ -232,8 +213,6 @@ public class XemPhimActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Giữ màn hình sáng khi ứng dụng hoạt động
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
-
 }

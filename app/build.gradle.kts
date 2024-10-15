@@ -67,7 +67,12 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
-    implementation ("com.google.android.exoplayer:exoplayer:2.17.1")
+    //exoplayer
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.4.1")
+    implementation("androidx.media3:media3-ui:1.4.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.4.1")
+
     implementation ("com.squareup.picasso:picasso:2.71828")
     implementation ("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
