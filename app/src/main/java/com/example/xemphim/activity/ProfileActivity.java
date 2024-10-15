@@ -58,6 +58,10 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference lichSuXemRef;
     private ApiService apiService;
     private DatabaseReference usersRef;
+    private boolean isUserLoggedIn = false; // Biến để theo dõi trạng thái đăng nhập
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,13 +89,41 @@ public class ProfileActivity extends AppCompatActivity {
         Toast.makeText(ProfileActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
         tvTenNguoiDung.setText(nameUser);
         tvEmail.setText(emailUser);
+
+        // Kiểm tra trạng thái đăng nhập
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            isUserLoggedIn = true; // Người dùng đã đăng nhập
+            binding.btnDangNhap.setText("Đăng Xuất"); // Đổi văn bản nút thành "Đăng Xuất"
+        } else {
+            isUserLoggedIn = false; // Người dùng chưa đăng nhập
+            binding.btnDangNhap.setText("Đăng Nhập"); // Đổi văn bản nút thành "Đăng Nhập"
+        }
+
         binding.btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
-                startActivity(intent);
+                if (isUserLoggedIn) {
+                    // Nếu người dùng đã đăng nhập, tiến hành đăng xuất
+                    FirebaseAuth.getInstance().signOut();
+                    isUserLoggedIn = false; // Cập nhật trạng thái đăng nhập
+
+                    // Cập nhật giao diện người dùng
+                    binding.btnDangNhap.setText("Đăng Nhập");
+                    tvTenNguoiDung.setText(""); // Xóa tên người dùng
+                    tvEmail.setText(""); // Xóa email người dùng
+                    watchedMoviesList.clear(); // Xóa danh sách phim đã xem
+                    lichSuXemAdapter.notifyDataSetChanged(); // Cập nhật adapter để hiển thị danh sách rỗng
+
+                    Toast.makeText(ProfileActivity.this, "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Nếu người dùng chưa đăng nhập, chuyển đến màn hình đăng nhập
+                    Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
+                    startActivity(intent);
+                }
             }
         });
+
         binding.tvXemtatca.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,7 +192,7 @@ public class ProfileActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser == null) {
-            Toast.makeText(this, "Lỗi: Người dùng không xác định", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Không có thông tin người dùng", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -238,8 +270,7 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     });
 
-                    binding.progressBar.setVisibility(View.GONE);
-                    binding.mainContent.setVisibility(View.VISIBLE);
+
                 } else {
                     Log.e("LichSuXemActivity", "Failed to fetch movie details for slug: " + slug);
                 }
