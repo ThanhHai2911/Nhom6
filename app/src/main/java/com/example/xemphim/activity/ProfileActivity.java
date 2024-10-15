@@ -1,6 +1,7 @@
 package com.example.xemphim.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -18,7 +19,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.xemphim.API.ApiClient;
+import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
+import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.adapter.LichSuXemAdapter;
 import com.example.xemphim.adapter.MovieAdapter;
 import com.example.xemphim.adapter.TheLoaiAdapter;
@@ -37,12 +41,23 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class ProfileActivity extends AppCompatActivity {
     private ActivityProfileBinding binding;
     private LichSuXemAdapter lichSuXemAdapter;
     private List<MovieDetail.MovieItem> watchedMoviesList;
     private DatabaseReference databaseReference;
-
+    private String idUser;
+    private  String nameUser;
+    private String emailUser;
+    private int idLoaiND;
+    private TextView tvTenNguoiDung, tvEmail;
+    private DatabaseReference lichSuXemRef;
+    private ApiService apiService;
+    private DatabaseReference usersRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,14 +71,20 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
     public void setControl(){
-        // Initialize Firebase Database reference
-        databaseReference = FirebaseDatabase.getInstance().getReference("watched_movies"); // Ensure the path is correct
+        tvTenNguoiDung = findViewById(R.id.tvTenNguoiDung);
+        tvEmail = findViewById(R.id.tvEmail);
 
         watchedMoviesList = new ArrayList<>();
+        lichSuXemAdapter = new LichSuXemAdapter(ProfileActivity.this, watchedMoviesList);
         binding.rcvLichSu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.rcvLichSu.setAdapter(lichSuXemAdapter);
+
     }
     public void setEven(){
+        laythongtinUser();
+        Toast.makeText(ProfileActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
+        tvTenNguoiDung.setText(nameUser);
+        tvEmail.setText(emailUser);
         binding.btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,46 +92,39 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        binding.tvXemtatca.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ProfileActivity.this, LichSuXemActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        binding.dsYeuThich.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Chuyển đến FavoriteMoviesActivity
+                Intent intent = new Intent(ProfileActivity.this, FavoriteMoviesActivity.class);
+                startActivity(intent);
+            }
+        });
         setupBottomNavigation();
+        lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
+        usersRef = FirebaseDatabase.getInstance().getReference("Users");
+        apiService = ApiClient.getClient().create(ApiService.class);
         loadWatchHistory();
     }
 
-    private void loadWatchHistory() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Toast.makeText(this, "Please log in to view your watch history.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        // Reference to the user's watch history in Firebase
-        DatabaseReference userHistoryRef = FirebaseDatabase.getInstance()
-                .getReference("LichSuXem")
-                .child(user.getUid()); // Using user ID to get the user's history
 
-        userHistoryRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                watchedMoviesList.clear(); // Clear the previous list
-                for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
-                    MovieDetail.MovieItem movieItem = movieSnapshot.getValue(MovieDetail.MovieItem.class);
-                    if (movieItem != null) {
-                        watchedMoviesList.add(movieItem); // Add to the list
-                    }
-                }
-                // Set the adapter with the new data
-                lichSuXemAdapter = new LichSuXemAdapter(ProfileActivity.this, watchedMoviesList);
-                binding.rcvLichSu.setAdapter(lichSuXemAdapter);
-                lichSuXemAdapter.notifyDataSetChanged(); // Notify the adapter of data changes
-            }
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+        nameUser = sharedPreferences.getString("name", null);
+        emailUser  = sharedPreferences.getString("email", null);
+        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("ProfileActivity", "Failed to read watch history: " + error.getMessage());
-            }
-        });
     }
-
-
 
 
     private void setupBottomNavigation() {
@@ -141,6 +155,102 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void loadWatchHistory() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            Toast.makeText(this, "Lỗi: Người dùng không xác định", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Lấy thông tin người dùng từ database
+        usersRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String idUser = dataSnapshot.child("id_user").getValue(String.class); // Lấy id_user
+
+                    if (idUser == null) {
+                        Toast.makeText(ProfileActivity.this, "Lỗi: id_user không tồn tại", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Sử dụng idUser để tải lịch sử xem phim
+                    lichSuXemRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            watchedMoviesList.clear(); // Xóa danh sách cũ trước khi thêm dữ liệu mới
+
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                String movieSlug = snapshot.child("slug").getValue(String.class);
+                                String episodeName = snapshot.child("episode_name").getValue(String.class);
+
+                                if (movieSlug != null) {
+                                    MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
+                                    movieItem.setSlug(movieSlug);
+                                    movieItem.setEpisodeCurrent(episodeName);
+                                    fetchMovieDetails(movieSlug, movieItem); // Lấy chi tiết phim
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Toast.makeText(ProfileActivity.this, "Lỗi khi tải lịch sử xem", Toast.LENGTH_SHORT).show();
+                            Log.e("LichSuXemActivity", "loadWatchHistory:onCancelled", databaseError.toException());
+                        }
+                    });
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Người dùng không tồn tại trong cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(ProfileActivity.this, "Lỗi khi lấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchMovieDetails(String slug, MovieDetail.MovieItem movieItem) {
+        Call<MovieDetail> call = apiService.getMovieDetail(slug);
+        call.enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieDetail movieDetail = response.body();
+                    movieItem.setName(movieDetail.getMovie().getName());
+                    movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
+
+                    // Thêm movieItem vào danh sách đã xem
+                    watchedMoviesList.add(movieItem);
+                    lichSuXemAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi
+
+                    // Cài đặt sự kiện nhấn cho các item trong adapter
+                    lichSuXemAdapter.setRecyclerViewItemClickListener(new LichSuXemAdapter.OnRecyclerViewItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                            MovieDetail.MovieItem movie = watchedMoviesList.get(position);
+                            intent.putExtra("slug", movie.getSlug()); // Truyền slug tới ChiTietActivity
+                            view.getContext().startActivity(intent);
+                        }
+                    });
+
+                } else {
+                    Log.e("LichSuXemActivity", "Failed to fetch movie details for slug: " + slug);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
+                Log.e("LichSuXemActivity", "Error fetching movie details", t);
+            }
+        });
+    }
+
+
 
 
     @Override

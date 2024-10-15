@@ -1,49 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#000000">
+    android:padding="8dp"
+    android:background="#2F2F2F"
+    tools:context=".activity.LichSuXemActivity">
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="visible" />
 
     <LinearLayout
+        android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <!-- Phần tiêu đề -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/baseline_arrow_back_24"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+            <!-- Nút quay lại -->
+            <ImageView
+                android:id="@+id/back_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/exit_left"
+                />
+
+            <!-- Tiêu đề "Lịch sử đã xem" -->
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Lịch sử đã xem"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Biểu tượng máy quay nhỏ bên cạnh -->
+            <ImageView
+                android:id="@+id/camera_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/lichsuxemphim"
+                />
+        </LinearLayout>
+
+        <!-- Thanh tìm kiếm -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lịch sử xem"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:layout_marginStart="8dp" />
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:background="@drawable/rounded_search_bar"
+            android:padding="8dp"
+            android:gravity="center_vertical">
+
+            <!-- Biểu tượng kính lúp -->
+            <ImageView
+                android:id="@+id/search_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/search"
+                />
+
+            <!-- Ô nhập tìm kiếm -->
+            <EditText
+                android:id="@+id/search_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:hint="Tìm kiếm tên phim"
+                android:textColorHint="@color/black"
+                android:textColor="#FFFFFF"
+                android:background="@android:color/transparent"
+                android:inputType="text" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvlichsuxem"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="16dp"
+            android:clipToPadding="false" />
 
     </LinearLayout>
-
-    <!-- Search bar -->
-    <EditText
-        android:id="@+id/edtSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Tìm kiếm tên phim"
-        android:drawableStart="@drawable/baseline_search_24"
-        android:padding="10dp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#BBBBBB"
-        android:layout_marginTop="10dp" />
-
-    <!-- RecyclerView to show movies in grid -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcvlichsu"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</LinearLayout>
+</FrameLayout>

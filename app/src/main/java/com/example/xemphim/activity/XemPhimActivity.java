@@ -1,5 +1,6 @@
 package com.example.xemphim.activity;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
@@ -33,11 +34,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -56,6 +61,11 @@ public class XemPhimActivity extends AppCompatActivity {
     private String movieSlug;
     private ImageButton btnAddToFavorites; // Thêm biến cho nút yêu thích
     private DatabaseReference favoritesRef;
+    private String idUser;
+    private  String nameUser;
+    private String emailUser;
+    private int idLoaiND;
+    private DatabaseReference lichSuXemRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +95,8 @@ public class XemPhimActivity extends AppCompatActivity {
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
-
+        lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
+        laythongtinUser();
 
     }
     private void addToFavorites() {
@@ -141,27 +152,17 @@ public class XemPhimActivity extends AppCompatActivity {
     }
 
     private void toggleFullScreen() {
-        long currentPosition = exoPlayer.getCurrentPosition(); // Lưu lại thời điểm hiện tại của video
+        // Lưu lại thời điểm hiện tại của video
 
         if (isFullScreen) {
+            // Chuyển về chế độ portrait
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT); // Chuyển về chế độ phù hợp với kích thước
-            // Đặt lại LayoutParams khi thoát toàn màn hình (phụ thuộc vào layout cha)
-            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    200 // hoặc giá trị chiều cao mong muốn
-            ));
         } else {
-            // Chuyển sang chế độ ngang
+            // Chuyển sang chế độ landscape
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL); // Chế độ toàn màn hình
-            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT
-            ));
         }
 
-        isFullScreen = !isFullScreen; // Đổi trạng thái fullscreen
+        isFullScreen = !isFullScreen;// Đổi trạng thái fullscreen
     }
 
     private void loadMovieDetails() {
@@ -196,7 +197,7 @@ public class XemPhimActivity extends AppCompatActivity {
                                 String movieTitle = movieDetails.getMovie().getName();
                                 String episodeName = selectedEpisode.getName();
                                 binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
-                                saveWatchHistory(movieSlug, movieLink, episodeName);
+                                luuLichSuXem(movieSlug);
                                 playEpisode(newMovieLink);
                             }
                         });
@@ -219,78 +220,128 @@ public class XemPhimActivity extends AppCompatActivity {
         });
     }
 
-    private void saveWatchHistory(String movieSlug, String movieLink, String episodeCurrent) {
-        // Get the current authenticated user
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Toast.makeText(this, "Please log in to save your watch history.", Toast.LENGTH_SHORT).show();
+    private void luuLichSuXem(String movieSlug) {
+        if (idUser == null || movieSlug == null) {
+            Toast.makeText(XemPhimActivity.this, "Không thể lưu lịch sử, thiếu thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Get user ID
-        String userId = user.getUid();
-
-        // Reference to the user's watch history in Firebase
-        DatabaseReference userHistoryRef = FirebaseDatabase.getInstance()
-                .getReference("LichSuXem")
-                .child(userId); // Using user ID to organize history
-
-        // Query to check if the movie already exists
-        userHistoryRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+        // Query để kiểm tra xem slug đã tồn tại cho user này chưa
+        Query query = lichSuXemRef.orderByChild("id_user").equalTo(idUser);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // If the movie already exists, update it
-                if (snapshot.exists()) {
-                    for (DataSnapshot movieSnapshot : snapshot.getChildren()) {
-                        // Update the existing movie data
-                        movieSnapshot.getRef().updateChildren(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(XemPhimActivity.this, "Watch history updated!", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(XemPhimActivity.this, "Failed to update watch history.", Toast.LENGTH_SHORT).show();
-                                });
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String idLichSuXem = null;
+                // Duyệt qua các bản ghi lịch sử xem phim của user
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String existingSlug = snapshot.child("slug").getValue(String.class);
+                    if (existingSlug != null && existingSlug.equals(movieSlug)) {
+                        idLichSuXem = snapshot.getKey(); // Lấy ID của bản ghi để cập nhật
+                        break;
                     }
+                }
+
+                if (idLichSuXem != null) {
+                    // Nếu slug tồn tại, cập nhật tập phim mới
+                   // updateExistingMovieHistory(idLichSuXem, episodeName, movieLink);
                 } else {
-                    // Prepare the movie data to be saved
-                    userHistoryRef.push().setValue(createMovieDataMap(movieSlug, movieLink, episodeCurrent, userId))
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(XemPhimActivity.this, "Watch history saved!", Toast.LENGTH_SHORT).show();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(XemPhimActivity.this, "Failed to save watch history.", Toast.LENGTH_SHORT).show();
-                            });
+                    // Nếu slug chưa tồn tại, tiến hành thêm mới
+                    addNewMovieHistory(movieSlug);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(XemPhimActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(XemPhimActivity.this, "Lỗi khi kiểm tra lịch sử", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Helper method to create the movie data map
-    private Map<String, Object> createMovieDataMap(String movieSlug, String movieLink, String episodeCurrent, String userId) {
-        Map<String, Object> movieData = new HashMap<>();
-        movieData.put("slug", movieSlug);
-        movieData.put("link", movieLink);
-        movieData.put("episode", episodeCurrent);
-        movieData.put("userId", userId); // Save the user ID
-        return movieData;
+    // Hàm để thêm mới lịch sử xem phim nếu slug chưa tồn tại
+    private void addNewMovieHistory(String movieSlug) {
+        // Tạo ID mới cho lịch sử xem phim
+        String idLichSuXem = lichSuXemRef.push().getKey();
+
+        // Tạo thời gian xem phim (watched_at)
+        String watchedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        // Tạo bản ghi lịch sử xem phim
+        Map<String, Object> lichSuXem = new HashMap<>();
+        lichSuXem.put("id_user", idUser);
+        lichSuXem.put("slug", movieSlug); // slug của phim
+        lichSuXem.put("watched_at", watchedAt);
+
+        // Lưu vào Firebase dưới node `LichSuXem`
+        lichSuXemRef.child(idLichSuXem).setValue(lichSuXem)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(XemPhimActivity.this, "Lưu lịch sử xem phim thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(XemPhimActivity.this, "Lưu lịch sử xem phim thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+        nameUser = sharedPreferences.getString("name", null);
+        emailUser  = sharedPreferences.getString("email", null);
+        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
+
+    }
+//    // Hàm để cập nhật lịch sử xem phim nếu slug tồn tại
+//    private void updateExistingMovieHistory(String idLichSuXem, String episodeName, String movieLink) {
+//        String watchedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+//
+//        Map<String, Object> updates = new HashMap<>();
+//        updates.put("episode_name", episodeName);
+//        updates.put("movie_link", movieLink);
+//        updates.put("watched_at", watchedAt);
+//
+//        lichSuXemRef.child(idLichSuXem).updateChildren(updates)
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        Toast.makeText(XemPhimActivity.this, "Cập nhật lịch sử xem thành công", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Toast.makeText(XemPhimActivity.this, "Cập nhật lịch sử xem thất bại", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//    }
 
 
+
+    //config
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.playerView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
+            // Ở chế độ ngang, vào fullscreen
+            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT
             ));
+
+            // Ẩn thanh trạng thái và thanh điều hướng
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_FULLSCREEN   // Ẩn thanh trạng thái (status bar)
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION   // Ẩn thanh điều hướng (navigation bar)
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY  // Ở chế độ immersive (toàn màn hình)
+            );
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // Thoát fullscreen khi về portrait
+            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT  // Trở về chiều cao ban đầu (ban đầu như thế nào thì set lại)
+            ));
+
+            // Hiển thị lại các thanh trạng thái và điều hướng
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+
         }
     }
 

@@ -17,10 +17,10 @@ import java.util.List;
 
 public class LichSuAdapter extends RecyclerView.Adapter<LichSuAdapter.MovieViewHolder> {
     private Activity context;
-    private List<Movie> movies;
+    private List<MovieDetail.MovieItem> movies;
     private static OnRecyclerViewItemClickListener recyclerViewItemClickListener;
 
-    public LichSuAdapter(Activity context, List<Movie> movies) {
+    public LichSuAdapter(Activity context, List<MovieDetail.MovieItem> movies) {
         this.context = context;
         this.movies = movies;
     }
@@ -38,12 +38,12 @@ public class LichSuAdapter extends RecyclerView.Adapter<LichSuAdapter.MovieViewH
 
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
-        Movie movie = movies.get(position);
+        MovieDetail.MovieItem movie = movies.get(position);
         holder.binding.movieTitle.setText(movie.getName());
 
         // Sử dụng Glide để load hình ảnh
         Glide.with(context)  // Sử dụng context đã được cung cấp
-                .load(movie.getPoster_url())
+                .load(movie.getPosterUrl())
                 .into(holder.binding.moviePoster);
 
 
