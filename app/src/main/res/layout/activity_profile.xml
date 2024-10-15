@@ -7,6 +7,12 @@
     android:layout_height="match_parent"
     android:background="#7B6262"
     tools:context=".activity.ProfileActivity">
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="visible" />
 
     <!-- Phần giao diện chính của ứng dụng -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -25,8 +31,8 @@
                 android:id="@+id/mainContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <!-- Thêm Toolbar vào đây -->
                 <com.google.android.material.appbar.AppBarLayout
@@ -260,11 +266,6 @@
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-<!--    <ProgressBar-->
-<!--        android:id="@+id/progressBar"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center" />-->
 
     <!-- Bottom Navigation nằm ở dưới cùng -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

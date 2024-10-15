@@ -238,6 +238,8 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     });
 
+                    binding.progressBar.setVisibility(View.GONE);
+                    binding.mainContent.setVisibility(View.VISIBLE);
                 } else {
                     Log.e("LichSuXemActivity", "Failed to fetch movie details for slug: " + slug);
                 }
