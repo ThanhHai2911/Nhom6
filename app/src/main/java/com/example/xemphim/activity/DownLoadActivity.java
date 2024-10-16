@@ -38,7 +38,7 @@ public class DownLoadActivity extends AppCompatActivity {
                 } else if (item.getItemId() == R.id.nav_vip) {
                     intent = new Intent(DownLoadActivity.this, VipActivity.class);
                 } else if (item.getItemId() == R.id.nav_profile) {
-                    intent = new Intent(DownLoadActivity.this, TrangCaNhan.class);
+                    intent = new Intent(DownLoadActivity.this, ProfileActivity.class);
                 } else if (item.getItemId() == R.id.nav_download) {
                     // Không làm gì nếu đã chọn mục Download
                     return true; // Trả về true để không khởi tạo lại Activity

@@ -94,6 +94,7 @@ public class LichSuXemActivity extends AppCompatActivity {
                         return;
                     }
 
+
                     // Sử dụng idUser để tải lịch sử xem phim
                     lichSuXemRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -141,11 +142,12 @@ public class LichSuXemActivity extends AppCompatActivity {
                     MovieDetail movieDetail = response.body();
                     movieItem.setName(movieDetail.getMovie().getName());
                     movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
+
                     // Add the movie item to the list after fetching details
                     watchedMoviesList.add(movieItem);
-                    lichSuAdapter.notifyDataSetChanged();  // Notify adapter for changes
 
-                    lichSuAdapter = new LichSuAdapter(LichSuXemActivity.this, watchedMoviesList);
+                    // Notify the adapter that data has changed
+                    lichSuAdapter.notifyDataSetChanged();  // Notify adapter for changes
                     lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
@@ -156,6 +158,8 @@ public class LichSuXemActivity extends AppCompatActivity {
                             view.getContext().startActivity(intent);
                         }
                     });
+                    // Remove the reinitialization of lichSuAdapter
+                    // Update click listener outside this function if necessary
                     binding.progressBar.setVisibility(View.GONE);
                     binding.layout.setVisibility(View.VISIBLE);
                 } else {
