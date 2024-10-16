@@ -41,7 +41,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#414441"
-                    app:navigationIcon="@drawable/baseline_west_24"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
                     <ImageView
                         android:id="@+id/camera_icon"

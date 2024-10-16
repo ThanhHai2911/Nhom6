@@ -79,6 +79,7 @@ public class LichSuXemActivity extends AppCompatActivity {
         // Kiểm tra xem ActionBar đã được khởi tạo chưa
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Lịch sử đã xem"); // Đặt tên mới cho Toolbar
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Hiện biểu tượng trở về
         }
         swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -257,14 +258,12 @@ public class LichSuXemActivity extends AppCompatActivity {
             // Xử lý sự kiện khi nhấn vào tìm kiếm
             Toast.makeText(this, "Bạn muốn tìm kiếm gì", Toast.LENGTH_SHORT).show();
             return true;
-        } else if (id == R.id.nav_phimbo) {
-            // Xử lý sự kiện khi nhấn vào thông báo
-            Toast.makeText(this, "Thông báo được nhấn", Toast.LENGTH_SHORT).show();
-            return true;
-        }else if (id == R.id.nav_theloai) {
+        } else if (item.getItemId() == android.R.id.home) {
+            // Chuyển đến màn hình profile
+            Intent intent = new Intent(this, ProfileActivity.class); // Thay ProfileActivity bằng tên Activity profile của bạn
+            startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
