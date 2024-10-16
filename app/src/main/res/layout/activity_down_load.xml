@@ -51,6 +51,14 @@
                     android:textColor="@android:color/white"
                     android:layout_marginTop="16dp"
                     android:layout_gravity="center" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewDownloadedMovies"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+                    android:padding="8dp"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

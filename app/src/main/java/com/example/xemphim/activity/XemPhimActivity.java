@@ -101,9 +101,7 @@ public class XemPhimActivity extends AppCompatActivity {
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
 
         btnDowload.setOnClickListener(v -> {
-            Log.d("XemPhimActivity", "Nút tải về đã được nhấn");  // Thêm dòng log để kiểm tra
             String movieName = binding.tvMovieTitle.getText().toString();
-
             // Kiểm tra nếu movieLink hợp lệ
             if (movieLink != null && !movieLink.isEmpty()) {
                 downloadMovie(movieLink, movieName);
@@ -213,66 +211,52 @@ public class XemPhimActivity extends AppCompatActivity {
         downloadTsFile(tsLinks, m3u8Link, movieName, 0, tsFiles);
     }
     private void downloadTsFile(List<String> tsLinks, String m3u8Link, String movieName, int index, List<File> tsFiles) {
-        // Kiểm tra nếu đã tải hết các file .ts
         if (index >= tsLinks.size()) {
-            // Khi tải xong tất cả file .ts, bắt đầu ghép file
-            mergeTsFiles(tsFiles, movieName);
+            mergeTsFiles(tsFiles, movieName); // Ghép file khi tải xong tất cả file .ts
             return;
         }
 
-        // Tạo link đầy đủ cho file .ts
         String tsLink = tsLinks.get(index);
         String tsFullLink = tsLink.startsWith("http") ? tsLink : m3u8Link.substring(0, m3u8Link.lastIndexOf("/") + 1) + tsLink;
 
-        // Gọi hàm downloadVideo để tải file .ts
-        File tsFile = downloadVideo(tsFullLink, movieName);
-        if (tsFile != null) {
-            tsFiles.add(tsFile); // Thêm file đã tải vào danh sách
-            // Tải file tiếp theo trong danh sách
-            downloadTsFile(tsLinks, m3u8Link, movieName, index + 1, tsFiles);
-        } else {
-            runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi tải file .ts: " + tsFullLink, Toast.LENGTH_LONG).show());
-        }
-    }
-    // Cập nhật phương thức downloadVideo để trả về file đã tải
-    private File downloadVideo(String videoLink, String movieName) {
-        // Tạo đường dẫn cho tệp video
-        File movieDir = getMovieFile(movieName);
-        File videoFile = new File(movieDir, movieName + "_" + videoLink.substring(videoLink.lastIndexOf("/") + 1));
-
-        Call<ResponseBody> call = apiService.downloadMovie(videoLink); // Gọi phương thức downloadMovie từ ApiService
+        Call<ResponseBody> call = apiService.downloadMovie(tsFullLink);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (!response.isSuccessful() || response.body() == null) {
-                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Tải video không thành công: " + videoLink, Toast.LENGTH_LONG).show());
+                    Log.e("downloadTsFile", "Lỗi khi tải file .ts: " + tsFullLink);
                     return;
                 }
 
-                try (InputStream inputStream = response.body().byteStream();
-                     FileOutputStream outputStream = new FileOutputStream(videoFile)) {
-                    Log.d("XemPhimActivity", "Đường dẫn lưu video: " + videoFile.getAbsolutePath());
+                // Lưu file .ts vào bộ nhớ
+                File movieDir = getMovieFile(movieName);
+                File tsFile = new File(movieDir, movieName + "_" + tsLink.substring(tsLink.lastIndexOf("/") + 1));
 
-                    byte[] buffer = new byte[4096]; // Đặt kích thước bộ đệm
+                try (InputStream inputStream = response.body().byteStream();
+                     FileOutputStream outputStream = new FileOutputStream(tsFile)) {
+
+                    byte[] buffer = new byte[4096];
                     int bytesRead;
                     while ((bytesRead = inputStream.read(buffer)) != -1) {
                         outputStream.write(buffer, 0, bytesRead);
                     }
-                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Đã tải về video: " + videoFile.getAbsolutePath(), Toast.LENGTH_LONG).show());
+
+                    tsFiles.add(tsFile); // Thêm file đã tải vào danh sách
+
+                    // Tải tiếp file tiếp theo
+                    downloadTsFile(tsLinks, m3u8Link, movieName, index + 1, tsFiles);
+
                 } catch (IOException e) {
-                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi ghi video: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    Log.e("downloadTsFile", "Lỗi ghi file .ts: " + e.getMessage());
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi tải video: " + t.getMessage(), Toast.LENGTH_LONG).show());
+                Log.e("downloadTsFile", "Lỗi khi tải file .ts: " + t.getMessage());
             }
         });
-
-        return videoFile; // Trả về đối tượng File sau khi đã khởi tạo
     }
-
     private void mergeTsFiles(List<File> tsFiles, String movieName) {
         File mergedFile = getMovieFile(movieName); // Tạo file đích cho phim đã ghép
 
