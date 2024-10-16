@@ -52,7 +52,6 @@ public class ProfileActivity extends AppCompatActivity {
     private  String nameUser;
     private String emailUser;
     private int idLoaiND;
-    private TextView tvTenNguoiDung, tvEmail, dsYeuThich;
     private DatabaseReference lichSuXemRef;
     private ApiService apiService;
     private DatabaseReference usersRef;
@@ -74,9 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
     public void setControl(){
-        tvTenNguoiDung = findViewById(R.id.tvTenNguoiDung);
-        tvEmail = findViewById(R.id.tvEmail);
-        dsYeuThich = findViewById(R.id.dsYeuThich);
+
 
         watchedMoviesList = new ArrayList<>();
         lichSuAdapter = new LichSuAdapter(ProfileActivity.this, watchedMoviesList);
@@ -87,12 +84,12 @@ public class ProfileActivity extends AppCompatActivity {
     public void setEven(){
         laythongtinUser();
         Toast.makeText(ProfileActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
-        tvTenNguoiDung.setText(nameUser);
-        tvEmail.setText(emailUser);
+        binding.tvTenNguoiDung.setText(nameUser);
+        binding.tvEmail.setText(emailUser);
 
         // Kiểm tra trạng thái đăng nhập
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
+        //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (idUser != null) {
             isUserLoggedIn = true; // Người dùng đã đăng nhập
             binding.btnDangNhap.setText("Đăng Xuất"); // Đổi văn bản nút thành "Đăng Xuất"
         } else {
@@ -105,21 +102,31 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (isUserLoggedIn) {
                     // Nếu người dùng đã đăng nhập, tiến hành đăng xuất
+//                    FirebaseAuth.getInstance().signOut();
+//                    isUserLoggedIn = false; // Cập nhật trạng thái đăng nhập
+//
+//                    // Cập nhật giao diện người dùng
+//                    binding.btnDangNhap.setText("Đăng Nhập");
+//                    binding.tvTenNguoiDung.setText(""); // Xóa tên người dùng
+//                    binding.tvEmail.setText(""); // Xóa email người dùng
+//                    watchedMoviesList.clear(); // Xóa danh sách phim đã xem
+//                    lichSuAdapter.notifyDataSetChanged(); // Cập nhật adapter để hiển thị danh sách rỗng
+
                     FirebaseAuth.getInstance().signOut();
-                    isUserLoggedIn = false; // Cập nhật trạng thái đăng nhập
+                    SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.clear(); // Xóa tất cả thông tin
+                    editor.apply();
 
-                    // Cập nhật giao diện người dùng
-                    binding.btnDangNhap.setText("Đăng Nhập");
-                    tvTenNguoiDung.setText(""); // Xóa tên người dùng
-                    tvEmail.setText(""); // Xóa email người dùng
-                    watchedMoviesList.clear(); // Xóa danh sách phim đã xem
-                    lichSuAdapter.notifyDataSetChanged(); // Cập nhật adapter để hiển thị danh sách rỗng
-
+                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
                     Toast.makeText(ProfileActivity.this, "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
                 } else {
                     // Nếu người dùng chưa đăng nhập, chuyển đến màn hình đăng nhập
                     Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
                     startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -138,6 +145,16 @@ public class ProfileActivity extends AppCompatActivity {
                 // Chuyển đến FavoriteMoviesActivity
                 Intent intent = new Intent(ProfileActivity.this, FavoriteMoviesActivity.class);
                 startActivity(intent);
+                finish();
+            }
+        });
+        binding.caiDat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(ProfileActivity.this, CaiDat.class);
+                startActivity(intent);
+                finish();
             }
         });
         setupBottomNavigation();

@@ -131,8 +131,12 @@ public class MainActivity extends AppCompatActivity {
         // Tham chiếu đến TextView trong header view
         TextView textView = headerView.findViewById(R.id.tvTenNguoiDung); // Thay bằng id của TextView trong layout_header
 
-        // Thay đổi nội dung TextView
-        textView.setText(nameUser);
+        if(nameUser != null){
+            // Thay đổi nội dung TextView
+            textView.setText(nameUser);
+        }else{
+            textView.setText("Khách");
+        }
     }
     private void navigationBottom() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
