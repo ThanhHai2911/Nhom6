@@ -48,13 +48,12 @@
                     android:layout_marginTop="16dp" />
 
                 <!-- Personal Info Button -->
-                <Button
+                <TextView
                     android:id="@+id/personalInfoButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thông tin cá nhân"
                     android:textColor="#FFFFFF"
-                    android:backgroundTint="#FF66B2"
                     android:layout_gravity="center"
                     android:layout_marginTop="16dp" />
 
@@ -76,7 +75,7 @@
                     <TextView
                         android:gravity="start"
                         android:id="@+id/tvTenNguoiDung"
-                        android:padding="7sp"
+                        android:padding="7dp"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
@@ -95,7 +94,7 @@
                     android:orientation="horizontal"
                     android:layout_marginTop="16dp"
                     android:gravity="center"
-                    android:padding="10dp">
+                    android:padding="5dp">
                     <TextView
                         android:textColor="@color/white"
                         android:layout_width="0dp"
@@ -107,7 +106,7 @@
                     <TextView
                         android:gravity="start"
                         android:id="@+id/tvEmail"
-                        android:padding="7sp"
+                        android:padding="7dp"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"

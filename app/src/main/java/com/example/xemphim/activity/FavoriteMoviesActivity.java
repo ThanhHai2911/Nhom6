@@ -98,7 +98,7 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
                     }
 
 
-                    // Sử dụng idUser để tải lịch sử xem phim
+                    // Sử dụng idUser để tải danh sách yêu
                     favoritesRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
