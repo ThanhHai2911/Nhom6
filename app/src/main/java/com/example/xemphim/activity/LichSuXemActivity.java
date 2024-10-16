@@ -25,6 +25,7 @@ import com.example.xemphim.databinding.ActivityLichSuXemBinding;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.Series;
+import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,6 +33,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -199,56 +201,73 @@ public class LichSuXemActivity extends AppCompatActivity {
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Nạp menu
         getMenuInflater().inflate(R.menu.menu_timkiem, menu);
-        // Tìm kiếm item trong menu
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
 
-        // Thiết lập listener cho sự kiện tìm kiếm
+        // Lấy id_user từ Firebase
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String idUser = currentUser != null ? currentUser.getUid() : null; // Lấy UID của người dùng
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Khi người dùng nhấn vào nút tìm kiếm trên bàn phím
-                // Hiển thị nội dung tìm kiếm qua Toast
-                Toast.makeText(LichSuXemActivity.this, "Tìm kiếm: " + query, Toast.LENGTH_SHORT).show();
+                if (idUser != null) { // Kiểm tra id_user không null
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("watchedMovies");
 
-                // Gọi API tìm kiếm với từ khóa và giới hạn 10 kết quả
-                apiService.searchMovies(query, 10).enqueue(new Callback<SeriesResponse>() {
-                    @Override
-                    public void onResponse(Call<SeriesResponse> call, Response<SeriesResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            List<Series> series = response.body().getData().getItems();
-                            binding.rcvlichsuxem.setAdapter(new SeriesAdapter(LichSuXemActivity.this, series));
+                    // Truy vấn Firebase theo id_user
+                    Query searchQuery = databaseReference.orderByChild("id_user")
+                            .equalTo(idUser); // Lọc theo id_user
 
-                            // Đóng SearchView sau khi tìm kiếm
-                            searchView.clearFocus();
-                        } else {
-                            Toast.makeText(LichSuXemActivity.this, "Không tìm thấy phim", Toast.LENGTH_SHORT).show();
+                    searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            watchedMoviesList.clear(); // Xóa danh sách cũ
+
+                            boolean found = false; // Biến kiểm tra xem có phim nào phù hợp không
+
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                MovieDetail.MovieItem movieDetail = snapshot.getValue(MovieDetail.MovieItem.class);
+
+                                // Kiểm tra slug có chứa từ khóa tìm kiếm không
+                                if (movieDetail != null && movieDetail.getSlug().toLowerCase().contains(query.toLowerCase())) {
+                                    watchedMoviesList.add(movieDetail); // Thêm phim vào danh sách
+                                    found = true; // Đánh dấu có phim phù hợp
+                                }
+                            }
+
+                            if (found) {
+                                lichSuAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi dữ liệu
+                            } else {
+                                Toast.makeText(LichSuXemActivity.this, "Không tìm thấy phim", Toast.LENGTH_SHORT).show();
+                            }
+
+                            searchView.clearFocus(); // Đóng SearchView sau khi tìm kiếm
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<SeriesResponse> call, Throwable t) {
-                        Toast.makeText(LichSuXemActivity.this, "Lỗi khi tìm kiếm", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(LichSuXemActivity.this, "Lỗi khi tìm kiếm", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(LichSuXemActivity.this, "Người dùng không hợp lệ", Toast.LENGTH_SHORT).show();
+                }
 
-                //searchView.clearFocus();
                 searchItem.collapseActionView();
-
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // Xử lý khi nội dung tìm kiếm thay đổi (nếu cần)
                 return false;
             }
         });
 
         return true;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
