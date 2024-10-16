@@ -72,6 +72,8 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-dash:1.4.1")
     implementation("androidx.media3:media3-ui:1.4.1")
     implementation("androidx.media3:media3-exoplayer-hls:1.4.1")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
 
     implementation ("com.squareup.picasso:picasso:2.71828")
     implementation ("com.github.bumptech.glide:glide:4.15.1")

@@ -4,10 +4,12 @@ import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 public interface ApiService {
     @GET("danh-sach/phim-moi-cap-nhat")
@@ -37,5 +39,7 @@ public interface ApiService {
 
     @GET("v1/api/quoc-gia/{slug}")
     Call<SeriesResponse> getQuocGia(@Path("slug") String slug);
+    @GET
+    Call<ResponseBody> downloadMovie(@Url String movieLink);
 }
 

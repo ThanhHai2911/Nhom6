@@ -1,13 +1,27 @@
 package com.example.xemphim.activity;
 
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.media3.ui.PlayerView;
 import android.widget.Toast;
 
@@ -27,12 +41,24 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.ui.AspectRatioFrameLayout;
 
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,8 +73,9 @@ public class XemPhimActivity extends AppCompatActivity {
     private String movieLink;
     private ApiService apiService;
     private String movieSlug;
-    private ImageButton btnAddToFavorites;
+    private ImageButton btnDowload;
     private DatabaseReference favoritesRef;
+    private OkHttpClient client = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +89,7 @@ public class XemPhimActivity extends AppCompatActivity {
 
     public void setControl() {
         btnFullScreen = binding.btnFullScreen;
-        btnAddToFavorites = binding.btnAddToFavorites;
+        btnDowload = binding.btnDowload;
         binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 4));
         favoritesRef = FirebaseDatabase.getInstance().getReference("favorites");
     }
@@ -70,13 +97,27 @@ public class XemPhimActivity extends AppCompatActivity {
     public void setEvent() {
         initializePlayer();
         movieSlug = getIntent().getStringExtra("slug");
+
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
+
+        btnDowload.setOnClickListener(v -> {
+            Log.d("XemPhimActivity", "Nút tải về đã được nhấn");  // Thêm dòng log để kiểm tra
+            String movieName = binding.tvMovieTitle.getText().toString();
+
+            // Kiểm tra nếu movieLink hợp lệ
+            if (movieLink != null && !movieLink.isEmpty()) {
+                downloadMovie(movieLink, movieName);
+            } else {
+                Toast.makeText(XemPhimActivity.this, "Liên kết phim không hợp lệ!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
     }
-    @OptIn(markerClass = UnstableApi.class)
+
     private void initializePlayer() {
-        String movieLink = getIntent().getStringExtra("movie_link");
+        movieLink = getIntent().getStringExtra("movie_link"); // Đã sửa để lấy lại movieLink
         if (exoPlayer == null) {
             exoPlayer = new ExoPlayer.Builder(this).build();
             PlayerView playerView = binding.playerView; // Đảm bảo đây là PlayerView từ Media3
@@ -103,6 +144,151 @@ public class XemPhimActivity extends AppCompatActivity {
             exoPlayer.setMediaItem(mediaItem);
             exoPlayer.prepare();
             exoPlayer.play();
+        }
+    }
+
+    public File getMovieFile(String movieName) {
+        // Lấy thư mục Movies riêng của ứng dụng
+        File movieDir = new File(getExternalFilesDir(Environment.DIRECTORY_MOVIES), "MyMovies/" + movieName);
+
+        if (!movieDir.exists()) {
+            boolean created = movieDir.mkdirs();
+            if (!created) {
+                Log.e("XemPhimActivity", "Không thể tạo thư mục lưu phim");
+            }
+        }
+        return movieDir;
+    }
+
+    // Hàm tải về từng đoạn video
+    private void downloadMovie(String m3u8Link, String movieName) {
+        Call<ResponseBody> call = apiService.downloadMovie(m3u8Link);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Tải file m3u8 không thành công!", Toast.LENGTH_LONG).show());
+                    return;
+                }
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body().byteStream()))) {
+                    String line;
+                    List<String> tsLinks = new ArrayList<>();
+                    while ((line = reader.readLine()) != null) {
+                        if (line.endsWith(".m3u8")) {
+                            // Nếu là m3u8 con, tải đệ quy
+                            String subM3U8Link = line.startsWith("http") ? line : m3u8Link.substring(0, m3u8Link.lastIndexOf("/") + 1) + line;
+                            downloadMovie(subM3U8Link, movieName);
+                            return;
+                        }
+                        if (line.endsWith(".ts")) {
+                            tsLinks.add(line); // Thêm link .ts vào danh sách
+                        }
+                    }
+
+                    if (tsLinks.isEmpty()) {
+                        runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Không tìm thấy link .ts trong file m3u8!", Toast.LENGTH_LONG).show());
+                        return;
+                    }
+
+                    // Tải các file .ts tuần tự
+                    downloadAllTsFilesSequentially(tsLinks, m3u8Link, movieName);
+
+                } catch (IOException e) {
+                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi phân tích file m3u8: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi tải file m3u8: " + t.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+    // Hàm để tải tuần tự từng file .ts
+    private void downloadAllTsFilesSequentially(List<String> tsLinks, String m3u8Link, String movieName) {
+        List<File> tsFiles = new ArrayList<>(); // Lưu các file .ts đã tải
+
+        // Đệ quy để tải từng file .ts theo thứ tự
+        downloadTsFile(tsLinks, m3u8Link, movieName, 0, tsFiles);
+    }
+    private void downloadTsFile(List<String> tsLinks, String m3u8Link, String movieName, int index, List<File> tsFiles) {
+        // Kiểm tra nếu đã tải hết các file .ts
+        if (index >= tsLinks.size()) {
+            // Khi tải xong tất cả file .ts, bắt đầu ghép file
+            mergeTsFiles(tsFiles, movieName);
+            return;
+        }
+
+        // Tạo link đầy đủ cho file .ts
+        String tsLink = tsLinks.get(index);
+        String tsFullLink = tsLink.startsWith("http") ? tsLink : m3u8Link.substring(0, m3u8Link.lastIndexOf("/") + 1) + tsLink;
+
+        // Gọi hàm downloadVideo để tải file .ts
+        File tsFile = downloadVideo(tsFullLink, movieName);
+        if (tsFile != null) {
+            tsFiles.add(tsFile); // Thêm file đã tải vào danh sách
+            // Tải file tiếp theo trong danh sách
+            downloadTsFile(tsLinks, m3u8Link, movieName, index + 1, tsFiles);
+        } else {
+            runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi tải file .ts: " + tsFullLink, Toast.LENGTH_LONG).show());
+        }
+    }
+    // Cập nhật phương thức downloadVideo để trả về file đã tải
+    private File downloadVideo(String videoLink, String movieName) {
+        // Tạo đường dẫn cho tệp video
+        File movieDir = getMovieFile(movieName);
+        File videoFile = new File(movieDir, movieName + "_" + videoLink.substring(videoLink.lastIndexOf("/") + 1));
+
+        Call<ResponseBody> call = apiService.downloadMovie(videoLink); // Gọi phương thức downloadMovie từ ApiService
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Tải video không thành công: " + videoLink, Toast.LENGTH_LONG).show());
+                    return;
+                }
+
+                try (InputStream inputStream = response.body().byteStream();
+                     FileOutputStream outputStream = new FileOutputStream(videoFile)) {
+                    Log.d("XemPhimActivity", "Đường dẫn lưu video: " + videoFile.getAbsolutePath());
+
+                    byte[] buffer = new byte[4096]; // Đặt kích thước bộ đệm
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Đã tải về video: " + videoFile.getAbsolutePath(), Toast.LENGTH_LONG).show());
+                } catch (IOException e) {
+                    runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi ghi video: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi tải video: " + t.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
+
+        return videoFile; // Trả về đối tượng File sau khi đã khởi tạo
+    }
+
+    private void mergeTsFiles(List<File> tsFiles, String movieName) {
+        File mergedFile = getMovieFile(movieName); // Tạo file đích cho phim đã ghép
+
+        try (FileOutputStream fos = new FileOutputStream(mergedFile)) {
+            for (File tsFile : tsFiles) {
+                try (FileInputStream fis = new FileInputStream(tsFile)) {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = fis.read(buffer)) != -1) {
+                        fos.write(buffer, 0, bytesRead); // Ghi dữ liệu của file .ts vào file hợp nhất
+                    }
+                }
+            }
+            runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Đã ghép file thành công: " + mergedFile.getAbsolutePath(), Toast.LENGTH_LONG).show());
+        } catch (IOException e) {
+            runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi ghép file .ts: " + e.getMessage(), Toast.LENGTH_LONG).show());
         }
     }
 
@@ -140,8 +326,8 @@ public class XemPhimActivity extends AppCompatActivity {
                     List<MovieDetail.Episode> tapPhim = movieDetails.getEpisodes();
                     String movieTitle = movieDetails.getMovie().getName();
                     String episodeName = getIntent().getStringExtra("episodeCurrent");
-                    binding.tvMovieTitle.setText(movieDetails.getMovie().getName());
                     binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
+
                     if (tapPhim != null && !tapPhim.isEmpty()) {
                         serverDataList.clear();
                         for (MovieDetail.Episode episode : tapPhim) {
@@ -204,15 +390,17 @@ public class XemPhimActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (exoPlayer != null) {
-            exoPlayer.pause();
+        if (exoPlayer != null && exoPlayer.isPlaying()) {
+            exoPlayer.pause(); // Dừng video khi Activity tạm dừng
         }
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (exoPlayer != null) {
+            exoPlayer.play(); // Phát lại video khi Activity trở lại
+        }
     }
 }
+
