@@ -53,7 +53,6 @@ public class LichSuXemActivity extends AppCompatActivity {
     private String idUser;
     private ApiService apiService;
     private DatabaseReference usersRef;
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +82,6 @@ public class LichSuXemActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Lịch sử đã xem"); // Đặt tên mới cho Toolbar
             getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Hiện biểu tượng trở về
         }
-        swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            loadWatchHistory();
-        });
     }
 
     public void setControl() {
@@ -128,7 +123,6 @@ public class LichSuXemActivity extends AppCompatActivity {
 
                                 if (movieSlug != null) {
                                     MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
-                                    MovieDetail.Episode.ServerData serverData = new MovieDetail.Episode.ServerData();
                                     movieItem.setSlug(movieSlug);
                                     movieItem.setEpisodeCurrent(episodeName);
                                     fetchMovieDetails(movieSlug, movieItem);
@@ -139,12 +133,10 @@ public class LichSuXemActivity extends AppCompatActivity {
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                             Toast.makeText(LichSuXemActivity.this, "Lỗi khi tải lịch sử xem", Toast.LENGTH_SHORT).show();
-                            swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                         }
                     });
                 } else {
                     Toast.makeText(LichSuXemActivity.this, "Người dùng không tồn tại trong cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
@@ -185,17 +177,14 @@ public class LichSuXemActivity extends AppCompatActivity {
                     // Update click listener outside this function if necessary
                     binding.progressBar.setVisibility(View.GONE);
                     binding.layout.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 } else {
                     Log.e("LichSuXemActivity", "Failed to fetch movie details for slug: " + slug);
-                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Log.e("LichSuXemActivity", "Error fetching movie details", t);
-                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
