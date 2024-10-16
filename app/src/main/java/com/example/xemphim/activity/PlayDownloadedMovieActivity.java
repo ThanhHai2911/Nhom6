@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
+import androidx.media3.datasource.DefaultDataSource;
+import androidx.media3.exoplayer.hls.HlsMediaSource;
 import androidx.media3.ui.PlayerView;
 import com.example.xemphim.R;
 import androidx.media3.exoplayer.ExoPlayer;
@@ -45,42 +47,36 @@ public class PlayDownloadedMovieActivity extends AppCompatActivity {
         // Lấy thư mục phim dựa trên tên phim
         File movieDir = getMovieFile(movieName);
 
-        if (movieDir.exists() && movieDir.isDirectory()) {
-            // Lấy danh sách các file .ts trong thư mục phim theo thứ tự
-            File[] tsFiles = movieDir.listFiles((dir, name) -> name.endsWith(".ts"));
+        // Kiểm tra nếu thư mục tồn tại và có chứa file playlist .m3u8
+        File m3u8File = new File(movieDir, "playlist.m3u8");
+        if (m3u8File.exists()) {
+            Log.d("PlayDownloadedMovieActivity", "Đang phát từ file playlist: " + m3u8File.getAbsolutePath());
 
-            if (tsFiles != null && tsFiles.length > 0) {
-                Arrays.sort(tsFiles); // Sắp xếp theo tên file để phát theo thứ tự
+            // Cấu hình ExoPlayer để phát HLS
+            DefaultTrackSelector trackSelector = new DefaultTrackSelector(this);
+            player = new ExoPlayer.Builder(this)
+                    .setTrackSelector(trackSelector)
+                    .build();
 
-                Log.d("PlayDownloadedMovieActivity", "Số lượng tệp .ts: " + tsFiles.length);
+            // Liên kết player với PlayerView
+            playerView.setPlayer(player);
 
-                // Cấu hình ExoPlayer để phát phim
-                DefaultTrackSelector trackSelector = new DefaultTrackSelector(this);
-                player = new ExoPlayer.Builder(this)
-                        .setTrackSelector(trackSelector)
-                        .build();
+            // Sử dụng HlsMediaSource để phát tệp HLS
+            Uri hlsUri = Uri.fromFile(m3u8File);
+            HlsMediaSource hlsMediaSource = new HlsMediaSource.Factory(
+                    new DefaultDataSource.Factory(this))
+                    .createMediaSource(MediaItem.fromUri(hlsUri));
 
-                // Liên kết player với PlayerView
-                playerView.setPlayer(player);
-
-                // Tạo MediaItems từ các tệp .ts và thêm vào player
-                for (File tsFile : tsFiles) {
-                    Uri fileUri = Uri.fromFile(tsFile);
-                    MediaItem mediaItem = MediaItem.fromUri(fileUri);
-                    player.addMediaItem(mediaItem);
-                }
-
-                // Chuẩn bị và phát
-                player.prepare();
-                player.play();
-            } else {
-                Log.e("PlayDownloadedMovieActivity", "Không tìm thấy tệp .ts nào để phát.");
-            }
+            // Chuẩn bị và phát
+            player.setMediaSource(hlsMediaSource);
+            player.prepare();
+            player.play();
         } else {
-            Log.e("PlayDownloadedMovieActivity", "Thư mục phim không tồn tại hoặc không hợp lệ.");
+            Log.e("PlayDownloadedMovieActivity", "Không tìm thấy tệp playlist .m3u8");
+            Toast.makeText(this, "Không tìm thấy tệp playlist để phát phim!", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
-
 
     @Override
     protected void onStart() {

@@ -46,10 +46,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -212,6 +214,7 @@ public class XemPhimActivity extends AppCompatActivity {
     }
     private void downloadTsFile(List<String> tsLinks, String m3u8Link, String movieName, int index, List<File> tsFiles) {
         if (index >= tsLinks.size()) {
+            createM3U8Playlist(getMovieFile(movieName), tsFiles); // Tạo tệp .m3u8 sau khi tải xong tất cả file .ts
             mergeTsFiles(tsFiles, movieName); // Ghép file khi tải xong tất cả file .ts
             return;
         }
@@ -257,6 +260,7 @@ public class XemPhimActivity extends AppCompatActivity {
             }
         });
     }
+
     private void mergeTsFiles(List<File> tsFiles, String movieName) {
         File mergedFile = getMovieFile(movieName); // Tạo file đích cho phim đã ghép
 
@@ -275,7 +279,26 @@ public class XemPhimActivity extends AppCompatActivity {
             runOnUiThread(() -> Toast.makeText(XemPhimActivity.this, "Lỗi khi ghép file .ts: " + e.getMessage(), Toast.LENGTH_LONG).show());
         }
     }
+    private void createM3U8Playlist(File movieDir, List<File> tsFiles) {
+        File m3u8File = new File(movieDir, "playlist.m3u8");
 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(m3u8File))) {
+            writer.write("#EXTM3U\n");
+            writer.write("#EXT-X-VERSION:3\n");
+            writer.write("#EXT-X-TARGETDURATION:10\n");
+            writer.write("#EXT-X-MEDIA-SEQUENCE:0\n");
+
+            for (File tsFile : tsFiles) {
+                writer.write("#EXTINF:10.0,\n");
+                writer.write(tsFile.getName() + "\n");
+            }
+
+            writer.write("#EXT-X-ENDLIST\n");
+            writer.flush();
+        } catch (IOException e) {
+            Log.e("PlayDownloadedMovieActivity", "Lỗi khi tạo file playlist.m3u8", e);
+        }
+    }
     private void toggleFullScreen() {
         long currentPosition = exoPlayer.getCurrentPosition(); // Lưu lại thời điểm hiện tại của video
 
