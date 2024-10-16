@@ -54,7 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
     private  String nameUser;
     private String emailUser;
     private int idLoaiND;
-    private TextView tvTenNguoiDung, tvEmail;
+    private TextView tvTenNguoiDung, tvEmail, dsYeuThich;
     private DatabaseReference lichSuXemRef;
     private ApiService apiService;
     private DatabaseReference usersRef;
@@ -77,6 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
     public void setControl(){
         tvTenNguoiDung = findViewById(R.id.tvTenNguoiDung);
         tvEmail = findViewById(R.id.tvEmail);
+        dsYeuThich = findViewById(R.id.dsYeuThich);
 
         watchedMoviesList = new ArrayList<>();
         lichSuXemAdapter = new LichSuXemAdapter(ProfileActivity.this, watchedMoviesList);

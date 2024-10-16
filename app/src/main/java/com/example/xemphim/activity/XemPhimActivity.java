@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
+import com.example.xemphim.R;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityXemphimBinding; // Import View Binding
 import com.example.xemphim.model.FavoriteMovie;
@@ -75,6 +76,11 @@ public class XemPhimActivity extends AppCompatActivity {
 
         setControl();
         setEvent();
+        // Kiểm tra và cập nhật màu nút trái tim
+        checkAndToggleFavorite();
+
+        // Thêm sự kiện nhấn cho nút thêm vào danh sách yêu thích
+        btnAddToFavorites.setOnClickListener(v -> addToFavorites());
 
     }
 
@@ -91,7 +97,7 @@ public class XemPhimActivity extends AppCompatActivity {
         initializePlayer();
         // Thiết lập sự kiện cho nút toàn màn hình
         movieSlug = getIntent().getStringExtra("slug");
-        btnAddToFavorites.setOnClickListener(v -> addToFavorites());
+
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
@@ -100,17 +106,96 @@ public class XemPhimActivity extends AppCompatActivity {
 
     }
     private void addToFavorites() {
-        // Lấy thông tin phim hiện tại
-        String movieId = movieSlug; // Hoặc bất kỳ ID nào bạn có cho phim
-        String movieTitle = binding.tvMovieTitle.getText().toString();
-        String movieLink = serverDataList.get(0).getLinkM3u8(); // Link tập phim đầu tiên
-        FavoriteMovie favoriteMovie = new FavoriteMovie(movieId, movieTitle, movieLink, movieSlug);
+        // Lấy thông tin cần thiết
+        String userId = idUser; // ID của người dùng hiện tại
+        String movieSlug = this.movieSlug; // Slug của phim
 
-        // Lưu vào Firebase
-        favoritesRef.child(movieId).setValue(favoriteMovie)
-                .addOnSuccessListener(aVoid -> Toast.makeText(XemPhimActivity.this, "Đã thêm vào yêu thích!", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        // Tham chiếu đến bảng Favorite
+        DatabaseReference favoritesRef = FirebaseDatabase.getInstance().getReference("Favorite");
+
+        // Tham chiếu đến vị trí phim yêu thích
+        favoritesRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean movieExists = false;
+                String movieIdToDelete = ""; // Để lưu id_phim khi cần xóa
+
+                // Kiểm tra từng entry trong danh sách yêu thích
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    FavoriteMovie favoriteMovie = snapshot.getValue(FavoriteMovie.class);
+                    if (favoriteMovie != null && favoriteMovie.getId_user().equals(userId)) {
+                        movieExists = true;
+                        movieIdToDelete = snapshot.getKey(); // Lưu id_phim để xóa
+                        break;
+                    }
+                }
+
+                if (movieExists) {
+                    // Nếu phim đã tồn tại, xóa nó
+                    favoritesRef.child(movieIdToDelete).removeValue()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(XemPhimActivity.this, "Đã xóa khỏi danh sách yêu thích!", Toast.LENGTH_SHORT).show();
+                                // Đổi màu trái tim về trắng
+                                btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24);
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                } else {
+                    // Nếu phim chưa tồn tại, thêm nó
+                    FavoriteMovie favoriteMovie = new FavoriteMovie(userId, movieSlug);
+                    favoritesRef.push().setValue(favoriteMovie)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(XemPhimActivity.this, "Đã thêm vào yêu thích!", Toast.LENGTH_SHORT).show();
+                                // Đổi màu trái tim thành đỏ
+                                btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(XemPhimActivity.this, "Lỗi: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    private void checkAndToggleFavorite() {
+        // Lấy thông tin cần thiết
+        String userId = idUser; // ID của người dùng hiện tại
+        String movieSlug = this.movieSlug; // Slug của phim
+        DatabaseReference favoritesRef = FirebaseDatabase.getInstance().getReference("Favorite");
+
+        // Kiểm tra nếu phim đã có trong danh sách yêu thích
+        favoritesRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean movieExists = false;
+
+                // Kiểm tra từng entry trong danh sách yêu thích
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    FavoriteMovie favoriteMovie = snapshot.getValue(FavoriteMovie.class);
+                    if (favoriteMovie != null && favoriteMovie.getId_user().equals(userId)) {
+                        movieExists = true;
+                        break;
+                    }
+                }
+
+                // Nếu phim đã tồn tại, đổi màu nút thành đỏ
+                if (movieExists) {
+                    btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
+                } else {
+                    // Nếu phim chưa tồn tại, để màu trắng
+                    btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(XemPhimActivity.this, "Lỗi: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void initializePlayer() {
         String movieLink = getIntent().getStringExtra("movie_link");
