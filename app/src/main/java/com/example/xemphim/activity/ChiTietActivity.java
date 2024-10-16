@@ -1,29 +1,36 @@
 package com.example.xemphim.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
-import com.example.xemphim.R;
 import com.example.xemphim.adapter.SeriesAdapter;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityChitietphimBinding;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.Series;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 
 import retrofit2.Call;
@@ -32,8 +39,13 @@ import retrofit2.Response;
 
 import android.text.TextUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class ChiTietActivity extends AppCompatActivity {
     private String movieSlug;
@@ -43,24 +55,22 @@ public class ChiTietActivity extends AppCompatActivity {
     private TapPhimAdapter tapPhimAdapter;
     private String movieLink;
     private MovieDetail.MovieItem movieDetails;
-
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private FirebaseAuth mAuth;
+    private String idUser;
+    private  String nameUser;
+    private String emailUser;
+    private int idLoaiND;
+    private DatabaseReference lichSuXemRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChitietphimBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        setMauTrangThai();
+        lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
+        laythongtinUser();
         setEvent();
-    }
-
-    private void setMauTrangThai() {
-        // Thiết lập màu sắc cho thanh trạng thái
-        Window window = getWindow();
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
-
-        // Thiết lập màu sắc cho thanh điều hướng
-        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
     }
 
     private void setEvent() {
@@ -73,8 +83,10 @@ public class ChiTietActivity extends AppCompatActivity {
 //        // Xử lý sự kiện click nút xem phim
         binding.btnXemPhim.setOnClickListener(view -> {
             if (movieLink != null && !movieLink.isEmpty()) {
-               // saveWatchedMovie(movieDetails.getId(), movieDetails.getName(), movieDetails.getEpisodeCurrent(), movieDetails.getPosterUrl(), movieLink);
+
                 String episodeCurrent = serverDataList.get(0).getName();
+                // Lưu lịch sử xem phim
+                luuLichSuXem(movieSlug);
                 // Khởi động activity phát video
                 Intent intent = new Intent(this, XemPhimActivity.class);
                 intent.putExtra("movie_link", movieLink);  // Truyền link phim
@@ -85,26 +97,90 @@ public class ChiTietActivity extends AppCompatActivity {
                 Toast.makeText(ChiTietActivity.this, "Link phim không khả dụng", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
-//    private void saveWatchedMovie(String movieId, String movieTitle, String episodeCurrent, String posterUrl,String linkM3u8) {
-//        // Get a reference to the Firebase Firestore or Realtime Database
-//        FirebaseFirestore db = FirebaseFirestore.getInstance(); // For Firestore
-//        // DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("watched_movies"); // For Realtime Database
-//
-//        MovieDetail watchedMovie = new MovieDetail(movieId,movieTitle, episodeCurrent, posterUrl, linkM3u8);
-//
-//        // Save to Firestore
-//        db.collection("watched_movies").document(movieId) // Use movieId as document ID to avoid duplicates
-//                .set(watchedMovie)
-//                .addOnSuccessListener(aVoid -> {
-//                    Log.d("Firestore", "DocumentSnapshot successfully written!");
-//                })
-//                .addOnFailureListener(e -> {
-//                    Log.w("Firestore", "Error writing document", e);
-//                });
-//    }
+    private void luuLichSuXem(String movieSlug) {
+        if (idUser == null || movieSlug == null) {
+            Toast.makeText(ChiTietActivity.this, "Không thể lưu lịch sử, thiếu thông tin", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Query để kiểm tra xem slug đã tồn tại cho user này chưa
+        Query query = lichSuXemRef.orderByChild("id_user").equalTo(idUser);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean exists = false;
+
+                // Duyệt qua các bản ghi lịch sử xem phim của user
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String existingSlug = snapshot.child("slug").getValue(String.class);
+                    if (existingSlug != null && existingSlug.equals(movieSlug)) {
+                        exists = true; // Slug đã tồn tại
+                        break;
+                    }
+                }
+
+                if (exists) {
+                    // Slug đã tồn tại, không thêm lịch sử xem phim mới
+                    Toast.makeText(ChiTietActivity.this, "Phim này đã có trong lịch sử xem của bạn", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Slug chưa tồn tại, tiến hành thêm mới
+                    addNewMovieHistory(movieSlug);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(ChiTietActivity.this, "Lỗi khi kiểm tra lịch sử", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Hàm để thêm mới lịch sử xem phim nếu slug chưa tồn tại
+    private void addNewMovieHistory(String movieSlug) {
+        // Tạo ID mới cho lịch sử xem phim
+        String idLichSuXem = lichSuXemRef.push().getKey();
+
+        // Tạo thời gian xem phim (watched_at)
+        String watchedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        // Tạo bản ghi lịch sử xem phim
+        Map<String, Object> lichSuXem = new HashMap<>();
+        lichSuXem.put("id_user", idUser);
+        lichSuXem.put("slug", movieSlug); // slug của phim
+        lichSuXem.put("watched_at", watchedAt);
+
+        // Lưu vào Firebase dưới node `LichSuXem`
+        lichSuXemRef.child(idLichSuXem).setValue(lichSuXem)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(ChiTietActivity.this, "Lưu lịch sử xem phim thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ChiTietActivity.this, "Lưu lịch sử xem phim thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
+    // Helper method to create the movie data map
+    private Map<String, Object> createMovieDataMap(String movieSlug, String movieLink, String episodeCurrent, String userId) {
+        Map<String, Object> movieData = new HashMap<>();
+        movieData.put("slug", movieSlug);
+        movieData.put("link", movieLink);
+        movieData.put("episode", episodeCurrent);
+        movieData.put("userId", userId); // Save the user ID
+        return movieData;
+    }
+
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+        nameUser = sharedPreferences.getString("name", null);
+        emailUser  = sharedPreferences.getString("email", null);
+        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
+
+    }
 
     private void loadMovieDetails(String slug) {
         binding.progressBar.setVisibility(View.VISIBLE);

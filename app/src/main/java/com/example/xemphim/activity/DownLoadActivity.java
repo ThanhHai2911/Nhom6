@@ -4,6 +4,7 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.WindowManager;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -14,7 +15,6 @@ import com.example.xemphim.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class DownLoadActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,5 +53,18 @@ public class DownLoadActivity extends AppCompatActivity {
                 return true; // Trả về true nếu đã xử lý
             }
         });
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Giữ màn hình sáng khi ứng dụng hoạt động
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.xemphim.activity;
 
-import android.view.Window;
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -12,14 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
-import com.example.xemphim.R;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityXemphimBinding; // Import View Binding
+import com.example.xemphim.model.FavoriteMovie;
 import com.example.xemphim.model.MovieDetail;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
@@ -28,9 +28,22 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,41 +59,57 @@ public class XemPhimActivity extends AppCompatActivity {
     private String movieLink;
     private ApiService apiService;
     private String movieSlug;
+    private ImageButton btnAddToFavorites; // Thêm biến cho nút yêu thích
+    private DatabaseReference favoritesRef;
+    private String idUser;
+    private  String nameUser;
+    private String emailUser;
+    private int idLoaiND;
+    private DatabaseReference lichSuXemRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityXemphimBinding.inflate(getLayoutInflater()); // Khởi tạo View Binding
         setContentView(binding.getRoot()); // Đặt layout cho Activity
-        setMauTrangThai();
+
         setControl();
         setEvent();
 
     }
 
-    private void setMauTrangThai() {
-        // Thiết lập màu sắc cho thanh trạng thái
-        Window window = getWindow();
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
-
-        // Thiết lập màu sắc cho thanh điều hướng
-        window.setNavigationBarColor(ContextCompat.getColor(this, R.color.meBlack)); // Thay your_color bằng màu bạn muốn
-    }
-
     public void setControl() {
         // Gán View cho các biến
         btnFullScreen = binding.btnFullScreen; // Gán nút toàn màn hình
+        btnAddToFavorites = binding.btnAddToFavorites; // Gán nút yêu thích
         binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 4)); // Thiết lập RecyclerView
+        // Khởi tạo Firebase Database
+        favoritesRef = FirebaseDatabase.getInstance().getReference("favorites"); // Thay "favorites" bằng tên bảng của bạn
     }
 
     public void setEvent() {
         initializePlayer();
         // Thiết lập sự kiện cho nút toàn màn hình
         movieSlug = getIntent().getStringExtra("slug");
+        btnAddToFavorites.setOnClickListener(v -> addToFavorites());
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
+        lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
+        laythongtinUser();
 
+    }
+    private void addToFavorites() {
+        // Lấy thông tin phim hiện tại
+        String movieId = movieSlug; // Hoặc bất kỳ ID nào bạn có cho phim
+        String movieTitle = binding.tvMovieTitle.getText().toString();
+        String movieLink = serverDataList.get(0).getLinkM3u8(); // Link tập phim đầu tiên
+        FavoriteMovie favoriteMovie = new FavoriteMovie(movieId, movieTitle, movieLink, movieSlug);
+
+        // Lưu vào Firebase
+        favoritesRef.child(movieId).setValue(favoriteMovie)
+                .addOnSuccessListener(aVoid -> Toast.makeText(XemPhimActivity.this, "Đã thêm vào yêu thích!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void initializePlayer() {
@@ -123,7 +152,7 @@ public class XemPhimActivity extends AppCompatActivity {
     }
 
     private void toggleFullScreen() {
-       // Lưu lại thời điểm hiện tại của video
+        // Lưu lại thời điểm hiện tại của video
 
         if (isFullScreen) {
             // Chuyển về chế độ portrait
@@ -168,7 +197,7 @@ public class XemPhimActivity extends AppCompatActivity {
                                 String movieTitle = movieDetails.getMovie().getName();
                                 String episodeName = selectedEpisode.getName();
                                 binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
-
+                                luuLichSuXem(movieSlug);
                                 playEpisode(newMovieLink);
                             }
                         });
@@ -191,8 +220,98 @@ public class XemPhimActivity extends AppCompatActivity {
         });
     }
 
+    private void luuLichSuXem(String movieSlug) {
+        if (idUser == null || movieSlug == null) {
+            Toast.makeText(XemPhimActivity.this, "Không thể lưu lịch sử, thiếu thông tin", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Query để kiểm tra xem slug đã tồn tại cho user này chưa
+        Query query = lichSuXemRef.orderByChild("id_user").equalTo(idUser);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String idLichSuXem = null;
+                // Duyệt qua các bản ghi lịch sử xem phim của user
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String existingSlug = snapshot.child("slug").getValue(String.class);
+                    if (existingSlug != null && existingSlug.equals(movieSlug)) {
+                        idLichSuXem = snapshot.getKey(); // Lấy ID của bản ghi để cập nhật
+                        break;
+                    }
+                }
+
+                if (idLichSuXem != null) {
+                    // Nếu slug tồn tại, cập nhật tập phim mới
+                   // updateExistingMovieHistory(idLichSuXem, episodeName, movieLink);
+                } else {
+                    // Nếu slug chưa tồn tại, tiến hành thêm mới
+                    addNewMovieHistory(movieSlug);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(XemPhimActivity.this, "Lỗi khi kiểm tra lịch sử", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Hàm để thêm mới lịch sử xem phim nếu slug chưa tồn tại
+    private void addNewMovieHistory(String movieSlug) {
+        // Tạo ID mới cho lịch sử xem phim
+        String idLichSuXem = lichSuXemRef.push().getKey();
+
+        // Tạo thời gian xem phim (watched_at)
+        String watchedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        // Tạo bản ghi lịch sử xem phim
+        Map<String, Object> lichSuXem = new HashMap<>();
+        lichSuXem.put("id_user", idUser);
+        lichSuXem.put("slug", movieSlug); // slug của phim
+        lichSuXem.put("watched_at", watchedAt);
+
+        // Lưu vào Firebase dưới node `LichSuXem`
+        lichSuXemRef.child(idLichSuXem).setValue(lichSuXem)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(XemPhimActivity.this, "Lưu lịch sử xem phim thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(XemPhimActivity.this, "Lưu lịch sử xem phim thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+        nameUser = sharedPreferences.getString("name", null);
+        emailUser  = sharedPreferences.getString("email", null);
+        idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
+
+    }
+//    // Hàm để cập nhật lịch sử xem phim nếu slug tồn tại
+//    private void updateExistingMovieHistory(String idLichSuXem, String episodeName, String movieLink) {
+//        String watchedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+//
+//        Map<String, Object> updates = new HashMap<>();
+//        updates.put("episode_name", episodeName);
+//        updates.put("movie_link", movieLink);
+//        updates.put("watched_at", watchedAt);
+//
+//        lichSuXemRef.child(idLichSuXem).updateChildren(updates)
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        Toast.makeText(XemPhimActivity.this, "Cập nhật lịch sử xem thành công", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Toast.makeText(XemPhimActivity.this, "Cập nhật lịch sử xem thất bại", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//    }
 
 
+
+    //config
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);

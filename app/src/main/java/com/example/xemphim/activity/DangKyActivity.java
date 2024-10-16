@@ -3,7 +3,9 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -13,18 +15,26 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
+import com.example.xemphim.model.LoaiNguoiDung;
+import com.example.xemphim.model.TrangThai;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class DangKyActivity extends AppCompatActivity {
+    // Các biến cần thiết
     private EditText edtHT, edtEmail, edtMk, edtNLMK;
     private Button btnDangKy;
     private ImageView ic_back;
@@ -64,7 +74,6 @@ public class DangKyActivity extends AppCompatActivity {
             }
         });
 
-
         ic_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,8 +82,39 @@ public class DangKyActivity extends AppCompatActivity {
                 finish();
             }
         });
-    }
 
+//        // Khởi tạo Firebase Database
+//        usersRef = FirebaseDatabase.getInstance().getReference("loaiNguoiDung");
+//
+//        // Thêm loại người dùng vào Firebase
+//        addLoaiNguoiDung();
+
+
+    }
+    private void addLoaiNguoiDung() {
+        // Tạo các loại người dùng
+        LoaiNguoiDung thuong = new LoaiNguoiDung(0, "thường");
+        LoaiNguoiDung vip = new LoaiNguoiDung(1, "vip");
+        LoaiNguoiDung admin = new LoaiNguoiDung(2, "admin");
+        LoaiNguoiDung quanLy = new LoaiNguoiDung(3, "quản lý");
+
+        // Sử dụng List để lưu trữ các loại người dùng
+        List<LoaiNguoiDung> loaiNguoiDungList = new ArrayList<>();
+        loaiNguoiDungList.add(thuong);
+        loaiNguoiDungList.add(vip);
+        loaiNguoiDungList.add(admin);
+        loaiNguoiDungList.add(quanLy);
+
+        // Thêm danh sách loại người dùng vào Firebase
+        usersRef.setValue(loaiNguoiDungList)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(DangKyActivity.this, "Thêm loại người dùng thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(DangKyActivity.this, "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
     private void setControl() {
         edtHT = findViewById(R.id.edtHT);
         edtEmail = findViewById(R.id.edtEmail);
@@ -89,11 +129,9 @@ public class DangKyActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Email đã tồn tại
                     Toast.makeText(DangKyActivity.this, "Email đã được sử dụng", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Đăng ký tài khoản mới
-                    registerUser(email, hoTen, matKhau);
+                    generateMaKH(hoTen, email, matKhau);
                 }
             }
 
@@ -104,30 +142,86 @@ public class DangKyActivity extends AppCompatActivity {
         });
     }
 
-    private void registerUser(final String email, final String hoTen, String matKhau) {
+    // Hàm tạo mã khách hàng
+    private void generateMaKH(final String hoTen, final String email, final String matKhau) {
+        String maKH = createMaKH(hoTen);
+
+        usersRef.orderByChild("maKH").equalTo(maKH).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Nếu mã đã tồn tại, tạo lại mã khác
+                    generateMaKH(hoTen, email, matKhau);
+                } else {
+                    // Mã hợp lệ, tiến hành đăng ký
+                    registerUser(email, hoTen, matKhau, maKH);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(DangKyActivity.this, "Đã xảy ra lỗi khi kiểm tra mã KH", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private String createMaKH(String hoTen) {
+        String[] words = hoTen.split(" ");
+        StringBuilder initials = new StringBuilder("FN");
+
+        for (String word : words) {
+            initials.append(word.charAt(0));  // Lấy chữ cái đầu
+        }
+
+        // Thêm 3 chữ số ngẫu nhiên
+        Random random = new Random();
+        String randomNumbers = String.format("%03d", random.nextInt(1000));
+        initials.append(randomNumbers);
+
+        // Xáo trộn các ký tự sau FN
+        List<Character> charList = new ArrayList<>();
+        for (int i = 2; i < initials.length(); i++) {
+            charList.add(initials.charAt(i));
+        }
+        Collections.shuffle(charList);
+
+        StringBuilder shuffledMaKH = new StringBuilder("FN");
+        for (char c : charList) {
+            shuffledMaKH.append(c);
+        }
+
+        return shuffledMaKH.toString();
+    }
+
+    private void registerUser(final String email, final String hoTen, String matKhau, final String maKH) {
         mAuth.createUserWithEmailAndPassword(email, matKhau).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) {
+                    // Tạo một Map để lưu thông tin người dùng
                     Map<String, Object> userMap = new HashMap<>();
-                    userMap.put("email", email);
-                    userMap.put("hoTen", hoTen);
+                    userMap.put("id_user", maKH); // Mã KH
+                    userMap.put("name", hoTen); // Tên người dùng
+                    userMap.put("email", email); // Địa chỉ email
+                    userMap.put("password", matKhau); // Mật khẩu (không nên lưu mật khẩu trong cơ sở dữ liệu)
+                    userMap.put("created_at", ServerValue.TIMESTAMP); // Thời gian tạo
+                    userMap.put("updated_at", ServerValue.TIMESTAMP); // Thời gian cập nhật
+                    userMap.put("id_loaiND", 0); // ID loại người dùng mặc định là 0
 
+                    // Lưu thông tin người dùng vào Firebase
                     usersRef.child(user.getUid()).setValue(userMap).addOnCompleteListener(task1 -> {
                         if (task1.isSuccessful()) {
                             Toast.makeText(DangKyActivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
-                            // Chuyển sang MainActivity sau khi đăng ký thành công
                             Intent intent = new Intent(DangKyActivity.this, DangNhapActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear all previous activities
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
-                            finish(); // Đóng Activity đăng ký sau khi chuyển sang MainActivity
+                            finish();
                         } else {
                             Toast.makeText(DangKyActivity.this, "Đã xảy ra lỗi khi lưu thông tin", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             } else {
-                // Chi tiết lỗi đăng ký Firebase
                 String errorMessage;
                 try {
                     throw task.getException();
@@ -138,6 +232,18 @@ public class DangKyActivity extends AppCompatActivity {
             }
         });
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Giữ màn hình sáng khi ứng dụng hoạt động
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
 
 }

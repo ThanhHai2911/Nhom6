@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#7B6262"
+    tools:context=".activity.ProfileActivity">
+
+
+    <!-- Phần giao diện chính của ứng dụng -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Thêm NestedScrollView để cuộn được -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Nội dung chính của ứng dụng"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/mainContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Thêm Toolbar vào đây -->
+                <com.google.android.material.appbar.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toobar1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#414441"
+                        android:contentDescription="Menu Toolbar" />
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <Button
+                    android:id="@+id/btnDangNhap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dang Nhap"
+                    android:backgroundTint="#FF66B2"
+                    android:layout_marginRight="20dp"
+                    android:layout_gravity="end"/>
+
+                <!-- User Avatar -->
+                <ImageView
+                    android:id="@+id/userAvatar"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/canhan"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp" />
+
+                <!-- Personal Info Button -->
+                <Button
+                    android:id="@+id/personalInfoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thông tin cá nhân"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#FF66B2"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp" />
+
+                <!-- Name and Phone Number Fields -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView
+                        android:textColor="@color/white"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Họ tên: "
+                        android:textSize="20sp" />
+                    <TextView
+                        android:gravity="start"
+                        android:id="@+id/tvTenNguoiDung"
+                        android:padding="7sp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:text="Huỳnh Văn Duy"
+                        android:textSize="20sp"
+                        android:background="@drawable/rounded_search_bar"
+                        />
+
+                </LinearLayout>
+
+
+                <!-- Name and Phone Number Fields -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:padding="10dp">
+                    <TextView
+                        android:textColor="@color/white"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Email: "
+                        android:textSize="20sp"
+                        />
+                    <TextView
+                        android:gravity="start"
+                        android:id="@+id/tvEmail"
+                        android:padding="7sp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:text="abc@gmail.com"
+                        android:textSize="20sp"
+                        android:background="@drawable/rounded_search_bar"
+                        />
+
+                </LinearLayout>
+
+                <!-- Update Info Button -->
+                <Button
+                    android:id="@+id/updateInfoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chỉnh sửa thông tin"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#FF66B2"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp" />
+
+                <!-- Watched Movies Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="20dp">
+                    <TextView
+                        android:id="@+id/watchedMoviesLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lịch sử đã xem 🎬"
+                        android:textColor="#FFFFFF"
+                        />
+                    <TextView
+                        android:id="@+id/tvXemtatca"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Xem tất cả"
+                        android:gravity="end"
+                        android:textColor="#e21b5e"
+                        android:layout_marginRight="20dp"/>
+
+                </LinearLayout>
+
+
+                <!-- RecyclerView for Watched Movies -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcvLichSu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:scrollbars="horizontal"
+                    android:clipToPadding="false"
+                    android:padding="8dp"
+
+                    />
+
+                <!-- Favorite List, Support, and Settings Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    android:layout_marginTop="16dp">
+
+                    <LinearLayout
+                        android:background="#c3bcbf"
+                        android:padding="5sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/dsYeuThich"
+                            android:textColor="@color/white"
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="Danh sách yêu thích"
+                            />
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="20sp"
+                            android:layout_weight="1"
+                            android:src="@drawable/img_1"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_marginTop="7sp"
+                        android:background="#c3bcbf"
+                        android:padding="5sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/dsLichSuXem"
+                            android:textColor="@color/white"
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="Lịch su xem"
+                            />
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="20sp"
+                            android:layout_weight="1"
+                            android:src="@drawable/img_1"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_marginTop="7sp"
+                        android:background="#c3bcbf"
+                        android:padding="5sp"
+                        android:layout_marginBottom="200dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/caiDat"
+                            android:textColor="@color/white"
+                            android:layout_width="0dp"
+                            android:layout_weight="10"
+                            android:layout_height="wrap_content"
+                            android:text="Cài đặt"
+                            />
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="20sp"
+                            android:layout_weight="1"
+                            android:src="@drawable/img_1"
+                            />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    <!-- Bottom Navigation nằm ở dưới cùng -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="selected"
+        android:background="@color/bottom_nav_unselected"/>
+</FrameLayout>

@@ -7,10 +7,12 @@
     android:padding="20dp"
     android:gravity="bottom">
     <ImageView
+        android:id="@+id/ivHinhanh"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:background="@drawable/ma"/>
+        android:background="@drawable/baseline_person_24"/>
     <TextView
+        android:id="@+id/tvTenNguoiDung"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Phim chill"
