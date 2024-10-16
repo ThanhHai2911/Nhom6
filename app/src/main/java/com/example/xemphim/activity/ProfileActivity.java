@@ -7,19 +7,28 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
+import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.adapter.LichSuXemAdapter;
+import com.example.xemphim.adapter.MovieAdapter;
+import com.example.xemphim.adapter.TheLoaiAdapter;
 import com.example.xemphim.databinding.ActivityProfileBinding;
+import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +48,7 @@ import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
     private ActivityProfileBinding binding;
-    private LichSuXemAdapter lichSuXemAdapter;
+    private LichSuAdapter lichSuAdapter;
     private List<MovieDetail.MovieItem> watchedMoviesList;
     private DatabaseReference databaseReference;
     private String idUser;
@@ -51,6 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ApiService apiService;
     private DatabaseReference usersRef;
     private boolean isUserLoggedIn = false; // Biến để theo dõi trạng thái đăng nhập
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -71,9 +81,9 @@ public class ProfileActivity extends AppCompatActivity {
         tvEmail = findViewById(R.id.tvEmail);
 
         watchedMoviesList = new ArrayList<>();
-        lichSuXemAdapter = new LichSuXemAdapter(ProfileActivity.this, watchedMoviesList);
+        lichSuAdapter = new LichSuAdapter(ProfileActivity.this, watchedMoviesList);
         binding.rcvLichSu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        binding.rcvLichSu.setAdapter(lichSuXemAdapter);
+        binding.rcvLichSu.setAdapter(lichSuAdapter);
 
     }
     public void setEven(){
@@ -105,7 +115,7 @@ public class ProfileActivity extends AppCompatActivity {
                     tvTenNguoiDung.setText(""); // Xóa tên người dùng
                     tvEmail.setText(""); // Xóa email người dùng
                     watchedMoviesList.clear(); // Xóa danh sách phim đã xem
-                    lichSuXemAdapter.notifyDataSetChanged(); // Cập nhật adapter để hiển thị danh sách rỗng
+                    lichSuAdapter.notifyDataSetChanged(); // Cập nhật adapter để hiển thị danh sách rỗng
 
                     Toast.makeText(ProfileActivity.this, "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
                 } else {
@@ -137,6 +147,10 @@ public class ProfileActivity extends AppCompatActivity {
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
         apiService = ApiClient.getClient().create(ApiService.class);
         loadWatchHistory();
+        swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadWatchHistory();
+        });
     }
 
 
@@ -222,17 +236,19 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                             Toast.makeText(ProfileActivity.this, "Lỗi khi tải lịch sử xem", Toast.LENGTH_SHORT).show();
-                            Log.e("LichSuXemActivity", "loadWatchHistory:onCancelled", databaseError.toException());
+                            swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                         }
                     });
                 } else {
                     Toast.makeText(ProfileActivity.this, "Người dùng không tồn tại trong cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(ProfileActivity.this, "Lỗi khi lấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
@@ -249,10 +265,10 @@ public class ProfileActivity extends AppCompatActivity {
 
                     // Thêm movieItem vào danh sách đã xem
                     watchedMoviesList.add(movieItem);
-                    lichSuXemAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi
+                    lichSuAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi
 
                     // Cài đặt sự kiện nhấn cho các item trong adapter
-                    lichSuXemAdapter.setRecyclerViewItemClickListener(new LichSuXemAdapter.OnRecyclerViewItemClickListener() {
+                    lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
                             Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
@@ -261,16 +277,14 @@ public class ProfileActivity extends AppCompatActivity {
                             view.getContext().startActivity(intent);
                         }
                     });
-
-
-                } else {
-                    Log.e("LichSuXemActivity", "Failed to fetch movie details for slug: " + slug);
+                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Log.e("LichSuXemActivity", "Error fetching movie details", t);
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
