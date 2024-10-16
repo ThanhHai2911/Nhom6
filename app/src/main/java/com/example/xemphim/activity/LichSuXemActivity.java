@@ -164,8 +164,6 @@ public class LichSuXemActivity extends AppCompatActivity {
                     // Add the movie item to the list after fetching details
                     watchedMoviesList.add(movieItem);
                     lichSuAdapter.notifyDataSetChanged();  // Notify adapter for changes
-
-                    lichSuAdapter = new LichSuAdapter(LichSuXemActivity.this, watchedMoviesList);
                     lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
