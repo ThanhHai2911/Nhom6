@@ -14,6 +14,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
@@ -51,6 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ApiService apiService;
     private DatabaseReference usersRef;
     private boolean isUserLoggedIn = false; // Biến để theo dõi trạng thái đăng nhập
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -137,6 +139,10 @@ public class ProfileActivity extends AppCompatActivity {
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
         apiService = ApiClient.getClient().create(ApiService.class);
         loadWatchHistory();
+        swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadWatchHistory();
+        });
     }
 
 
@@ -222,17 +228,19 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                             Toast.makeText(ProfileActivity.this, "Lỗi khi tải lịch sử xem", Toast.LENGTH_SHORT).show();
-                            Log.e("LichSuXemActivity", "loadWatchHistory:onCancelled", databaseError.toException());
+                            swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                         }
                     });
                 } else {
                     Toast.makeText(ProfileActivity.this, "Người dùng không tồn tại trong cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(ProfileActivity.this, "Lỗi khi lấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
@@ -261,16 +269,14 @@ public class ProfileActivity extends AppCompatActivity {
                             view.getContext().startActivity(intent);
                         }
                     });
-
-
-                } else {
-                    Log.e("LichSuXemActivity", "Failed to fetch movie details for slug: " + slug);
+                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Log.e("LichSuXemActivity", "Error fetching movie details", t);
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
