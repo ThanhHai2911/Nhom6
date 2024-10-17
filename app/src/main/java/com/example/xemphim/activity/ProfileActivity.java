@@ -100,8 +100,7 @@ public class ProfileActivity extends AppCompatActivity {
         binding.btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isUserLoggedIn) {
-                    // Nếu người dùng đã đăng nhập, tiến hành đăng xuất
+                if (isUserLoggedIn) {// Nếu người dùng đã đăng nhập, tiến hành đăng xuất
 //                    FirebaseAuth.getInstance().signOut();
 //                    isUserLoggedIn = false; // Cập nhật trạng thái đăng nhập
 //
