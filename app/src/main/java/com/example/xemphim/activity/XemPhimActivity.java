@@ -119,16 +119,73 @@ public class XemPhimActivity extends AppCompatActivity {
 
         btnDowload.setOnClickListener(v -> {
             String movieName = binding.tvMovieTitle.getText().toString();
-            // Kiểm tra nếu movieLink hợp lệ
             if (movieLink != null && !movieLink.isEmpty()) {
-                downloadMovie(movieLink, movieName);
+                // Tải poster trước
+                loadPosterAndDownloadMovie(movieSlug, movieLink, movieName);
             } else {
                 Toast.makeText(XemPhimActivity.this, "Liên kết phim không hợp lệ!", Toast.LENGTH_SHORT).show();
             }
         });
 
-        apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
+    }
+    private void loadPosterAndDownloadMovie(String movieSlug, String movieLink, String movieName) {
+        Call<MovieDetail> call = apiService.getMovieDetail(movieSlug);
+        call.enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieDetail movieDetails = response.body();
+                    String posterUrl = movieDetails.getMovie().getPosterUrl();
+                    Log.d("Poster URL", "Poster link: " + posterUrl);
+                    // Tải poster
+                    downloadPoster(posterUrl, movieName, () -> {
+                        // Sau khi tải poster xong, tiến hành tải phim
+                        downloadMovie(movieLink, movieName);
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
+                Toast.makeText(XemPhimActivity.this, "Failed to load movie details", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void downloadPoster(String posterUrl, String movieName, Runnable onSuccess) {
+        Call<ResponseBody> call = apiService.downloadMovie(posterUrl); // Sử dụng API để tải poster
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        File movieDir = getMovieFile(movieName); // Lấy thư mục phim
+                        File posterFile = new File(movieDir, movieName + "_poster.jpg"); // Đặt tên file poster
+                        try (InputStream inputStream = response.body().byteStream();
+                             FileOutputStream outputStream = new FileOutputStream(posterFile)) {
+
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outputStream.write(buffer, 0, bytesRead);
+                            }
+
+                            Log.d("DownloadPoster", "Poster đã được lưu tại: " + posterFile.getAbsolutePath());
+                            onSuccess.run(); // Gọi hàm để tiếp tục tải phim sau khi poster tải xong
+                        }
+                    } catch (IOException e) {
+                        Log.e("DownloadPoster", "Lỗi khi lưu poster: " + e.getMessage());
+                    }
+                } else {
+                    Log.e("DownloadPoster", "Tải poster thất bại: " + posterUrl);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("DownloadPoster", "Lỗi khi tải poster: " + t.getMessage());
+            }
+        });
     }
 
     private void initializePlayer() {

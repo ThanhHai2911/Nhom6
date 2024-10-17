@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.R;
 import com.example.xemphim.adapter.DownloadedMoviesAdapter;
+import com.example.xemphim.model.MovieDetail;
+import com.example.xemphim.model.MovieItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
@@ -30,11 +32,10 @@ import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 public class DownLoadActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private DownloadedMoviesAdapter adapter;
-    private List<File> downloadedMovies = new ArrayList<>();
+    private List<MovieItem> downloadedMovies = new ArrayList<>(); // Đổi thành List<MovieItem>
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,17 +90,27 @@ public class DownLoadActivity extends AppCompatActivity {
         if (movieDir.exists() && movieDir.isDirectory()) {
             File[] movieFiles = movieDir.listFiles();
             if (movieFiles != null) {
-                downloadedMovies.addAll(Arrays.asList(movieFiles));
+                for (File movieFile : movieFiles) {
+                    // Kiểm tra nếu là thư mục
+                    if (movieFile.isDirectory()) {
+                        String movieName = movieFile.getName();
+                        File posterFile = new File(movieFile, movieName + "_poster.jpg");
+
+                        // Kiểm tra nếu tệp poster tồn tại
+                        if (posterFile.exists()) {
+                            // Sử dụng lớp MovieItem mà bạn đã tạo
+                            downloadedMovies.add(new MovieItem(movieName, posterFile.getAbsolutePath()));
+                        }
+                    }
+                }
             }
         }
     }
 
     // Phát phim đã tải khi nhấn vào
-    private void playDownloadedMovie(File movieFile) {
+    private void playDownloadedMovie(MovieItem movieItem) {
         Intent intent = new Intent(this, PlayDownloadedMovieActivity.class);
-
-        // Truyền tên phim thay vì đường dẫn
-        intent.putExtra("movie_name", movieFile.getName());
+        intent.putExtra("movie_name", movieItem.getName());
         startActivity(intent);
     }
 

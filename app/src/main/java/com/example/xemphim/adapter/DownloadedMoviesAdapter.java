@@ -1,9 +1,9 @@
 package com.example.xemphim.adapter;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
-import android.content.Intent;
+import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,72 +12,66 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.xemphim.R;
-import com.example.xemphim.activity.PlayDownloadedMovieActivity;
+import com.example.xemphim.databinding.ItemDownloadedMovieBinding;
+import com.example.xemphim.databinding.ItemLichsuxemBinding;
+import com.example.xemphim.model.Movie;
+import com.example.xemphim.model.MovieItem;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;
 
 public class DownloadedMoviesAdapter extends RecyclerView.Adapter<DownloadedMoviesAdapter.MovieViewHolder> {
-
-    private List<File> movieFiles;
+    private List<MovieItem> movies;
     private OnMovieClickListener listener;
 
-    public DownloadedMoviesAdapter(List<File> movieFiles, OnMovieClickListener listener) {
-        this.movieFiles = movieFiles;
+    public DownloadedMoviesAdapter(List<MovieItem> movies, OnMovieClickListener listener) {
+        this.movies = movies;
         this.listener = listener;
     }
 
-    @NonNull
     @Override
-    public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_downloaded_movie, parent, false);
+    public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_movie, parent, false);
         return new MovieViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
-        File movieFile = movieFiles.get(position);
-        holder.bind(movieFile);
+    public void onBindViewHolder(MovieViewHolder holder, int position) {
+        MovieItem movie = movies.get(position);
+        holder.bind(movie, listener);
     }
 
     @Override
     public int getItemCount() {
-        return movieFiles.size();
+        return movies.size();
     }
 
-    class MovieViewHolder extends RecyclerView.ViewHolder {
+    public static class MovieViewHolder extends RecyclerView.ViewHolder {
+        private TextView movieNameTextView;
+        private ImageView moviePosterImageView;
 
-        TextView tvMovieName;
-        ImageView ivMoviePoster; // Thêm ImageView cho poster phim
-
-        public MovieViewHolder(@NonNull View itemView) {
+        public MovieViewHolder(View itemView) {
             super(itemView);
-            tvMovieName = itemView.findViewById(R.id.movieTitle);
-            ivMoviePoster = itemView.findViewById(R.id.moviePoster); // Khởi tạo ImageView
-            itemView.setOnClickListener(v -> listener.onMovieClick(movieFiles.get(getAdapterPosition())));
+            movieNameTextView = itemView.findViewById(R.id.movieTitle);
+            moviePosterImageView = itemView.findViewById(R.id.moviePoster);
         }
 
-        public void bind(File movieFile) {
-            tvMovieName.setText(movieFile.getName());
-
-            // Giả sử bạn có một phương thức để lấy URL poster từ tên phim
-            String posterUrl = getPosterUrl(movieFile.getName());
-            // Tải poster vào ImageView
-            Picasso.get()
-                    .load(posterUrl)
-                    .into(ivMoviePoster);
-        }
-
-        // Phương thức để lấy URL poster dựa trên tên phim
-        private String getPosterUrl(String movieName) {
-            // Thay đổi logic để lấy URL poster phù hợp với dự án của bạn
-            return "https://example.com/posters/" + movieName.replace(" ", "%20") + ".jpg"; // Ví dụ
+        public void bind(MovieItem movie, OnMovieClickListener listener) {
+            movieNameTextView.setText(movie.getName());
+            // Sử dụng thư viện như Glide hoặc Picasso để tải ảnh poster
+            Glide.with(itemView.getContext()).load(movie.getPosterPath()).into(moviePosterImageView);
+            itemView.setOnClickListener(v -> listener.onMovieClick(movie));
         }
     }
 
     public interface OnMovieClickListener {
-        void onMovieClick(File movieFile);
+        void onMovieClick(MovieItem movie);
     }
 }
+
+
+
+
