@@ -242,6 +242,8 @@ public class ProfileActivity extends AppCompatActivity {
                                     MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
                                     movieItem.setSlug(movieSlug);
                                     movieItem.setEpisodeCurrent(episodeName);
+                                    watchedMoviesList.add(0,movieItem);
+                                    lichSuAdapter.notifyItemChanged(0);
                                     fetchMovieDetails(movieSlug, movieItem); // Lấy chi tiết phim
                                 }
                             }
@@ -276,11 +278,7 @@ public class ProfileActivity extends AppCompatActivity {
                     MovieDetail movieDetail = response.body();
                     movieItem.setName(movieDetail.getMovie().getName());
                     movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
-
-                    // Thêm movieItem vào danh sách đã xem
-                    watchedMoviesList.add(movieItem);
-                    lichSuAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi
-
+                    lichSuAdapter.notifyDataSetChanged();
                     // Cài đặt sự kiện nhấn cho các item trong adapter
                     lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
