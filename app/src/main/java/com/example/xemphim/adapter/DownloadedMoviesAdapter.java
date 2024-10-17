@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ItemDownloadedMovieBinding;
-import com.example.xemphim.databinding.ItemLichsuxemBinding;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieItem;
 import com.squareup.picasso.Picasso;
@@ -34,7 +33,7 @@ public class DownloadedMoviesAdapter extends RecyclerView.Adapter<DownloadedMovi
 
     @Override
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_movie, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_downloaded_movie, parent, false);
         return new MovieViewHolder(view);
     }
 
