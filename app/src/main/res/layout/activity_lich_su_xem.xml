@@ -5,16 +5,21 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp"
     android:background="#2F2F2F"
+    android:orientation="vertical"
     tools:context=".activity.LichSuXemActivity">
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="visible" />
+    <!-- ProgressBar (nếu cần) -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="visible" />
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/layout"
@@ -22,81 +27,33 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone">
-        <!-- Phần tiêu đề -->
-        <LinearLayout
+
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp"
-            android:gravity="center_vertical">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <!-- Nút quay lại -->
-            <ImageView
-                android:id="@+id/back_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/exit_left"
-                />
-
-            <!-- Tiêu đề "Lịch sử đã xem" -->
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Lịch sử đã xem"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <!-- Biểu tượng máy quay nhỏ bên cạnh -->
-            <ImageView
-                android:id="@+id/camera_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end"
-                android:layout_marginStart="10dp"
-                android:src="@drawable/lichsuxemphim"
-                />
-        </LinearLayout>
-
-        <!-- Thanh tìm kiếm -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:background="@drawable/rounded_search_bar"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-
-            <!-- Biểu tượng kính lúp -->
-            <ImageView
-                android:id="@+id/search_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/search"
-                />
-
-            <!-- Ô nhập tìm kiếm -->
-            <EditText
-                android:id="@+id/search_input"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:hint="Tìm kiếm tên phim"
-                android:textColorHint="@color/black"
-                android:textColor="#FFFFFF"
-                android:background="@android:color/transparent"
-                android:inputType="text" />
-        </LinearLayout>
+                android:background="#414441"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <ImageView
+                    android:id="@+id/camera_icon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/lichsuxemphim" />
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvlichsuxem"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_marginTop="16dp"
+            android:layout_weight="1"
             android:clipToPadding="false" />
 
     </LinearLayout>

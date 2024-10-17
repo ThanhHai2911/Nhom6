@@ -3,6 +3,8 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -10,20 +12,28 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
+import com.example.xemphim.R;
 import com.example.xemphim.adapter.LichSuAdapter;
+import com.example.xemphim.adapter.SeriesAdapter;
 import com.example.xemphim.databinding.ActivityLichSuXemBinding;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
+import com.example.xemphim.model.Series;
+import com.example.xemphim.response.MovieResponse;
+import com.example.xemphim.response.SeriesResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -65,6 +75,13 @@ public class LichSuXemActivity extends AppCompatActivity {
         apiService = ApiClient.getClient().create(ApiService.class);
         setControl();
         loadWatchHistory();
+        // Thiết lập ActionBar và DrawerLayout
+        setSupportActionBar(binding.toolbar);
+        // Kiểm tra xem ActionBar đã được khởi tạo chưa
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Lịch sử đã xem"); // Đặt tên mới cho Toolbar
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Hiện biểu tượng trở về
+        }
     }
 
     public void setControl() {
@@ -106,7 +123,6 @@ public class LichSuXemActivity extends AppCompatActivity {
 
                                 if (movieSlug != null) {
                                     MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
-                                    MovieDetail.Episode.ServerData serverData = new MovieDetail.Episode.ServerData();
                                     movieItem.setSlug(movieSlug);
                                     movieItem.setEpisodeCurrent(episodeName);
                                     fetchMovieDetails(movieSlug, movieItem);
@@ -117,7 +133,6 @@ public class LichSuXemActivity extends AppCompatActivity {
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                             Toast.makeText(LichSuXemActivity.this, "Lỗi khi tải lịch sử xem", Toast.LENGTH_SHORT).show();
-                            Log.e("LichSuXemActivity", "loadWatchHistory:onCancelled", databaseError.toException());
                         }
                     });
                 } else {
@@ -172,6 +187,92 @@ public class LichSuXemActivity extends AppCompatActivity {
                 Log.e("LichSuXemActivity", "Error fetching movie details", t);
             }
         });
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_timkiem, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        // Lấy id_user từ Firebase
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String idUser = currentUser != null ? currentUser.getUid() : null; // Lấy UID của người dùng
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (idUser != null) { // Kiểm tra id_user không null
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("watchedMovies");
+
+                    // Truy vấn Firebase theo id_user
+                    Query searchQuery = databaseReference.orderByChild("id_user")
+                            .equalTo(idUser); // Lọc theo id_user
+
+                    searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            watchedMoviesList.clear(); // Xóa danh sách cũ
+
+                            boolean found = false; // Biến kiểm tra xem có phim nào phù hợp không
+
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                MovieDetail.MovieItem movieDetail = snapshot.getValue(MovieDetail.MovieItem.class);
+
+                                // Kiểm tra slug có chứa từ khóa tìm kiếm không
+                                if (movieDetail != null && movieDetail.getSlug().toLowerCase().contains(query.toLowerCase())) {
+                                    watchedMoviesList.add(movieDetail); // Thêm phim vào danh sách
+                                    found = true; // Đánh dấu có phim phù hợp
+                                }
+                            }
+
+                            if (found) {
+                                lichSuAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi dữ liệu
+                            } else {
+                                Toast.makeText(LichSuXemActivity.this, "Không tìm thấy phim", Toast.LENGTH_SHORT).show();
+                            }
+
+                            searchView.clearFocus(); // Đóng SearchView sau khi tìm kiếm
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Toast.makeText(LichSuXemActivity.this, "Lỗi khi tìm kiếm", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(LichSuXemActivity.this, "Người dùng không hợp lệ", Toast.LENGTH_SHORT).show();
+                }
+
+                searchItem.collapseActionView();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_search) {
+            // Xử lý sự kiện khi nhấn vào tìm kiếm
+            Toast.makeText(this, "Bạn muốn tìm kiếm gì", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (item.getItemId() == android.R.id.home) {
+            // Chuyển đến màn hình profile
+            Intent intent = new Intent(this, ProfileActivity.class); // Thay ProfileActivity bằng tên Activity profile của bạn
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

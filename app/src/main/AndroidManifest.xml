@@ -62,6 +62,7 @@
         <activity android:name=".activity.LichSuXemActivity" />
         <activity android:name=".activity.FavoriteMoviesActivity" />
         <activity android:name=".activity.ThanhToanActivity" />
+        <activity android:name=".activity.CaiDat" />
     </application>
 
 </manifest>
