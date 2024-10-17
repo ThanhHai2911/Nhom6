@@ -18,6 +18,12 @@
             android:name=".activity.QLQuocGiaActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.QLTheLoaiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ThemPhimActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.QuanLyAPI"
             android:exported="false" />
         <activity

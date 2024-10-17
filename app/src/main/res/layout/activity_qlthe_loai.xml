@@ -5,16 +5,15 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".activity.QLTheLoaiActivity"
     android:orientation="vertical"
-    tools:context=".activity.QLQuocGiaActivity"
-    android:background="#4D4D4D"
+    android:background="#424242"
     >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -37,7 +36,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Quản Lý Quốc gia"
+                android:text="Quản Lý Thể loại"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
@@ -80,56 +79,32 @@
                 android:inputType="text" />
         </LinearLayout>
 
-        <LinearLayout
+        <!-- RecyclerView for Category List -->
+        <androidx.recyclerview.widget.RecyclerView
+
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
             android:layout_weight="8"
-            android:padding="10dp"
-            >
+            />
+        <LinearLayout
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/border_radiu_caidat"
+            android:gravity="center"
+            android:padding="8dp"
+            android:layout_marginTop="16dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewApis"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="3"
-                android:scrollbars="vertical"
-                android:padding="8dp"
-                android:clipToPadding="false"
-                android:overScrollMode="ifContentScrolls"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_api"
-                />
-
-            <!-- Add more LinearLayout blocks for other APIs if needed -->
-
-            <!-- Add API Button -->
-            <LinearLayout
-                android:layout_margin="8dp"
-                android:layout_width="match_parent"
+            <ImageButton
+                android:id="@+id/btnAddApi"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/border_radiu_caidat"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="16dp">
-
-                <ImageButton
-                    android:id="@+id/btnAddApi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_add"
-                    android:contentDescription="Add API" />
-            </LinearLayout>
-
+                android:src="@drawable/ic_add"
+                />
         </LinearLayout>
 
-
-
-
-
-
-        <!-- Save Changes Button -->
         <Button
             android:textSize="25sp"
             android:id="@+id/btnSaveChanges"
@@ -143,5 +118,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:padding="12dp"
             android:layout_margin="14dp"/>
+
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
