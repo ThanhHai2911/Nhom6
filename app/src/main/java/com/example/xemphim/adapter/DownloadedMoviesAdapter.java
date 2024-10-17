@@ -7,12 +7,14 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.R;
 import com.example.xemphim.activity.PlayDownloadedMovieActivity;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;
@@ -48,22 +50,34 @@ public class DownloadedMoviesAdapter extends RecyclerView.Adapter<DownloadedMovi
     class MovieViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvMovieName;
+        ImageView ivMoviePoster; // Thêm ImageView cho poster phim
 
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
             tvMovieName = itemView.findViewById(R.id.movieTitle);
+            ivMoviePoster = itemView.findViewById(R.id.moviePoster); // Khởi tạo ImageView
             itemView.setOnClickListener(v -> listener.onMovieClick(movieFiles.get(getAdapterPosition())));
         }
 
         public void bind(File movieFile) {
             tvMovieName.setText(movieFile.getName());
+
+            // Giả sử bạn có một phương thức để lấy URL poster từ tên phim
+            String posterUrl = getPosterUrl(movieFile.getName());
+            // Tải poster vào ImageView
+            Picasso.get()
+                    .load(posterUrl)
+                    .into(ivMoviePoster);
+        }
+
+        // Phương thức để lấy URL poster dựa trên tên phim
+        private String getPosterUrl(String movieName) {
+            // Thay đổi logic để lấy URL poster phù hợp với dự án của bạn
+            return "https://example.com/posters/" + movieName.replace(" ", "%20") + ".jpg"; // Ví dụ
         }
     }
 
     public interface OnMovieClickListener {
         void onMovieClick(File movieFile);
-
     }
-
 }
-

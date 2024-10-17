@@ -18,9 +18,18 @@ import com.example.xemphim.adapter.DownloadedMoviesAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DownLoadActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -93,4 +102,5 @@ public class DownLoadActivity extends AppCompatActivity {
         intent.putExtra("movie_name", movieFile.getName());
         startActivity(intent);
     }
+
 }
