@@ -180,6 +180,8 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     private void setupBottomNavigation() {
+        // Đặt item mặc định được chọn là màn hình Home
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_profile);
         // Xử lý sự kiện chọn item của Bottom Navigation
         binding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -193,7 +195,6 @@ public class ProfileActivity extends AppCompatActivity {
                     intent = new Intent(ProfileActivity.this, DownLoadActivity.class);
                 } else if (item.getItemId() == R.id.nav_profile) {
                     return true;
-
                 }
                 // Pass the selected item to the new Activity
                 if (intent != null) {

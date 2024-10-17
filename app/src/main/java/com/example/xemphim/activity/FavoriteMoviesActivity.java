@@ -137,7 +137,8 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
             public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieDetail.MovieItem movieItem = response.body().getMovie();
-                    favoriteMovies.add(movieItem); // Thêm phim vào danh sách yêu thích
+                    favoriteMovies.add(0,movieItem); // Thêm phim vào danh sách yêu thích
+                    favoriteMoviesAdapter.notifyItemChanged(0);
 
                     // Notify the adapter that data has changed
                     favoriteMoviesAdapter.notifyDataSetChanged();  // Notify adapter for changes

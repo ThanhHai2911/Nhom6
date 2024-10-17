@@ -131,13 +131,11 @@
             }
         }
         private void navigationBottom() {
-            BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-
             // Đặt item mặc định được chọn là màn hình Home
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
 
             // Xử lý sự kiện chọn item của Bottom Navigation
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            binding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Intent intent = null;
