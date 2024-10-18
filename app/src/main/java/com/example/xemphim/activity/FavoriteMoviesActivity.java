@@ -1,18 +1,16 @@
 package com.example.xemphim.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.WindowManager;
+import android.support.annotation.NonNull;
+import android.telecom.Call;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -137,8 +135,7 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
             public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieDetail.MovieItem movieItem = response.body().getMovie();
-                    favoriteMovies.add(0,movieItem); // Thêm phim vào danh sách yêu thích
-                    favoriteMoviesAdapter.notifyItemChanged(0);
+                    favoriteMovies.add(movieItem); // Thêm phim vào danh sách yêu thích
 
                     // Notify the adapter that data has changed
                     favoriteMoviesAdapter.notifyDataSetChanged();  // Notify adapter for changes

@@ -53,9 +53,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ChiTietActivity" />
-        <activity
-            android:name=".activity.XemPhimActivity"
-            android:configChanges="orientation|screenSize"></activity>
+        <activity android:name=".activity.XemPhimActivity"
+            android:configChanges="orientation|screenSize">
+        </activity>
         <activity android:name=".activity.LichSuXemActivity" />
         <activity android:name=".activity.FavoriteMoviesActivity" />
         <activity android:name=".activity.ThanhToanActivity" />
