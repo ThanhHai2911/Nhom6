@@ -88,12 +88,6 @@ public class XemPhimActivity extends AppCompatActivity {
                 .writeTimeout(60, TimeUnit.SECONDS)   // Tăng thời gian write timeout
                 .retryOnConnectionFailure(true)       // Tự động retry khi lỗi kết nối
                 .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiClient.getBaseUrl())
-                .client(okHttpClient) // Sử dụng OkHttpClient với timeout lớn hơn
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
         setControl();
         setEvent();
 
@@ -139,7 +133,6 @@ public class XemPhimActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieDetail movieDetails = response.body();
                     String posterUrl = movieDetails.getMovie().getPosterUrl();
-                    Log.d("Poster URL", "Poster link: " + posterUrl);
                     // Tải poster
                     downloadPoster(posterUrl, movieName, () -> {
                         // Sau khi tải poster xong, tiến hành tải phim
@@ -147,7 +140,6 @@ public class XemPhimActivity extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Toast.makeText(XemPhimActivity.this, "Failed to load movie details", Toast.LENGTH_SHORT).show();
@@ -171,7 +163,6 @@ public class XemPhimActivity extends AppCompatActivity {
                             while ((bytesRead = inputStream.read(buffer)) != -1) {
                                 outputStream.write(buffer, 0, bytesRead);
                             }
-
                             Log.d("DownloadPoster", "Poster đã được lưu tại: " + posterFile.getAbsolutePath());
                             onSuccess.run(); // Gọi hàm để tiếp tục tải phim sau khi poster tải xong
                         }
