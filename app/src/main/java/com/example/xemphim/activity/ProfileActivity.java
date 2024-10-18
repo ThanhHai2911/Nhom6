@@ -179,6 +179,8 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     private void setupBottomNavigation() {
+
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_profile);
         // Xử lý sự kiện chọn item của Bottom Navigation
         binding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
