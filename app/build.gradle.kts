@@ -84,7 +84,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-database:20.0.0")
     implementation ("com.google.android.material:material:1.4.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.0.4")
-    implementation ("com.google.firebase:firebase-firestore:24.0.1")
+
 
 
 

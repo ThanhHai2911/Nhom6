@@ -443,13 +443,9 @@
                     if (response.isSuccessful() && response.body() != null) {
                         List<Movie> movies = response.body().getItems();
                         Log.d("API Response", "Movies fetched: " + movies.size());
-                        List<String> imageUrls = new ArrayList<>();
-                        for (Movie movie : movies) {
-                            String thumbUrl = movie.getThumb_url();
-                            Log.d("Movie Thumbnail", thumbUrl); // Log each image URL
-                            imageUrls.add(thumbUrl);
-                        }
-                        setupBannerViewPager(imageUrls);
+
+                        // Setup the banner with the movies list
+                        setupBannerViewPager(movies);
                     } else {
                         Log.e("API Error", "Response was not successful or body is null");
                     }
@@ -462,16 +458,17 @@
             });
         }
 
-        private void setupBannerViewPager(List<String> imageUrls) {
-            BannerAdapter bannerAdapter = new BannerAdapter(this, imageUrls);
+        private void setupBannerViewPager(List<Movie> movies) {
+            BannerAdapter bannerAdapter = new BannerAdapter(this, movies);
             binding.viewPagerBanner.setAdapter(bannerAdapter);
 
             Handler bannerHandler = new Handler();
             Runnable bannerRunnable = new Runnable() {
                 private int currentPage = 0;
+
                 @Override
                 public void run() {
-                    if (currentPage == imageUrls.size()) {
+                    if (currentPage == movies.size()) {
                         currentPage = 0;
                     }
                     binding.viewPagerBanner.setCurrentItem(currentPage++, true);

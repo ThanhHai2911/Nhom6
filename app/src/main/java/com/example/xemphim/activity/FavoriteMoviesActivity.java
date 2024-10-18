@@ -1,16 +1,18 @@
 package com.example.xemphim.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.telecom.Call;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.EditText;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -96,7 +98,7 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
                     }
 
 
-                    // Sử dụng idUser để tải danh sách yêu
+                    // Sử dụng idUser để tải danh sách yêu thích
                     favoritesRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

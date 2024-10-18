@@ -60,6 +60,7 @@
         <activity android:name=".activity.FavoriteMoviesActivity" />
         <activity android:name=".activity.ThanhToanActivity" />
         <activity android:name=".activity.CaiDatActivity" />
+        <activity android:name=".activity.PlayDownloadedMovieActivity"/>
     </application>
 
 </manifest>

@@ -7,16 +7,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -25,7 +20,6 @@ import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
 import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.databinding.ActivityProfileBinding;
-import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,36 +82,20 @@ public class ProfileActivity extends AppCompatActivity {
         binding.tvEmail.setText(emailUser);
 
         // Kiểm tra trạng thái đăng nhập
-        //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (idUser != null) {
             isUserLoggedIn = true; // Người dùng đã đăng nhập
-            binding.btnDangNhap.setText("Đăng Xuất"); // Đổi văn bản nút thành "Đăng Xuất"
+            binding.btnDangNhap.setVisibility(View.GONE);
         } else {
             isUserLoggedIn = false; // Người dùng chưa đăng nhập
+            binding.btnDangNhap.setVisibility(View.VISIBLE);
             binding.btnDangNhap.setText("Đăng Nhập"); // Đổi văn bản nút thành "Đăng Nhập"
         }
 
         binding.btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isUserLoggedIn) {// Nếu người dùng đã đăng nhập, tiến hành đăng xuất
-
-                    FirebaseAuth.getInstance().signOut();
-                    SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.clear(); // Xóa tất cả thông tin
-                    editor.apply();
-
-                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                    Toast.makeText(ProfileActivity.this, "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Nếu người dùng chưa đăng nhập, chuyển đến màn hình đăng nhập
-                    Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
+                Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -142,19 +120,11 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(ProfileActivity.this, CaiDat.class);
+                Intent intent = new Intent(ProfileActivity.this, CaiDatActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
-//        binding.updateInfoButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(ProfileActivity.this, EditUserActivity.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
         setupBottomNavigation();
         lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
@@ -179,7 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     private void setupBottomNavigation() {
-
+        // Đặt item mặc định được chọn là màn hình Home
         binding.bottomNavigation.setSelectedItemId(R.id.nav_profile);
         // Xử lý sự kiện chọn item của Bottom Navigation
         binding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -194,7 +164,6 @@ public class ProfileActivity extends AppCompatActivity {
                     intent = new Intent(ProfileActivity.this, DownLoadActivity.class);
                 } else if (item.getItemId() == R.id.nav_profile) {
                     return true;
-
                 }
                 // Pass the selected item to the new Activity
                 if (intent != null) {
@@ -243,6 +212,8 @@ public class ProfileActivity extends AppCompatActivity {
                                     MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
                                     movieItem.setSlug(movieSlug);
                                     movieItem.setEpisodeCurrent(episodeName);
+                                    watchedMoviesList.add(0,movieItem);
+                                    lichSuAdapter.notifyItemChanged(0);
                                     fetchMovieDetails(movieSlug, movieItem); // Lấy chi tiết phim
                                 }
                             }
@@ -277,11 +248,7 @@ public class ProfileActivity extends AppCompatActivity {
                     MovieDetail movieDetail = response.body();
                     movieItem.setName(movieDetail.getMovie().getName());
                     movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
-
-                    // Thêm movieItem vào danh sách đã xem
-                    watchedMoviesList.add(movieItem);
-                    lichSuAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi
-
+                    lichSuAdapter.notifyDataSetChanged();
                     // Cài đặt sự kiện nhấn cho các item trong adapter
                     lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
