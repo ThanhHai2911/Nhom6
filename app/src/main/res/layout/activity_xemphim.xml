@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,7 +17,7 @@
             android:id="@+id/btnFullScreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
+            android:layout_gravity="end|top"
             android:layout_margin="8dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:src="@drawable/ic_fullscreen" />
@@ -29,43 +30,52 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_below="@id/playerView"
+
         android:padding="16dp">
 
+        <!-- Favorite and Download Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:background="#708090"
+            android:layout_gravity="center">
 
             <ImageButton
                 android:id="@+id/btnAddToFavorites"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="1dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="@android:color/transparent"
-                android:src="@drawable/baseline_favorite_24" />
+                android:src="@drawable/baseline_favorite_24"
+                android:contentDescription="Yêu thích" />
+
             <ImageButton
                 android:id="@+id/btnDowload"
-                android:layout_width="30dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="1dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="@android:color/transparent"
-                android:src="@drawable/dow" />
-
-            <TextView
-                android:id="@+id/tvMovieTitle"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF" />
+                app:srcCompat="@drawable/baseline_download_24"
+                android:contentDescription="Tải xuống"
+                app:tint="#ff4500" />
         </LinearLayout>
 
+        <!-- Movie Title -->
+        <TextView
+            android:id="@+id/tvMovieTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
+
+        <!-- Episode List -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:text="Tập Phim:"
             android:textColor="#FFFFFF" />

@@ -216,12 +216,11 @@ public class XemPhimActivity extends AppCompatActivity {
                 // Kiểm tra từng entry trong danh sách yêu thích
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     FavoriteMovie favoriteMovie = snapshot.getValue(FavoriteMovie.class);
-                    if (favoriteMovie != null && favoriteMovie.getId_user().equals(userId)) {
+                    if (favoriteMovie != null && favoriteMovie.getId_user() != null && userId != null && favoriteMovie.getId_user().equals(userId)) {
                         movieExists = true;
                         break;
                     }
                 }
-
                 // Nếu phim đã tồn tại, đổi màu nút thành đỏ
                 if (movieExists) {
                     btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
