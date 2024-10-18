@@ -138,7 +138,6 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieDetail.MovieItem movieItem = response.body().getMovie();
                     favoriteMovies.add(movieItem); // Thêm phim vào danh sách yêu thích
-
                     // Notify the adapter that data has changed
                     favoriteMoviesAdapter.notifyDataSetChanged();  // Notify adapter for changes
                     favoriteMoviesAdapter.setRecyclerViewItemClickListener(new FavoriteMoviesAdapter.OnRecyclerViewItemClickListener() {
