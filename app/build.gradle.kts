@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -83,6 +84,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-database:20.0.0")
     implementation ("com.google.android.material:material:1.4.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.0.4")
+
 
 
 

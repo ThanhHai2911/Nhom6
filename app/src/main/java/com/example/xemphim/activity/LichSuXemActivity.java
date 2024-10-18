@@ -125,6 +125,8 @@ public class LichSuXemActivity extends AppCompatActivity {
                                     MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
                                     movieItem.setSlug(movieSlug);
                                     movieItem.setEpisodeCurrent(episodeName);
+                                    watchedMoviesList.add(0,movieItem);
+                                    lichSuAdapter.notifyItemChanged(0);
                                     fetchMovieDetails(movieSlug, movieItem);
                                 }
                             }
@@ -157,12 +159,7 @@ public class LichSuXemActivity extends AppCompatActivity {
                     MovieDetail movieDetail = response.body();
                     movieItem.setName(movieDetail.getMovie().getName());
                     movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
-
-                    // Add the movie item to the list after fetching details
-                    watchedMoviesList.add(movieItem);
-
-                    // Notify the adapter that data has changed
-                    lichSuAdapter.notifyDataSetChanged();  // Notify adapter for changes
+                    lichSuAdapter.notifyDataSetChanged();
                     lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {

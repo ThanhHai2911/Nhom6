@@ -1,29 +1,33 @@
 package com.example.xemphim.adapter;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
+import android.widget.TextView;
 import androidx.annotation.NonNull;
-
-import com.bumptech.glide.Glide;
 import androidx.viewpager.widget.PagerAdapter;
-
-
+import com.bumptech.glide.Glide;
 import java.util.List;
-public class BannerAdapter extends PagerAdapter {
-    private Context context;
-    private List<String> imageUrls;
+import com.example.xemphim.activity.ChiTietActivity;
+import com.example.xemphim.databinding.ItemBannerBinding;
+import com.example.xemphim.model.Movie;
 
-    public BannerAdapter(Context context, List<String> imageUrls) {
+public class BannerAdapter extends PagerAdapter {
+
+    private Activity context;
+    private List<Movie> movies;
+
+    public BannerAdapter(Activity context, List<Movie> movies) {
         this.context = context;
-        this.imageUrls = imageUrls;
+        this.movies = movies;
     }
 
     @Override
     public int getCount() {
-        return imageUrls.size();
+        return movies.size();
     }
 
     @Override
@@ -34,14 +38,30 @@ public class BannerAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        ImageView imageView = new ImageView(context);
-        // Use your preferred image loading library (like Glide or Picasso) to load images
-        Glide.with(context)
-                .load(imageUrls.get(position))
-                .into(imageView);
+        // Inflate banner layout for each item
+        ItemBannerBinding binding = ItemBannerBinding.inflate(LayoutInflater.from(context), container, false);
+        Movie movie = movies.get(position);
 
-        container.addView(imageView);
-        return imageView;
+        // Set movie title
+        binding.tvTenPhim.setText(movie.getName());
+
+        // Load movie banner image
+        Glide.with(context)
+                .load(movie.getThumb_url())  // Assuming you are using thumb_url for the banner
+                .into(binding.imageViewBanner);
+
+        // Handle click event to pass slug
+        binding.getRoot().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ChiTietActivity.class);
+                intent.putExtra("slug", movie.getSlug());  // Pass the movie slug
+                context.startActivity(intent);
+            }
+        });
+
+        container.addView(binding.getRoot());
+        return binding.getRoot();
     }
 
     @Override
@@ -49,4 +69,3 @@ public class BannerAdapter extends PagerAdapter {
         container.removeView((View) object);
     }
 }
-

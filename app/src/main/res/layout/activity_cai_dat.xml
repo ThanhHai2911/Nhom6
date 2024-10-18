@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.CaiDat"
+    tools:context=".activity.CaiDatActivity"
     android:background="#504d4e"
     >
     <FrameLayout
@@ -26,6 +26,7 @@
                 android:orientation="horizontal"
                 android:paddingTop="30dp">
                 <ImageView
+                    android:id="@+id/btnThoat"
                     android:paddingRight="40dp"
                     android:layout_marginTop="20dp"
                     android:layout_width="0dp"
@@ -37,6 +38,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="50dp"
+                    android:textColor="#000"
                     android:text="Cài đặt"
                     android:textSize="40dp" />
                 <ImageView
@@ -79,10 +81,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Huỳnh Văn Duy"
+                    android:textColor="#000"
                     android:textSize="25dp"/>
                 <ImageView
-
-                    android:id="@+id/ivout"
+                    android:id="@+id/ivdangxuat"
                     android:layout_marginLeft="30dp"
                     android:layout_width="30dp"
                     android:layout_height="40dp"
@@ -106,38 +108,20 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
                 <TextView
-                    android:layout_marginLeft="20dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chỉnh sửa thông tin"
-                    android:textSize="25dp"
-                    />
-                <ImageView
-                    android:layout_marginLeft="50dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/img"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-                <TextView
+                    android:id="@+id/tvThaydoiMk"
                     android:layout_marginLeft="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thay đổi mật khẩu"
+                    android:textColor="#000"
                     android:textSize="25dp"
                     />
                 <ImageView
                     android:layout_marginLeft="60dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:src="@drawable/img"/>
 
             </LinearLayout>
@@ -150,25 +134,8 @@
                     android:layout_marginLeft="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bậc thông báo"
-                    android:textSize="25dp"
-                    />
-                <Switch
-                    android:layout_marginLeft="100dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-                <TextView
-                    android:layout_marginLeft="20dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tự động cập nhập"
+                    android:text="Giao diện sáng tối"
+                    android:textColor="#000"
                     android:textSize="25dp"
                     />
                 <Switch
@@ -177,6 +144,7 @@
                     android:layout_height="50dp"/>
 
             </LinearLayout>
+
             <TextView
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center"
@@ -202,12 +170,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Về chúng tôi"
+                    android:textColor="#000"
                     android:textSize="25dp"
                     />
                 <ImageView
                     android:layout_marginLeft="125dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:textColor="#000"
                     android:src="@drawable/img"/>
 
             </LinearLayout>
@@ -221,12 +191,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Trợ giúp"
+                    android:textColor="#000"
                     android:textSize="25dp"
                     />
                 <ImageView
                     android:layout_marginLeft="170dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:src="@drawable/img"/>
 
             </LinearLayout>

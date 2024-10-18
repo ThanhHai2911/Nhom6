@@ -45,7 +45,7 @@
                     android:layout_height="100dp"
                     android:src="@drawable/canhan"
                     android:layout_gravity="center"
-                    android:layout_marginTop="16dp" />
+                    android:layout_marginTop="50dp" />
 
                 <!-- Personal Info Button -->
                 <TextView
@@ -116,17 +116,6 @@
                         />
 
                 </LinearLayout>
-
-                <!-- Update Info Button -->
-                <Button
-                    android:id="@+id/updateInfoButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chỉnh sửa thông tin"
-                    android:textColor="#FFFFFF"
-                    android:backgroundTint="#FF66B2"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="16dp" />
 
                 <!-- Watched Movies Section -->
                 <LinearLayout
@@ -233,5 +222,5 @@
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="selected"
-        android:background="@color/bottom_nav_unselected"/>
+        android:background="@color/bottom_nav_unselected" />
 </FrameLayout>

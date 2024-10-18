@@ -1,65 +1,79 @@
 package com.example.xemphim.adapter;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.xemphim.R;
-import com.example.xemphim.activity.XemPhimActivity;
-import com.example.xemphim.databinding.ItemMovieBinding;
-import com.example.xemphim.model.FavoriteMovie;
-import com.example.xemphim.model.Movie;
+import com.example.xemphim.databinding.ItemLichsuBinding;
+import com.example.xemphim.model.MovieDetail;
 
 import java.util.List;
 
 public class FavoriteMoviesAdapter extends RecyclerView.Adapter<FavoriteMoviesAdapter.ViewHolder> {
-    private List<FavoriteMovie> favoriteMovies;
-    private Context context;
+    private Activity context;
+    private List<MovieDetail.MovieItem> movies;
+    private static OnRecyclerViewItemClickListener recyclerViewItemClickListener;
 
-    public FavoriteMoviesAdapter(Context context, List<FavoriteMovie> favoriteMovies) {
+    public FavoriteMoviesAdapter(Activity context, List<MovieDetail.MovieItem> favoriteMovies) {
         this.context = context;
-        this.favoriteMovies = favoriteMovies;
+        this.movies = favoriteMovies;
+    }
+
+    public void setRecyclerViewItemClickListener(OnRecyclerViewItemClickListener listener) {
+        this.recyclerViewItemClickListener = listener;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemLichsuBinding binding = ItemLichsuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_movie, parent, false);
-        return new ViewHolder(view);
-    }
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        MovieDetail.MovieItem movie = movies.get(position);
+        holder.binding.movieTitle.setText(movie.getName());
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        FavoriteMovie favoriteMovie = favoriteMovies.get(position);
-        holder.tvTitle.setText(favoriteMovie.getTitle());
-        // Thêm các hành động khác như click để xem phim
-        holder.itemView.setOnClickListener(v -> {
-            // Mở phim khi người dùng nhấn vào
-            Intent intent = new Intent(context, XemPhimActivity.class);
-            intent.putExtra("slug", favoriteMovie.getSlug());
-            context.startActivity(intent);
-        });
+        // Sử dụng Glide để load hình ảnh
+        Glide.with(context)
+                .load(movie.getPosterUrl())
+                .into(holder.binding.moviePoster);
+
+        final int pos = position;
+        holder.position = pos; // Lưu Position cho Holder
     }
 
     @Override
     public int getItemCount() {
-        return favoriteMovies.size();
+        return movies.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle;
+        ItemLichsuBinding binding;
+        int position;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
-            tvTitle = itemView.findViewById(R.id.movieTitle); // Đảm bảo bạn có TextView trong layout item
+        public ViewHolder(@NonNull ItemLichsuBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (recyclerViewItemClickListener != null) {
+                        recyclerViewItemClickListener.onItemClick(view, position);
+                    }
+                }
+            });
         }
     }
-}
 
+    public interface OnRecyclerViewItemClickListener {
+        void onItemClick(View view, int position);
+    }
+}

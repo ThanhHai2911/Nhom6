@@ -92,6 +92,9 @@ public class Series {
     public String getPoster_url() {
         return poster_url;
     }
+    public String getThumb_url() {
+        return thumb_url;
+    }
 
     public String getPosterUrl() {
         return APP_DOMAIN_CDN_IMAGE + thumb_url; // Kết hợp để tạo URL đầy đủ
