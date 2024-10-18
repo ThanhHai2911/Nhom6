@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
+import com.example.xemphim.model.Phim;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,7 +40,22 @@ public class DangNhapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dang_nhap);
-
+//// Khởi tạo Firebase Database reference
+//        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Movies");
+//
+//        // Tạo đối tượng Movie
+//        Phim newMovie = new Phim("1", "Movie Title", "Movie Description",
+//                "2024-01-01", "2h", 8.5f,
+//                "https://phimimg.com/upload/vod/20241005-1/795e8f69a90d9b470c844a6d017e7565.jpg",
+//                "https://phimimg.com/upload/vod/20241005-1/aac3986c07b75cd6a7002797cdd61fc9.jpg",
+//                2024, 0, 0, 0, "https://youtu.be/0q7XhWAB88Q?si=--l0pQykPWfpRNTg");
+//
+//        // Thêm phim vào database với ID tự tạo
+//        String movieId = databaseReference.push().getKey();
+//        if (movieId != null) {
+//            newMovie.setId_movie(movieId);
+//            databaseReference.child(movieId).setValue(newMovie);
+//        }
         // Ánh xạ các view
         setControl();
 
@@ -129,7 +145,7 @@ public class DangNhapActivity extends AppCompatActivity {
                     errorMessage = task.getException().getMessage(); // Lấy thông điệp lỗi từ exception
                     Log.e("DangNhapActivity", "Đăng nhập thất bại: " + errorMessage); // Ghi log lỗi
                 }
-                Toast.makeText(DangNhapActivity.this, "Đăng nhập thất bại: " + errorMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(DangNhapActivity.this, "Đăng nhập thất bại, mật khẩu hoặc email không đúng", Toast.LENGTH_LONG).show();
             }
         });
     }

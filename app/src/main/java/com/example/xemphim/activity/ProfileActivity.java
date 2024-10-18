@@ -101,15 +101,6 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isUserLoggedIn) {// Nếu người dùng đã đăng nhập, tiến hành đăng xuất
-//                    FirebaseAuth.getInstance().signOut();
-//                    isUserLoggedIn = false; // Cập nhật trạng thái đăng nhập
-//
-//                    // Cập nhật giao diện người dùng
-//                    binding.btnDangNhap.setText("Đăng Nhập");
-//                    binding.tvTenNguoiDung.setText(""); // Xóa tên người dùng
-//                    binding.tvEmail.setText(""); // Xóa email người dùng
-//                    watchedMoviesList.clear(); // Xóa danh sách phim đã xem
-//                    lichSuAdapter.notifyDataSetChanged(); // Cập nhật adapter để hiển thị danh sách rỗng
 
                     FirebaseAuth.getInstance().signOut();
                     SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -156,6 +147,14 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+//        binding.updateInfoButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(ProfileActivity.this, EditUserActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//        });
         setupBottomNavigation();
         lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
