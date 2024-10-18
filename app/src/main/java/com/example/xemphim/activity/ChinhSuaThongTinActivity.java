@@ -2,11 +2,14 @@ package com.example.xemphim.activity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.databinding.ActivityChinhSuaThongTinBinding;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,6 +27,7 @@ public class ChinhSuaThongTinActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityChinhSuaThongTinBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         // Khởi tạo Firebase Realtime Database
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
 
@@ -33,68 +37,87 @@ public class ChinhSuaThongTinActivity extends AppCompatActivity {
             userId = user.getUid(); // Lấy ID người dùng từ Firebase Authentication
         } else {
             // Xử lý trường hợp người dùng chưa đăng nhập
-            Log.w("UpdateUserActivity", "User is not logged in.");
+            Log.w("UpdateUserActivity", "Người dùng chưa đăng nhập.");
             finish(); // Đóng Activity nếu người dùng chưa đăng nhập
             return;
         }
+
         // Thiết lập sự kiện cho nút Lưu
         binding.btnLuu.setOnClickListener(view -> updateUserInfo());
-        binding.btnHuy.setOnClickListener(view -> finish()); // Đóng activity nếu nhấn Huỷ
+        binding.btnThoat.setOnClickListener(view -> finish()); // Đóng activity nếu nhấn Huỷ
     }
 
     private void updateUserInfo() {
-        String name = binding.edtTenNguoiDung.getText().toString().trim();
-        String newPassword = binding.edtMkMoi.getText().toString().trim();
+        String currentPassword = binding.edtMkCu.getText().toString().trim(); // Mật khẩu hiện tại
+        String newPassword = binding.edtMkMoi.getText().toString().trim(); // Mật khẩu mới
 
-        // Kiểm tra nếu các trường không rỗng
-        if (name.isEmpty() || newPassword.isEmpty()) {
-            Log.w("UpdateUserActivity", "Please fill all fields.");
+        // Kiểm tra nếu các trường rỗng
+        if (currentPassword.isEmpty() || newPassword.isEmpty()) {
+            Log.w("UpdateUserActivity", "Vui lòng điền đầy đủ thông tin.");
             return; // Dừng nếu có trường rỗng
         }
 
         // Kiểm tra nếu userId không null
         if (userId == null) {
-            Log.w("UpdateUserActivity", "User ID is null, cannot update user information.");
+            Log.w("UpdateUserActivity", "Không tìm thấy ID người dùng, không thể cập nhật thông tin.");
             return;
         }
 
-        // Cập nhật thông tin người dùng trong Realtime Database
-        databaseReference.child(userId).child("name").setValue(name)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("UpdateUserActivity", "User name updated successfully.");
-                        // Cập nhật mật khẩu mới
-                        updatePassword(newPassword);
-                    } else {
-                        Log.w("UpdateUserActivity", "Error updating user name in database", task.getException());
-                    }
-                });
+        reauthenticateAndChangePassword(currentPassword, newPassword);
     }
 
-    private void updatePassword(String newPassword) {
+    private void reauthenticateAndChangePassword(String currentPassword, String newPassword) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         if (user != null) {
-            // Update password directly
-            user.updatePassword(newPassword).addOnCompleteListener(updateTask -> {
-                if (updateTask.isSuccessful()) {
-                    Log.d("UpdateUserActivity", "Password updated successfully.");
-                    // Save the new password to the database, if necessary
-                    databaseReference.child(userId).child("password").setValue(newPassword)
-                            .addOnCompleteListener(passwordUpdateTask -> {
-                                if (passwordUpdateTask.isSuccessful()) {
-                                    Log.d("UpdateUserActivity", "Password saved in database successfully.");
-                                } else {
-                                    Log.w("UpdateUserActivity", "Error saving password in database", passwordUpdateTask.getException());
-                                }
-                            });
+            // Lấy email của người dùng (giả định người dùng đăng nhập bằng email và mật khẩu)
+            String email = user.getEmail();
+
+            // Xác thực người dùng bằng mật khẩu hiện tại
+            AuthCredential credential = EmailAuthProvider.getCredential(email, currentPassword);
+            user.reauthenticate(credential).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Log.d("UpdateUserActivity", "Xác thực thành công.");
+
+                    // Cập nhật mật khẩu sau khi xác thực thành công
+                    user.updatePassword(newPassword).addOnCompleteListener(updateTask -> {
+                        if (updateTask.isSuccessful()) {
+                            Log.d("UpdateUserActivity", "Đổi mật khẩu thành công.");
+
+                            // Lưu mật khẩu mới vào cơ sở dữ liệu (tùy chọn, không khuyến nghị lưu mật khẩu)
+                            databaseReference.child(userId).child("password").setValue(newPassword)
+                                    .addOnCompleteListener(passwordUpdateTask -> {
+                                        if (passwordUpdateTask.isSuccessful()) {
+                                            Log.d("UpdateUserActivity", "Lưu mật khẩu mới vào cơ sở dữ liệu thành công.");
+                                        } else {
+                                            Log.w("UpdateUserActivity", "Lỗi khi lưu mật khẩu mới vào cơ sở dữ liệu.", passwordUpdateTask.getException());
+                                        }
+                                    });
+                        } else {
+                            Log.w("UpdateUserActivity", "Lỗi khi cập nhật mật khẩu.", updateTask.getException());
+                        }
+                    });
                 } else {
-                    Log.w("UpdateUserActivity", "Error updating password", updateTask.getException());
+                    Log.w("UpdateUserActivity", "Xác thực thất bại. Kiểm tra lại mật khẩu hiện tại.", task.getException());
+                    Toast.makeText(ChinhSuaThongTinActivity.this, "Mật khẩu cũ không trùng khớp.", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            Log.w("UpdateUserActivity", "No user is logged in, cannot update password.");
+            Log.w("UpdateUserActivity", "Người dùng chưa đăng nhập, không thể xác thực.");
         }
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Giữ màn hình sáng khi ứng dụng hoạt động
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
 }
+

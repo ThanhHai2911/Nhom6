@@ -35,36 +35,59 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chỉnh sửa thông tin"
+        android:text="Thay đổi mật khẩu"
         android:textColor="#FFFFFF"
         android:backgroundTint="#FF4081"
         android:layout_gravity="center"
         android:layout_marginBottom="20dp"/>
-
-    <!-- Name input field -->
-    <EditText
-        android:id="@+id/edtTenNguoiDung"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Họ Tên:"
-        android:textColorHint="#000000"
-        android:textColor="#0C0C0C"
-        android:background="@drawable/rounded_search_bar"
-        android:padding="10dp"
-        android:enabled="true"
-        android:layout_marginBottom="10dp"/>
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MK cũ:   "
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/edtMkCu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="#000000"
+            android:inputType="textPassword"
+            android:textColor="#0C0C0C"
+            android:background="@drawable/rounded_search_bar"
+            android:padding="10dp"
+            android:layout_marginBottom="20dp"/>
+    </LinearLayout>
 
-    <EditText
-        android:id="@+id/edtMkMoi"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Mật khẩu mới:"
-        android:textColorHint="#000000"
-        android:inputType="textPassword"
-        android:textColor="#0C0C0C"
-        android:background="@drawable/rounded_search_bar"
-        android:padding="10dp"
-        android:layout_marginBottom="20dp"/>
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MK mới: "
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/edtMkMoi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="#000000"
+            android:inputType="textPassword"
+            android:textColor="#0C0C0C"
+            android:background="@drawable/rounded_search_bar"
+            android:padding="10dp"
+            android:layout_marginBottom="20dp"/>
+    </LinearLayout>
+
+
+
 
     <!-- Save and Cancel buttons -->
     <LinearLayout
@@ -75,20 +98,13 @@
 
         <Button
             android:id="@+id/btnLuu"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Lưu"
             android:textColor="#FFFFFF"
             android:backgroundTint="#FF4081"
             android:layout_marginEnd="10dp"/>
 
-        <Button
-            android:id="@+id/btnHuy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Huỷ"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#FF4081"/>
     </LinearLayout>
 
 </LinearLayout>
