@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -17,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
+import com.example.xemphim.model.Phim;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -30,6 +34,7 @@ public class DangNhapActivity extends AppCompatActivity {
     private Button btnDangNhap;
     private CheckBox rememberMeCheckBox;
     private TextView tvTaoTaiKhoan;
+    private boolean isPasswordVisible = false;  // Trạng thái của mật khẩu
 
     // Firebase Authentication
     private FirebaseAuth mAuth;
@@ -39,10 +44,25 @@ public class DangNhapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dang_nhap);
-
+//// Khởi tạo Firebase Database reference
+//        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Movies");
+//
+//        // Tạo đối tượng Movie
+//        Phim newMovie = new Phim("1", "Movie Title", "Movie Description",
+//                "2024-01-01", "2h", 8.5f,
+//                "https://phimimg.com/upload/vod/20241005-1/795e8f69a90d9b470c844a6d017e7565.jpg",
+//                "https://phimimg.com/upload/vod/20241005-1/aac3986c07b75cd6a7002797cdd61fc9.jpg",
+//                2024, 0, 0, 0, "https://youtu.be/0q7XhWAB88Q?si=--l0pQykPWfpRNTg");
+//
+//        // Thêm phim vào database với ID tự tạo
+//        String movieId = databaseReference.push().getKey();
+//        if (movieId != null) {
+//            newMovie.setId_movie(movieId);
+//            databaseReference.child(movieId).setValue(newMovie);
+//        }
         // Ánh xạ các view
         setControl();
-
+        xemMatKhau();
         // Khởi tạo FirebaseAuth và DatabaseReference
         mAuth = FirebaseAuth.getInstance();
         usersRef = FirebaseDatabase.getInstance().getReference("Users"); // Đảm bảo rằng bạn đã khởi tạo đúng đường dẫn
@@ -71,6 +91,32 @@ public class DangNhapActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
+        });
+    }
+
+    private void xemMatKhau() {
+        // Thiết lập sự kiện nhấn vào biểu tượng con mắt
+        edtMk.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;  // Vị trí của drawableEnd (con mắt) là vị trí thứ 2 (bên phải)
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (edtMk.getRight() - edtMk.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    // Kiểm tra trạng thái hiện tại của mật khẩu
+                    if (isPasswordVisible) {
+                        // Nếu mật khẩu đang hiển thị, chuyển sang ẩn
+                        edtMk.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        edtMk.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_off_24, 0);
+                    } else {
+                        // Nếu mật khẩu đang ẩn, chuyển sang hiển thị
+                        edtMk.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        edtMk.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_24, 0);
+                    }
+                    // Thay đổi trạng thái
+                    isPasswordVisible = !isPasswordVisible;
+                    edtMk.setSelection(edtMk.getText().length()); // Để con trỏ vẫn ở cuối EditText
+                    return true;
+                }
+            }
+            return false;
         });
     }
 
@@ -129,7 +175,7 @@ public class DangNhapActivity extends AppCompatActivity {
                     errorMessage = task.getException().getMessage(); // Lấy thông điệp lỗi từ exception
                     Log.e("DangNhapActivity", "Đăng nhập thất bại: " + errorMessage); // Ghi log lỗi
                 }
-                Toast.makeText(DangNhapActivity.this, "Đăng nhập thất bại: " + errorMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(DangNhapActivity.this, "Đăng nhập thất bại, mật khẩu hoặc email không đúng", Toast.LENGTH_LONG).show();
             }
         });
     }

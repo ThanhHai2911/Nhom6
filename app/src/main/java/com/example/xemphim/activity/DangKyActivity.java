@@ -3,7 +3,10 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -38,7 +41,8 @@ public class DangKyActivity extends AppCompatActivity {
     private EditText edtHT, edtEmail, edtMk, edtNLMK;
     private Button btnDangKy;
     private ImageView ic_back;
-
+    private boolean isPasswordVisible = false; // Flag for mật khẩu 1
+    private boolean isPasswordVisibleRepeat = false; // Flag for mật khẩu 2
     // Firebase Database and Auth
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
@@ -51,6 +55,7 @@ public class DangKyActivity extends AppCompatActivity {
         // Ánh xạ view
         setControl();
 
+        xemMatKhau();
         // Khởi tạo Firebase
         mAuth = FirebaseAuth.getInstance();
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
@@ -91,6 +96,57 @@ public class DangKyActivity extends AppCompatActivity {
 
 
     }
+
+    private void xemMatKhau() {
+        // Xử lý sự kiện cho trường "Mật Khẩu"
+        edtMk.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_END = 2; // DrawableEnd (icon con mắt)
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (edtMk.getRight() - edtMk.getCompoundDrawables()[DRAWABLE_END].getBounds().width())) {
+                        if (isPasswordVisible) {
+                            // Ẩn mật khẩu
+                            edtMk.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                            edtMk.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_off_24, 0);
+                        } else {
+                            // Hiển thị mật khẩu
+                            edtMk.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                            edtMk.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_24, 0);
+                        }
+                        isPasswordVisible = !isPasswordVisible; // Đổi trạng thái
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+
+        // Xử lý sự kiện cho trường "Nhập Lại Mật Khẩu"
+        edtNLMK.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_END = 2; // DrawableEnd (icon con mắt)
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (edtNLMK.getRight() - edtNLMK.getCompoundDrawables()[DRAWABLE_END].getBounds().width())) {
+                        if (isPasswordVisibleRepeat) {
+                            // Ẩn mật khẩu
+                            edtNLMK.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                            edtNLMK.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_off_24, 0);
+                        } else {
+                            // Hiển thị mật khẩu
+                            edtNLMK.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                            edtNLMK.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_24, 0);
+                        }
+                        isPasswordVisibleRepeat = !isPasswordVisibleRepeat; // Đổi trạng thái
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
     private void addLoaiNguoiDung() {
         // Tạo các loại người dùng
         LoaiNguoiDung thuong = new LoaiNguoiDung(0, "thường");

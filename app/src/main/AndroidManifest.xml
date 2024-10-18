@@ -21,7 +21,7 @@
             android:name=".activity.ProfileActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="adjustPan|stateHidden"/>
+            android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
             android:name=".activity.DownLoadActivity"
             android:exported="false"
@@ -50,13 +50,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ChiTietActivity" />
-        <activity android:name=".activity.XemPhimActivity"
-            android:configChanges="orientation|screenSize">
-        </activity>
+        <activity android:name=".activity.XemPhimActivity" />
         <activity android:name=".activity.LichSuXemActivity" />
         <activity android:name=".activity.FavoriteMoviesActivity" />
-        <activity android:name=".activity.ThanhToanActivity" />
-        <activity android:name=".activity.CaiDat" />
+        <activity android:name=".activity.PlayDownloadedMovieActivity"/>
     </application>
 
 </manifest>

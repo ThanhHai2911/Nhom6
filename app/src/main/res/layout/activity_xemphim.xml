@@ -5,7 +5,7 @@
     android:background="#1C1C1C">
 
     <!-- Video Player -->
-    <com.google.android.exoplayer2.ui.PlayerView
+    <androidx.media3.ui.PlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="250dp"
@@ -21,7 +21,7 @@
             android:background="?android:selectableItemBackgroundBorderless"
             android:src="@drawable/ic_fullscreen" />
 
-    </com.google.android.exoplayer2.ui.PlayerView>
+    </androidx.media3.ui.PlayerView>
 
     <!-- Movie Information -->
     <LinearLayout
@@ -44,6 +44,13 @@
                 android:layout_marginEnd="1dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/baseline_favorite_24" />
+            <ImageButton
+                android:id="@+id/btnDowload"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/dow" />
 
             <TextView
                 android:id="@+id/tvMovieTitle"

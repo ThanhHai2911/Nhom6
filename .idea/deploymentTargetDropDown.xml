@@ -2,8 +2,40 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="DangNhapActivity">
+      <entry key="DangKyActivity">
         <State />
+      </entry>
+      <entry key="DangNhapActivity">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="adb-LZYXRK4DVC5L5H4L-gNMUmZ._adb-tls-connect._tcp" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-10-18T00:19:59.740386500Z" />
+        </State>
+      </entry>
+      <entry key="MainActivity">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\Admin\.android\avd\Pixel_4_XL_API_30.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-10-17T04:02:48.136146800Z" />
+        </State>
       </entry>
     </value>
   </component>
