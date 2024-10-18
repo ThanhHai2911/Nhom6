@@ -49,6 +49,7 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
     private DatabaseReference favoritesRef;
     private ApiService apiService;
     private DatabaseReference usersRef;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,10 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Danh Sách yêu thích"); // Đặt tên mới cho Toolbar
             getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Hiện biểu tượng trở về
         }
+        swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadFavoriteMovies();
+        });
     }
     private void setControl() {
         favoriteMovies = new ArrayList<>();
@@ -85,6 +90,9 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
             Toast.makeText(this, "Lỗi: Người dùng không xác định", Toast.LENGTH_SHORT).show();
             return;
         }
+        // Clear the watchedMoviesList to avoid duplication
+        favoriteMovies.clear();
+        favoriteMoviesAdapter.notifyDataSetChanged(); // Notify adapter about the cleared list
         // Lấy id_user từ database
         usersRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -104,28 +112,32 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                String slug = snapshot.child("slug").getValue(String.class);
-                                if (slug != null) {
-                                    fetchMovieDetails(slug);
-                                }
+                                MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
+                                String movieSlug = snapshot.child("slug").getValue(String.class);
+                                movieItem.setSlug(movieSlug);
+                                fetchMovieDetails(movieSlug);
                             }
                             binding.progressBar.setVisibility(View.GONE);
                             binding.layout.setVisibility(View.VISIBLE);
+                            swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                             Toast.makeText(FavoriteMoviesActivity.this, "Lỗi khi tải danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                            swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                         }
                     });
                 } else {
                     Toast.makeText(FavoriteMoviesActivity.this, "Người dùng không tồn tại trong cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(FavoriteMoviesActivity.this, "Lỗi khi lấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
@@ -172,54 +184,65 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
 
-        // Lấy id_user từ Firebase
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String idUser = currentUser != null ? currentUser.getUid() : null; // Lấy UID của người dùng
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (idUser != null) { // Kiểm tra id_user không null
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("watchedMovies");
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                    // Truy vấn Firebase theo id_user
-                    Query searchQuery = databaseReference.orderByChild("id_user")
-                            .equalTo(idUser); // Lọc theo id_user
-
-                    searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            favoriteMovies.clear(); // Xóa danh sách cũ
-
-                            boolean found = false; // Biến kiểm tra xem có phim nào phù hợp không
-
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                MovieDetail.MovieItem movieDetail = snapshot.getValue(MovieDetail.MovieItem.class);
-
-                                // Kiểm tra slug có chứa từ khóa tìm kiếm không
-                                if (movieDetail != null && movieDetail.getSlug().toLowerCase().contains(query.toLowerCase())) {
-                                    favoriteMovies.add(movieDetail); // Thêm phim vào danh sách
-                                    found = true; // Đánh dấu có phim phù hợp
-                                }
-                            }
-
-                            if (found) {
-                                favoriteMoviesAdapter.notifyDataSetChanged(); // Thông báo adapter về thay đổi dữ liệu
-                            } else {
-                                Toast.makeText(FavoriteMoviesActivity.this, "Không tìm thấy phim", Toast.LENGTH_SHORT).show();
-                            }
-
-                            searchView.clearFocus(); // Đóng SearchView sau khi tìm kiếm
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Toast.makeText(FavoriteMoviesActivity.this, "Lỗi khi tìm kiếm", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    Toast.makeText(FavoriteMoviesActivity.this, "Người dùng không hợp lệ", Toast.LENGTH_SHORT).show();
+                if (currentUser == null) {
+                    Toast.makeText(FavoriteMoviesActivity.this, "Lỗi: Người dùng không xác định", Toast.LENGTH_SHORT).show();
+                    return true;
                 }
+
+                usersRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            String idUser = dataSnapshot.child("id_user").getValue(String.class);
+
+                            if (idUser == null) {
+                                Toast.makeText(FavoriteMoviesActivity.this, "Lỗi: id_user không tồn tại", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            favoritesRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    boolean found = false;
+
+                                    // Lưu trữ một danh sách phim tìm thấy tạm thời
+                                    List<MovieDetail.MovieItem> searchResults = new ArrayList<>();
+
+                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                        String movieSlug = snapshot.child("slug").getValue(String.class);
+                                        if (movieSlug != null) {
+                                            // Gọi hàm để lấy thông tin chi tiết phim
+                                            chiTietPhimTimKiem(movieSlug, query, searchResults); // Truyền danh sách tạm thời
+                                            found = true;
+                                        }
+                                    }
+
+                                    if (!found) {
+                                        Toast.makeText(FavoriteMoviesActivity.this, "Không tìm thấy kết quả", Toast.LENGTH_SHORT).show();
+                                    }
+                                    searchView.clearFocus();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Toast.makeText(FavoriteMoviesActivity.this, "Lỗi khi tìm kiếm", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(FavoriteMoviesActivity.this, "Người dùng không tồn tại trong cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(FavoriteMoviesActivity.this, "Lỗi khi lấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 searchItem.collapseActionView();
                 return true;
@@ -232,6 +255,39 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
         });
 
         return true;
+    }
+
+    private void chiTietPhimTimKiem(String slug, String query, List<MovieDetail.MovieItem> searchResults) {
+        Call<MovieDetail> call = apiService.getMovieDetail(slug);
+        call.enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieDetail movieDetail = response.body();
+                    MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
+                    movieItem.setName(movieDetail.getMovie().getName());
+                    movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
+                    movieItem.setSlug(slug); // Set slug for navigation
+
+                    // Kiểm tra xem tên phim có chứa truy vấn không
+                    if (movieItem.getName().toLowerCase().contains(query.toLowerCase())) {
+                        // Thêm phim tìm thấy vào đầu danh sách tìm kiếm
+                        searchResults.add(0, movieItem);
+
+                        // Cập nhật danh sách chính
+                        favoriteMovies.add(0, movieItem); // Thêm vào đầu danh sách chính
+                        favoriteMoviesAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
+                    }
+                } else {
+                    Log.e("FavoriteMoviesActivity", "Failed to fetch movie details for slug: " + slug);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
+                Log.e("FavoriteMoviesActivity", "Error fetching movie details", t);
+            }
+        });
     }
 
     @Override
