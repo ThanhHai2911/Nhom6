@@ -195,7 +195,36 @@ public class ChiTietActivity extends AppCompatActivity {
 
                     // Hiển thị thông tin phim using ViewBinding
                     binding.textViewTitle.setText(movie.getName());
-                    binding.textViewDescription.setText(movie.getContent());
+                    // Giới hạn số ký tự cho description
+                    final int MAX_CHAR_COUNT = 200;
+                    String fullDescription = movie.getContent();
+                    if (fullDescription.length() > MAX_CHAR_COUNT) {
+                        String shortDescription = fullDescription.substring(0, MAX_CHAR_COUNT) + "...";
+                        binding.textViewDescription.setText(shortDescription);
+                        binding.buttonReadMore.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.textViewDescription.setText(fullDescription);
+                        binding.buttonReadMore.setVisibility(View.GONE);
+                    }
+
+                    // Sự kiện nhấn nút "Xem thêm" để hiển thị toàn bộ phần mô tả
+                    binding.buttonReadMore.setOnClickListener(new View.OnClickListener() {
+                        boolean isExpanded = false; // Biến trạng thái để kiểm tra xem có đang mở rộng hay không
+
+                        @Override
+                        public void onClick(View v) {
+                            if (!isExpanded) {
+                                binding.textViewDescription.setText(fullDescription);
+                                binding.buttonReadMore.setText("Thu gọn");
+                                isExpanded = true;
+                            } else {
+                                String shortDescription = fullDescription.substring(0, MAX_CHAR_COUNT) + "...";
+                                binding.textViewDescription.setText(shortDescription);
+                                binding.buttonReadMore.setText("Xem thêm");
+                                isExpanded = false;
+                            }
+                        }
+                    });
                     binding.textViewYear.setText(String.valueOf(movie.getYear()));
                     binding.textViewActors.setText(TextUtils.join(", ", movie.getActor()));
                     binding.textViewDirector.setText(TextUtils.join(", ", movie.getDirector()));
@@ -236,8 +265,6 @@ public class ChiTietActivity extends AppCompatActivity {
                         // Hiển thị chuỗi thể loại lên TextView
                         binding.categoryName.setText(categoryText);
                     }
-
-
                     // Tải poster bằng Glide (poster image and thumbnail)
                     Glide.with(ChiTietActivity.this)
                             .load(movie.getThumbUrl())

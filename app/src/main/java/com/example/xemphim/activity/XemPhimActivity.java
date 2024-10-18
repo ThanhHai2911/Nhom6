@@ -104,8 +104,6 @@ public class XemPhimActivity extends AppCompatActivity {
                 .writeTimeout(60, TimeUnit.SECONDS)   // Tăng thời gian write timeout
                 .retryOnConnectionFailure(true)       // Tự động retry khi lỗi kết nối
                 .build();
-
-
         setControl();
         setEvent();
         // Kiểm tra và cập nhật màu nút trái tim
