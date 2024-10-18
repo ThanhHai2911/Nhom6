@@ -58,15 +58,18 @@
                             android:id="@+id/viewPagerBanner"
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
-                            android:layout_marginTop="-20dp"/>
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="10dp"/>
 
                         <!-- Phim mới cập nhật -->
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Phim mới cập nhật"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:padding="7dp"
+                            android:background="@drawable/theloai_border"
                             android:textStyle="bold" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -78,12 +81,14 @@
 
                         <!-- Phim bộ -->
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="Phim bộ"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:padding="7dp"
+                            android:background="@drawable/theloai_border"
                             android:textStyle="bold" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -95,12 +100,14 @@
 
                         <!-- Phim Lẻ -->
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="Phim Lẻ"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:padding="7dp"
+                            android:background="@drawable/theloai_border"
                             android:textStyle="bold" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -112,12 +119,14 @@
 
                         <!-- TV Show -->
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="TV Show"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:padding="7dp"
+                            android:background="@drawable/theloai_border"
                             android:textStyle="bold" />
 
                         <androidx.recyclerview.widget.RecyclerView
@@ -129,12 +138,14 @@
 
                         <!-- Phim Hoạt Hình -->
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="Phim Hoạt Hình"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/white"
                             android:textSize="18sp"
+                            android:padding="7dp"
+                            android:background="@drawable/theloai_border"
                             android:textStyle="bold" />
 
                         <androidx.recyclerview.widget.RecyclerView

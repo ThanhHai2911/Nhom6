@@ -156,6 +156,13 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+        binding.updateInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ProfileActivity.this, ChinhSuaThongTinActivity.class);
+                startActivity(intent);
+            }
+        });
         setupBottomNavigation();
         lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
         usersRef = FirebaseDatabase.getInstance().getReference("Users");

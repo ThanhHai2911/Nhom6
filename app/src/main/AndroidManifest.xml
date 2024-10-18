@@ -15,6 +15,9 @@
         android:theme="@style/Theme.AppXemPhim"
         tools:targetApi="31">
         <activity
+            android:name=".activity.ChinhSuaThongTinActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.AdminActivity"
             android:exported="false" />
         <activity
@@ -50,9 +53,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ChiTietActivity" />
-        <activity android:name=".activity.XemPhimActivity"
-            android:configChanges="orientation|screenSize">
-        </activity>
+        <activity
+            android:name=".activity.XemPhimActivity"
+            android:configChanges="orientation|screenSize"></activity>
         <activity android:name=".activity.LichSuXemActivity" />
         <activity android:name=".activity.FavoriteMoviesActivity" />
         <activity android:name=".activity.ThanhToanActivity" />
