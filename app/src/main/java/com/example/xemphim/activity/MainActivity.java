@@ -98,11 +98,14 @@
             }
             swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
             swipeRefreshLayout.setOnRefreshListener(() -> {
-                loadMovies(); // Tải lại danh sách phim
+              //  loadMovies(); // Tải lại danh sách phim
                 loadSeries(); // Tải lại danh sach phim bo
                 loadTVShow();// Tải lại danh sách tvshow
                 loadPhimLe();
                 loadPhimHoatHinh();
+                fetchMoviesFromFirebase();
+                binding.tvDanhSachTimKiem.setVisibility(View.GONE);
+                binding.recyclerViewMovies.setVisibility(View.GONE);
             });
             Banner();
             FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -122,7 +125,7 @@
 
             // Load phim từ Firebase
             fetchMoviesFromFirebase();
-            loadMovies();
+           // loadMovies();
             loadSeries();
             loadTVShow();
             loadPhimLe();
@@ -211,17 +214,34 @@
                         public void onResponse(Call<SeriesResponse> call, Response<SeriesResponse> response) {
                             if (response.isSuccessful() && response.body() != null) {
                                 List<Series> series = response.body().getData().getItems();
-                                binding.recyclerViewMovies.setAdapter(new SeriesAdapter(MainActivity.this, series));
+                                // Nếu có kết quả, hiển thị kết quả tìm kiếm
+                                if (!series.isEmpty()) {
+                                    // Show the search results section
+                                    binding.tvDanhSachTimKiem.setVisibility(View.VISIBLE);
+                                    binding.recyclerViewMovies.setVisibility(View.VISIBLE);
+
+                                    // Set up the adapter with search results
+                                    binding.recyclerViewMovies.setAdapter(new SeriesAdapter(MainActivity.this, series));
+                                } else {
+                                    // If no results, hide the search results section
+                                    binding.tvDanhSachTimKiem.setVisibility(View.GONE);
+                                    binding.recyclerViewMovies.setVisibility(View.GONE);
+                                    Toast.makeText(MainActivity.this, "Không tìm thấy phim", Toast.LENGTH_SHORT).show();
+                                }
 
                                 // Đóng SearchView sau khi tìm kiếm
                                 searchView.clearFocus();
                             } else {
+                                binding.tvDanhSachTimKiem.setVisibility(View.GONE);
+                                binding.recyclerViewMovies.setVisibility(View.GONE);
                                 Toast.makeText(MainActivity.this, "Không tìm thấy phim", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<SeriesResponse> call, Throwable t) {
+                            binding.tvDanhSachTimKiem.setVisibility(View.GONE);
+                            binding.recyclerViewMovies.setVisibility(View.GONE);
                             Toast.makeText(MainActivity.this, "Lỗi khi tìm kiếm", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -292,48 +312,48 @@
                 }
             });
         }
-        private void loadMovies() {
-            // Hiển thị ProgressBar và ẩn nội dung chính
-            binding.progressBar.setVisibility(View.VISIBLE);
-            binding.mainContent.setVisibility(View.GONE);
-
-            apiService.getMovies(1).enqueue(new Callback<MovieResponse>() {
-                @Override
-                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-                    // Ẩn ProgressBar và hiển thị nội dung chính
-                    binding.progressBar.setVisibility(View.GONE);
-                    binding.mainContent.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
-
-                    if (response.isSuccessful() && response.body() != null) {
-                        List<Movie> movies = response.body().getItems();
-                        // Khởi tạo MovieAdapter
-                        movieAdapter = new MovieAdapter(MainActivity.this, movies);
-                        // Thiết lập sự kiện click cho từng item
-                        movieAdapter.setRecyclerViewItemClickListener(new MovieAdapter.OnRecyclerViewItemClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
-                                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
-                                Movie movie = movies.get(position);
-                                intent.putExtra("slug", movie.getSlug());
-                                view.getContext().startActivity(intent);
-                            }
-                        });
-                        
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<MovieResponse> call, Throwable t) {
-                    // Ẩn ProgressBar và thông báo lỗi
-                    binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu", Toast.LENGTH_SHORT).show();
-                    binding.mainContent.setVisibility(View.VISIBLE); // Hiển thị lại nội dung chính
-                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
-                }
-            });
-        }
+//        private void loadMovies() {
+//            // Hiển thị ProgressBar và ẩn nội dung chính
+//            binding.progressBar.setVisibility(View.VISIBLE);
+//            binding.mainContent.setVisibility(View.GONE);
+//
+//            apiService.getMovies(1).enqueue(new Callback<MovieResponse>() {
+//                @Override
+//                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+//                    // Ẩn ProgressBar và hiển thị nội dung chính
+//                    binding.progressBar.setVisibility(View.GONE);
+//                    binding.mainContent.setVisibility(View.VISIBLE);
+//                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
+//
+//                    if (response.isSuccessful() && response.body() != null) {
+//                        List<Movie> movies = response.body().getItems();
+//                        // Khởi tạo MovieAdapter
+//                        movieAdapter = new MovieAdapter(MainActivity.this, movies);
+//                        // Thiết lập sự kiện click cho từng item
+//                        movieAdapter.setRecyclerViewItemClickListener(new MovieAdapter.OnRecyclerViewItemClickListener() {
+//                            @Override
+//                            public void onItemClick(View view, int position) {
+//                                //Lay thong tin chi tiet phim tu slug truyen den man hinh chi tiet phim
+//                                Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+//                                Movie movie = movies.get(position);
+//                                intent.putExtra("slug", movie.getSlug());
+//                                view.getContext().startActivity(intent);
+//                            }
+//                        });
+//
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<MovieResponse> call, Throwable t) {
+//                    // Ẩn ProgressBar và thông báo lỗi
+//                    binding.progressBar.setVisibility(View.GONE);
+//                    Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu", Toast.LENGTH_SHORT).show();
+//                    binding.mainContent.setVisibility(View.VISIBLE); // Hiển thị lại nội dung chính
+//                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
+//                }
+//            });
+//        }
 
 
         private void loadSeries() {
