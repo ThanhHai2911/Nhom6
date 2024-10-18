@@ -13,9 +13,11 @@
     import com.example.xemphim.R;
     import com.example.xemphim.adapter.BannerAdapter;
     import com.example.xemphim.adapter.MovieAdapter;
+    import com.example.xemphim.adapter.PhimAdapter;
     import com.example.xemphim.adapter.SeriesAdapter;
     import com.example.xemphim.databinding.ActivityMainBinding;
     import com.example.xemphim.model.Movie;
+    import com.example.xemphim.model.Phim;
     import com.example.xemphim.model.Series;
     import com.example.xemphim.response.MovieResponse;
     import com.example.xemphim.response.SeriesResponse;
@@ -40,6 +42,11 @@
     import android.widget.Toast;
     import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
     import com.google.android.material.bottomnavigation.BottomNavigationView;
+    import com.google.firebase.database.DataSnapshot;
+    import com.google.firebase.database.DatabaseError;
+    import com.google.firebase.database.DatabaseReference;
+    import com.google.firebase.database.FirebaseDatabase;
+    import com.google.firebase.database.ValueEventListener;
 
     public class MainActivity extends AppCompatActivity {
         private ActivityMainBinding binding;
@@ -54,7 +61,10 @@
         private String emailUser;
         private int idLoaiND;
         private BannerAdapter bannerAdapter;
-
+        //
+        private PhimAdapter phimAdapter;
+        private DatabaseReference movieRef;
+        private List<Phim> movieList;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +105,23 @@
                 loadPhimHoatHinh();
             });
             Banner();
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            movieRef = database.getReference("movies"); // Đây là nơi lưu trữ thông tin phim trên Firebase
+
+            // Khởi tạo movieList và RecyclerView
+            movieList = new ArrayList<>();
+            phimAdapter = new PhimAdapter(this, movieList);
+            binding.recyclerViewphim.setLayoutManager(new LinearLayoutManager(this));
+            binding.recyclerViewphim.setAdapter(phimAdapter);
 
             setupRecyclerViews();
+            // Khởi tạo Firebase Realtime Database reference
+
+
+
+
+            // Load phim từ Firebase
+            fetchMoviesFromFirebase();
             loadMovies();
             loadSeries();
             loadTVShow();
@@ -104,6 +129,7 @@
             loadPhimHoatHinh();
 
             navigationBottom();
+
         }
         private void laythongtinUser(){
             SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -241,8 +267,31 @@
             binding.recyclerViewtvShow.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             binding.recyclerViewphimle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             binding.recyclerViewphimhoathinh.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        }
+            binding.recyclerViewphim.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
+        }
+        private void fetchMoviesFromFirebase() {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Movies");
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    movieList.clear(); // Xóa dữ liệu cũ (nếu có)
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Phim movie = snapshot.getValue(Phim.class);
+                        if (movie != null) {
+                            movieList.add(movie);
+                        }
+                    }
+                    // Cập nhật RecyclerView sau khi có dữ liệu
+                    phimAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e("MainActivity", "Failed to fetch data", databaseError.toException());
+                }
+            });
+        }
         private void loadMovies() {
             // Hiển thị ProgressBar và ẩn nội dung chính
             binding.progressBar.setVisibility(View.VISIBLE);
@@ -271,7 +320,7 @@
                                 view.getContext().startActivity(intent);
                             }
                         });
-                        binding.recyclerViewMovies.setAdapter(movieAdapter);
+                        
                     }
                 }
 
