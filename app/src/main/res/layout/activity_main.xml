@@ -59,25 +59,28 @@
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
                             android:layout_marginTop="-20dp"
-                            android:layout_marginBottom="10dp"/>
+                            android:layout_marginBottom="3dp"/>
 
                         <!-- Phim mới cập nhật -->
                         <TextView
+                            android:id="@+id/tvDanhSachTimKiem"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Phim mới cập nhật"
+                            android:text="Danh Sách phim tìm kiếm"
                             android:textColor="@color/white"
                             android:textSize="18sp"
                             android:padding="7dp"
                             android:background="@drawable/theloai_border"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewMovies"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:orientation="horizontal" />
+                            android:orientation="horizontal"
+                            android:visibility="gone" />
 
                         <!-- Phim bộ -->
                         <TextView
