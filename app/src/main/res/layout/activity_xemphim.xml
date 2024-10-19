@@ -20,7 +20,9 @@
             android:layout_gravity="end|top"
             android:layout_margin="8dp"
             android:background="?android:selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_fullscreen" />
+            android:text="@string/fullscreen"
+            android:src="@drawable/ic_fullscreen"
+            android:contentDescription="@null"/>
 
     </androidx.media3.ui.PlayerView>
 
@@ -44,20 +46,29 @@
 
             <ImageButton
                 android:id="@+id/btnAddToFavorites"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/baseline_favorite_24"
-                android:contentDescription="Yêu thích" />
+                android:text="@string/favorite_button_label"
+                android:contentDescription="@null" />
 
             <ImageButton
                 android:id="@+id/btnDowload"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 app:srcCompat="@drawable/baseline_download_24"
-                android:contentDescription="Tải xuống"
-                app:tint="#ff4500" />
+                android:contentDescription="@null"
+                app:tint="#4169e1" />
+            <ImageButton
+                android:id="@+id/btnReport"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/baseline_report_24"
+                android:contentDescription="@null"
+                app:tint="#4169e1" />
         </LinearLayout>
 
         <!-- Movie Title -->
@@ -70,14 +81,13 @@
             android:textColor="#FFFFFF"
             android:paddingTop="8dp"
             android:paddingBottom="8dp" />
-
         <!-- Episode List -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="Tập Phim:"
+            android:text="@string/episode"
             android:textColor="#FFFFFF" />
 
         <androidx.recyclerview.widget.RecyclerView
