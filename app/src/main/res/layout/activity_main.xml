@@ -107,14 +107,14 @@
                                 android:gravity="end">
 
                                 <TextView
-                                    android:id="@+id/xemThemTextView"
+                                    android:id="@+id/xemThemPhimBo"
+                                    android:clickable="true"
+                                    android:focusable="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Xem thêm"
                                     android:textColor="@color/white"
                                     android:textSize="16sp"
-                                    android:clickable="true"
-                                    android:focusable="true"
                                     android:layout_gravity="center_vertical" />
 
                                 <ImageView
@@ -159,6 +159,9 @@
                                 android:gravity="end">
 
                                 <TextView
+                                    android:id="@+id/xemThemPhimLe"
+                                    android:clickable="true"
+                                    android:focusable="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Xem thêm"
@@ -208,6 +211,9 @@
                                 android:gravity="end">
 
                                 <TextView
+                                    android:id="@+id/xemThemTVshow"
+                                    android:clickable="true"
+                                    android:focusable="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Xem thêm"
@@ -259,6 +265,9 @@
                                 android:gravity="end">
 
                                 <TextView
+                                    android:id="@+id/xemThemHoatHinh"
+                                    android:clickable="true"
+                                    android:focusable="true"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Xem thêm"

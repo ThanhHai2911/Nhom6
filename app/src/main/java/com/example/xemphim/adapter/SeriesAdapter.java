@@ -89,6 +89,11 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.SeriesView
         }
 
     }
+    public void updateData(List<Series> newData) {
+        seriesList.clear(); // Xóa dữ liệu cũ
+        seriesList.addAll(newData); // Thêm dữ liệu mới
+        notifyDataSetChanged(); // Thông báo adapter đã có dữ liệu mới
+    }
 
     // Interface để xử lý sự kiện click
     public interface OnRecyclerViewItemClickListener {

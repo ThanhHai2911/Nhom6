@@ -20,19 +20,19 @@ public interface ApiService {
 
 
     @GET("v1/api/danh-sach/phim-bo")
-    Call<SeriesResponse> getSeries();
+    Call<SeriesResponse> getSeries(@Query("page") int page);
 
     @GET("phim/{slug}")
     Call<MovieDetail> getMovieDetail(@Path("slug") String slug);
 
     @GET("v1/api/danh-sach/tv-shows")
-    Call<SeriesResponse> getTVShow();
+    Call<SeriesResponse> getTVShow(@Query("page") int page);
 
     @GET("v1/api/danh-sach/phim-le")
-    Call<SeriesResponse> getPhimLe();
+    Call<SeriesResponse> getPhimLe(@Query("page") int page);
 
     @GET("v1/api/danh-sach/hoat-hinh")
-    Call<SeriesResponse> getHoatHinh();
+    Call<SeriesResponse> getHoatHinh(@Query("page") int page);
 
     @GET("v1/api/the-loai/tinh-cam")
     Call<SeriesResponse> getTheLoai();
