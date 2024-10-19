@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#473F3F"
+    android:background="#696969"
     android:padding="10dp">
     <ProgressBar
         android:id="@+id/progressBar"
@@ -19,28 +19,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone" >
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/imageViewthumburl"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="242dp"
-                android:src="@drawable/thumb_url"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/thumb_url" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="#708090"
                 android:layout_marginTop="16dp" >
 
                 <ImageView
                     android:id="@+id/imageViewPoster"
                     android:layout_width="148dp"
-                    android:layout_height="217dp"
+                    android:layout_height="match_parent"
                     android:elevation="8dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/poster_url"/>
+                    android:src="@drawable/poster_url" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -172,23 +173,21 @@
                             android:layout_width="130dp"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
-                            android:background="@drawable/textview_border"
                             android:paddingHorizontal="5dp"
                             android:text="Hành động, Hài hước, Kịch"
-                            android:textColor="@color/black"
-                            android:textSize="12sp" />
+                            android:textColor="#9CFFFFFF"
+                            android:textSize="14sp" />
                     </LinearLayout>
-
-
-
-
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="24dp">
+                android:background="@drawable/text_description_background"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="5dp"
+                >
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -199,31 +198,49 @@
                     android:textStyle="bold" />
                 <TextView
                     android:id="@+id/textViewActors"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="4dp"
                     android:text=""
                     android:textColor="#9CFFFFFF"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="30dp"
-                android:text="Nội dung phim"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-            <TextView
-                android:id="@+id/textViewDescription"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:text=""
-                android:textColor="#9CFFFFFF"
-                android:textSize="20sp" />
+                android:orientation="vertical"
+                android:background="@drawable/text_description_background"
+                android:padding="12dp"
+                android:elevation="2dp"
+                android:shadowColor="#2A2A2A"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="3">
+
+                <TextView
+                    android:id="@+id/textViewDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="8dp"
+                    android:justificationMode="inter_word"/>
+
+                <Button
+                    android:id="@+id/buttonReadMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Xem thêm"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/pink"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
 
             <Button
 
@@ -231,8 +248,8 @@
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="40dp"
-                android:backgroundTint="#ED4DE0"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/pink"
                 android:text="Xem Phim"
                 android:textSize="25sp">
 

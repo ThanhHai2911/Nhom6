@@ -1,13 +1,17 @@
 package com.example.xemphim.activity;
 
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityChinhSuaThongTinBinding;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -20,6 +24,7 @@ public class ChinhSuaThongTinActivity extends AppCompatActivity {
     private ActivityChinhSuaThongTinBinding binding;
     private DatabaseReference databaseReference; // Tham chiếu đến Realtime Database
     private String userId;
+    private boolean isPasswordVisible = false;  // Trạng thái của mật khẩu
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,8 @@ public class ChinhSuaThongTinActivity extends AppCompatActivity {
         // Thiết lập sự kiện cho nút Lưu
         binding.btnLuu.setOnClickListener(view -> updateUserInfo());
         binding.btnThoat.setOnClickListener(view -> finish()); // Đóng activity nếu nhấn Huỷ
+        xemMatKhauCu();
+        xemMatKhauMoi();
     }
 
     private void updateUserInfo() {
@@ -105,6 +112,56 @@ public class ChinhSuaThongTinActivity extends AppCompatActivity {
         } else {
             Log.w("UpdateUserActivity", "Người dùng chưa đăng nhập, không thể xác thực.");
         }
+    }
+    private void xemMatKhauCu() {
+        // Thiết lập sự kiện nhấn vào biểu tượng con mắt
+        binding.edtMkCu.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;  // Vị trí của drawableEnd (con mắt) là vị trí thứ 2 (bên phải)
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (binding.edtMkCu.getRight() - binding.edtMkCu.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    // Kiểm tra trạng thái hiện tại của mật khẩu
+                    if (isPasswordVisible) {
+                        // Nếu mật khẩu đang hiển thị, chuyển sang ẩn
+                        binding.edtMkCu.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        binding.edtMkCu.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_off_24, 0);
+                    } else {
+                        // Nếu mật khẩu đang ẩn, chuyển sang hiển thị
+                        binding.edtMkCu.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        binding.edtMkCu.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_24, 0);
+                    }
+                    // Thay đổi trạng thái
+                    isPasswordVisible = !isPasswordVisible;
+                    binding.edtMkCu.setSelection(binding.edtMkCu.getText().length()); // Để con trỏ vẫn ở cuối EditText
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+    private void xemMatKhauMoi() {
+        // Thiết lập sự kiện nhấn vào biểu tượng con mắt
+        binding.edtMkMoi.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;  // Vị trí của drawableEnd (con mắt) là vị trí thứ 2 (bên phải)
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (binding.edtMkMoi.getRight() - binding.edtMkMoi.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    // Kiểm tra trạng thái hiện tại của mật khẩu
+                    if (isPasswordVisible) {
+                        // Nếu mật khẩu đang hiển thị, chuyển sang ẩn
+                        binding.edtMkMoi.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        binding.edtMkMoi.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_off_24, 0);
+                    } else {
+                        // Nếu mật khẩu đang ẩn, chuyển sang hiển thị
+                        binding.edtMkMoi.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        binding.edtMkMoi.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_outline_24, 0, R.drawable.baseline_visibility_24, 0);
+                    }
+                    // Thay đổi trạng thái
+                    isPasswordVisible = !isPasswordVisible;
+                    binding.edtMkMoi.setSelection(binding.edtMkMoi.getText().length()); // Để con trỏ vẫn ở cuối EditText
+                    return true;
+                }
+            }
+            return false;
+        });
     }
     @Override
     protected void onResume() {
