@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,7 +13,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppXemPhim"
-        tools:targetApi="31">
+        tools:targetApi="31" >
+        <activity
+            android:name=".activity.AllMovie"
+            android:exported="false" />
         <activity
             android:name=".activity.ChinhSuaThongTinActivity"
             android:exported="false" />
@@ -45,7 +48,7 @@
             android:name=".activity.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="adjustPan|stateHidden">
+            android:windowSoftInputMode="adjustPan|stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -53,14 +56,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ChiTietActivity" />
-        <activity android:name=".activity.XemPhimActivity"
-            android:configChanges="orientation|screenSize">
+        <activity
+            android:name=".activity.XemPhimActivity"
+            android:configChanges="orientation|screenSize" >
         </activity>
         <activity android:name=".activity.LichSuXemActivity" />
         <activity android:name=".activity.FavoriteMoviesActivity" />
         <activity android:name=".activity.ThanhToanActivity" />
         <activity android:name=".activity.CaiDatActivity" />
-        <activity android:name=".activity.PlayDownloadedMovieActivity"/>
+        <activity android:name=".activity.PlayDownloadedMovieActivity" />
     </application>
 
 </manifest>
