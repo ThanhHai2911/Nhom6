@@ -61,16 +61,50 @@
         private String emailUser;
         private int idLoaiND;
         private BannerAdapter bannerAdapter;
-        //
         private PhimAdapter phimAdapter;
         private DatabaseReference movieRef;
         private List<Phim> movieList;
+        private List<Series> seriesPhimLe;
+        private List<Series> seriesPhimBo;
+        private List<Series> seriesPhimHoatHinh;
+        private List<Series> seriesTvShow;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
+            seriesPhimLe = new ArrayList<>();
+            seriesPhimBo = new ArrayList<>();
+            seriesPhimHoatHinh = new ArrayList<>();
+            seriesTvShow = new ArrayList<>();
+            binding.xemThemPhimBo.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, AllMovie.class);
+                intent.putParcelableArrayListExtra("seriesList", new ArrayList<>(seriesPhimBo)); // Chuyển danh sách phim bộ
+                intent.putExtra("type", "series"); // Thêm loại phim bộ
+                startActivity(intent);
+            });
+
+            binding.xemThemPhimLe.setOnClickListener(v -> {
+                Log.d("MainActivity", "xemThemPhimLe clicked");
+                Intent intent = new Intent(MainActivity.this, AllMovie.class);
+                intent.putParcelableArrayListExtra("phimLe", new ArrayList<>(seriesPhimLe)); // Danh sách phim lẻ
+                intent.putExtra("type", "movie"); // Thêm loại phim lẻ
+                startActivity(intent);
+            });
+            binding.xemThemTVshow.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, AllMovie.class);
+                intent.putParcelableArrayListExtra("tVshow", new ArrayList<>(seriesTvShow)); // Chuyển danh sách phim bộ
+                intent.putExtra("type", "tvShow"); // Thêm loại phim bộ
+                startActivity(intent);
+            });
+            binding.xemThemHoatHinh.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, AllMovie.class);
+                intent.putParcelableArrayListExtra("hoatHinh", new ArrayList<>(seriesPhimHoatHinh)); // Chuyển danh sách phim bộ
+                intent.putExtra("type", "hoathinh"); // Thêm loại phim bộ
+                startActivity(intent);
+            });
+
             // truy cập thông tin người dùng.
             laythongtinUser();
             Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
@@ -119,9 +153,6 @@
 
             setupRecyclerViews();
             // Khởi tạo Firebase Realtime Database reference
-
-
-
 
             // Load phim từ Firebase
             fetchMoviesFromFirebase();
@@ -357,7 +388,9 @@
 
 
         private void loadSeries() {
-            apiService.getSeries().enqueue(new Callback<SeriesResponse>() {
+            // Giả sử bạn muốn bắt đầu từ trang 1
+            int page = 1;
+            apiService.getSeries(page).enqueue(new Callback<SeriesResponse>() {
                 @Override
                 public void onResponse(Call<SeriesResponse> call, Response<SeriesResponse> response) {
                     // Ẩn ProgressBar và hiển thị nội dung chính
@@ -366,8 +399,8 @@
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
-                        List<Series> series = response.body().getData().getItems();
-                        binding.recyclerViewSeries.setAdapter(new SeriesAdapter(MainActivity.this, series));
+                        seriesPhimBo = response.body().getData().getItems();
+                        binding.recyclerViewSeries.setAdapter(new SeriesAdapter(MainActivity.this, seriesPhimBo));
                     }
                 }
 
@@ -380,9 +413,9 @@
                 }
             });
         }
-
         private void loadPhimLe() {
-            apiService.getPhimLe().enqueue(new Callback<SeriesResponse>() {
+            int page = 1;
+            apiService.getPhimLe(page).enqueue(new Callback<SeriesResponse>() {
                 @Override
                 public void onResponse(Call<SeriesResponse> call, Response<SeriesResponse> response) {
                     // Ẩn ProgressBar và hiển thị nội dung chính
@@ -391,8 +424,8 @@
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
-                        List<Series> series = response.body().getData().getItems();
-                        binding.recyclerViewphimle.setAdapter(new SeriesAdapter(MainActivity.this, series));
+                        seriesPhimLe = response.body().getData().getItems();
+                        binding.recyclerViewphimle.setAdapter(new SeriesAdapter(MainActivity.this, seriesPhimLe));
                     }
                 }
 
@@ -407,7 +440,8 @@
         }
 
         private void loadTVShow() {
-            apiService.getTVShow().enqueue(new Callback<SeriesResponse>() {
+            int page = 1;
+            apiService.getTVShow(page).enqueue(new Callback<SeriesResponse>() {
                 @Override
                 public void onResponse(Call<SeriesResponse> call, Response<SeriesResponse> response) {
                     // Ẩn ProgressBar và hiển thị nội dung chính
@@ -416,8 +450,8 @@
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
-                        List<Series> series = response.body().getData().getItems();
-                        binding.recyclerViewtvShow.setAdapter(new SeriesAdapter(MainActivity.this, series));
+                        seriesTvShow = response.body().getData().getItems();
+                        binding.recyclerViewtvShow.setAdapter(new SeriesAdapter(MainActivity.this, seriesTvShow));
                     }
                 }
 
@@ -432,7 +466,8 @@
         }
 
         private void loadPhimHoatHinh() {
-            apiService.getHoatHinh().enqueue(new Callback<SeriesResponse>() {
+            int page = 1;
+            apiService.getHoatHinh(page).enqueue(new Callback<SeriesResponse>() {
                 @Override
                 public void onResponse(Call<SeriesResponse> call, Response<SeriesResponse> response) {
                     // Ẩn ProgressBar và hiển thị nội dung chính
@@ -441,8 +476,8 @@
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
-                        List<Series> series = response.body().getData().getItems();
-                        binding.recyclerViewphimhoathinh.setAdapter(new SeriesAdapter(MainActivity.this, series));
+                        seriesPhimHoatHinh = response.body().getData().getItems();
+                        binding.recyclerViewphimhoathinh.setAdapter(new SeriesAdapter(MainActivity.this, seriesPhimHoatHinh));
                     }
                 }
 

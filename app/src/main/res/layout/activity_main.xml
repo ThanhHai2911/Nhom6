@@ -83,17 +83,50 @@
                             android:visibility="gone" />
 
                         <!-- Phim bộ -->
-                        <TextView
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="Phim bộ"
-                            android:textColor="@color/white"
-                            android:textSize="18sp"
-                            android:padding="7dp"
+                            android:orientation="horizontal"
                             android:background="@drawable/theloai_border"
-                            android:textStyle="bold" />
+                            android:padding="7dp">
 
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Phim Bộ"
+                                android:textColor="@color/white"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="end">
+
+                                <TextView
+                                    android:id="@+id/xemThemPhimBo"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Xem thêm"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:layout_gravity="center_vertical" />
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_right_24"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="4dp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewSeries"
                             android:layout_width="match_parent"
@@ -102,17 +135,50 @@
                             android:orientation="horizontal" />
 
                         <!-- Phim Lẻ -->
-                        <TextView
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="Phim Lẻ"
-                            android:textColor="@color/white"
-                            android:textSize="18sp"
-                            android:padding="7dp"
+                            android:orientation="horizontal"
                             android:background="@drawable/theloai_border"
-                            android:textStyle="bold" />
+                            android:padding="7dp">
 
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Phim Lẻ"
+                                android:textColor="@color/white"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="end">
+
+                                <TextView
+                                    android:id="@+id/xemThemPhimLe"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Xem thêm"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:layout_gravity="center_vertical" />
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_right_24"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="4dp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewphimle"
                             android:layout_width="match_parent"
@@ -121,16 +187,51 @@
                             android:orientation="horizontal" />
 
                         <!-- TV Show -->
-                        <TextView
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="TV Show"
-                            android:textColor="@color/white"
-                            android:textSize="18sp"
-                            android:padding="7dp"
+                            android:orientation="horizontal"
                             android:background="@drawable/theloai_border"
-                            android:textStyle="bold" />
+                            android:padding="7dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="TV Show"
+                                android:textColor="@color/white"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="end">
+
+                                <TextView
+                                    android:id="@+id/xemThemTVshow"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Xem thêm"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:layout_gravity="center_vertical" />
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_right_24"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="4dp" /> <!-- Thêm khoảng cách giữa chữ và icon -->
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewtvShow"
@@ -140,16 +241,51 @@
                             android:orientation="horizontal" />
 
                         <!-- Phim Hoạt Hình -->
-                        <TextView
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="Phim Hoạt Hình"
-                            android:textColor="@color/white"
-                            android:textSize="18sp"
-                            android:padding="7dp"
+                            android:orientation="horizontal"
                             android:background="@drawable/theloai_border"
-                            android:textStyle="bold" />
+                            android:padding="7dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Hoạt Hình"
+                                android:textColor="@color/white"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="end">
+
+                                <TextView
+                                    android:id="@+id/xemThemHoatHinh"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Xem thêm"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:layout_gravity="center_vertical" />
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_right_24"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="4dp" /> <!-- Thêm khoảng cách giữa chữ và icon -->
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewphimhoathinh"
@@ -157,14 +293,47 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:orientation="horizontal" />
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="Phim Hoạt Hình"
-                            android:textColor="@android:color/white"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:orientation="horizontal"
+                            android:background="@drawable/theloai_border"
+                            android:padding="7dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Phim Hot"
+                                android:textColor="@color/white"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="end">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Xem thêm"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:layout_gravity="center_vertical" />
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_right_24"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="4dp" /> <!-- Thêm khoảng cách giữa chữ và icon -->
+
+                            </LinearLayout>
+
+                        </LinearLayout>
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewphim"
