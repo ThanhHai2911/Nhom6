@@ -154,6 +154,16 @@ public class MovieDetail {
 
         @SerializedName("country")
         private List<Country> country;
+        private List<BinhLuanPhim> comments;
+        public List<BinhLuanPhim> getComments() {
+            return comments;
+        }
+        public void setComments(List<BinhLuanPhim> comments) {
+            this.comments = comments;
+        }
+        public void addComment(BinhLuanPhim comment) {
+            comments.add(comment);
+        }
 
         // Getters and setters
 
