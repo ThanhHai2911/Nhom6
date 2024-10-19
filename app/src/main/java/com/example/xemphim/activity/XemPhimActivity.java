@@ -28,6 +28,7 @@ import androidx.media3.exoplayer.hls.HlsMediaSource;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
@@ -118,7 +119,7 @@ public class XemPhimActivity extends AppCompatActivity {
         // Gán View cho các biến
         btnFullScreen = binding.btnFullScreen; // Gán nút toàn màn hình
         btnAddToFavorites = binding.btnAddToFavorites; // Gán nút yêu thích
-        binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 4)); // Thiết lập RecyclerView
+        binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 2, RecyclerView.HORIZONTAL,false)); // Thiết lập RecyclerView
         // Khởi tạo Firebase Database
         favoritesRef = FirebaseDatabase.getInstance().getReference("favorites"); // Thay "favorites" bằng tên bảng của bạn
     }
@@ -216,12 +217,11 @@ public class XemPhimActivity extends AppCompatActivity {
                 // Kiểm tra từng entry trong danh sách yêu thích
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     FavoriteMovie favoriteMovie = snapshot.getValue(FavoriteMovie.class);
-                    if (favoriteMovie != null && favoriteMovie.getId_user().equals(userId)) {
+                    if (favoriteMovie != null && favoriteMovie.getId_user() != null && userId != null && favoriteMovie.getId_user().equals(userId)) {
                         movieExists = true;
                         break;
                     }
                 }
-
                 // Nếu phim đã tồn tại, đổi màu nút thành đỏ
                 if (movieExists) {
                     btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
