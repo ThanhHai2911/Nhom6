@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#1C1C1C">
+    android:background="#696969">
 
     <!-- Video Player -->
     <androidx.media3.ui.PlayerView
@@ -22,7 +22,7 @@
             android:background="?android:selectableItemBackgroundBorderless"
             android:text="@string/fullscreen"
             android:src="@drawable/ic_fullscreen"
-            android:contentDescription="@null"/>
+            android:contentDescription="@null" />
 
     </androidx.media3.ui.PlayerView>
 
@@ -32,8 +32,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_below="@id/playerView"
-
-        android:padding="16dp">
+        android:padding="5dp">
 
         <!-- Favorite and Download Buttons -->
         <LinearLayout
@@ -50,7 +49,6 @@
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/baseline_favorite_24"
-                android:text="@string/favorite_button_label"
                 android:contentDescription="@null" />
 
             <ImageButton
@@ -60,7 +58,8 @@
                 android:background="@android:color/transparent"
                 app:srcCompat="@drawable/baseline_download_24"
                 android:contentDescription="@null"
-                app:tint="#4169e1" />
+                app:tint="#3b5998" />
+
             <ImageButton
                 android:id="@+id/btnReport"
                 android:layout_width="48dp"
@@ -68,37 +67,81 @@
                 android:background="@android:color/transparent"
                 app:srcCompat="@drawable/baseline_report_24"
                 android:contentDescription="@null"
-                app:tint="#4169e1" />
+                app:tint="#3b5998" />
+
+            <ImageButton
+                android:id="@+id/btnShare"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_share_24"
+                android:contentDescription="@null"
+                app:tint="#3b5998" />
         </LinearLayout>
 
         <!-- Movie Title -->
         <TextView
             android:id="@+id/tvMovieTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="5dp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
-        <!-- Episode List -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:text="@string/episode"
-            android:textColor="#FFFFFF" />
+            android:paddingTop="5dp"
+            android:background="@drawable/text_title"
+            android:paddingBottom="5dp" />
 
+        <!-- Episode List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvTapPhim"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="16dp"
-            android:layout_weight="1"
+            android:background="@drawable/text_description_background"
             android:clipToPadding="false"
+            android:paddingTop="5dp"
+            android:scrollbars="horizontal" />
+
+        <!-- Comment Section -->
+        <TextView
+            android:id="@+id/tvCommentHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bình luận"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/commentInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Viết bình luận của bạn..."
+            android:padding="12dp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnSubmitComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gửi bình luận"
+            android:textColor="@android:color/white"
+            android:background="#FF4500"
+            android:layout_gravity="end"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Comment List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvComments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:scrollbars="vertical" />
+
     </LinearLayout>
 
 </RelativeLayout>
