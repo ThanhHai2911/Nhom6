@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.xemphim.API.ApiClient;
@@ -63,6 +64,7 @@ public class ChiTietActivity extends AppCompatActivity {
     private int idLoaiND;
     private DatabaseReference lichSuXemRef;
     private DatabaseReference ratingsRef;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +97,11 @@ public class ChiTietActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(ChiTietActivity.this, "Link phim không khả dụng", Toast.LENGTH_SHORT).show();
             }
+        });
+        swipeRefreshLayout = binding.swipeRefreshLayout; // Khởi tạo SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadMovieDetails(movieSlug);
+            calculateAverageRating(movieSlug);
         });
         lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
         laythongtinUser();
@@ -311,16 +318,18 @@ public class ChiTietActivity extends AppCompatActivity {
                         }
 
                         tapPhimAdapter.notifyDataSetChanged();
-
+                        swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                         binding.progressBar.setVisibility(View.GONE);
                         binding.scvChitiet.setVisibility(View.VISIBLE);
                     } else {
                         Toast.makeText(ChiTietActivity.this, "Không có tập phim nào", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                     }
 
 
                 } else {
                     Toast.makeText(ChiTietActivity.this, "Failed to load movie details", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                 }
             }
 
@@ -328,6 +337,7 @@ public class ChiTietActivity extends AppCompatActivity {
             public void onFailure(Call<MovieDetail> call, Throwable t) {
                 Toast.makeText(ChiTietActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 binding.progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
@@ -355,11 +365,13 @@ public class ChiTietActivity extends AppCompatActivity {
                     binding.ratingBar.setRating(0); // Reset ratingBar nếu không có đánh giá
                     binding.ratingBar.setIsIndicator(true);
                 }
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 // Xử lý lỗi
+                swipeRefreshLayout.setRefreshing(false); // Ngừng loading
             }
         });
     }
