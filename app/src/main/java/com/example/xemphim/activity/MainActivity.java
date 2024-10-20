@@ -2,7 +2,7 @@
     import android.content.Intent;
     import android.content.SharedPreferences;
     import android.os.Bundle;
-
+    import java.util.Date;
     import androidx.annotation.NonNull;
     import androidx.appcompat.app.ActionBarDrawerToggle;
     import androidx.appcompat.app.AppCompatActivity;
@@ -19,12 +19,16 @@
     import com.example.xemphim.model.Movie;
     import com.example.xemphim.model.Phim;
     import com.example.xemphim.model.Series;
+    import com.example.xemphim.model.TruyCap;
     import com.example.xemphim.response.MovieResponse;
     import com.example.xemphim.response.SeriesResponse;
     import com.google.android.material.navigation.NavigationView;
 
+    import java.text.SimpleDateFormat;
     import java.util.ArrayList;
     import java.util.List;
+    import java.util.Locale;
+
     import retrofit2.Call;
     import retrofit2.Callback;
     import retrofit2.Response;
@@ -110,6 +114,9 @@
             Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
             updateUser();
 
+            // Kiểm tra và thêm thông tin truy cập
+            kiemTraTruyCap(idUser);
+
             apiService = ApiClient.getClient().create(ApiService.class);
             // Thiết lập ActionBar và DrawerLayout
             setSupportActionBar(binding.toolbar);
@@ -165,6 +172,79 @@
             navigationBottom();
 
         }
+
+         public static void kiemTraTruyCap(String idUser) {
+            // Kiểm tra xem id_user có null hay không và xem ngày truy cập đã tồn tại hay chưa
+            if (idUser != null && !idUser.isEmpty()) {
+                DatabaseReference truyCapRef = FirebaseDatabase.getInstance().getReference("TruyCap");
+                long currentTime = System.currentTimeMillis();
+
+                // Lấy ngày hiện tại (không bao gồm giờ, phút, giây)
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String currentDate = sdf.format(new Date(currentTime));
+
+                // Tìm kiếm bản ghi theo id_user và ngày truy cập
+                truyCapRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        boolean exists = false;
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            TruyCap truyCap = snapshot.getValue(TruyCap.class);
+                            if (truyCap != null) {
+                                // So sánh ngày truy cập
+                                long timeStamp = truyCap.getThoigiantruycap();
+                                String truyCapDate = sdf.format(new Date(timeStamp));
+
+                                if (truyCapDate.equals(currentDate)) {
+                                    exists = true; // Nếu đã có bản ghi cho ngày hôm nay
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!exists) {
+                            // Nếu không có bản ghi nào, gọi phương thức thêm truy cập
+                            themTruyCap(idUser);
+                        } else {
+                            Log.d("TruyCap", "Người dùng đã truy cập hôm nay.");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("TruyCap", "Lỗi khi kiểm tra truy cập: " + databaseError.getMessage());
+                    }
+                });
+            }
+            else{
+                Log.e("kiem tra id", "iduser rong" );
+            }
+        }
+        public static void themTruyCap(String idUser) {
+            DatabaseReference truyCapRef = FirebaseDatabase.getInstance().getReference("TruyCap");
+            long currentTime = System.currentTimeMillis();
+
+            // Tạo một ID mới cho bản ghi truy cập
+            String truyCapId = truyCapRef.push().getKey();
+            TruyCap truyCap = new TruyCap(idUser, currentTime);
+
+            // Thêm thông tin truy cập vào Firebase
+            truyCapRef.child(truyCapId).setValue(truyCap)
+                    .addOnSuccessListener(aVoid -> {
+                        // Xử lý thành công
+                        Log.d("TruyCap", "Thêm truy cập thành công cho người dùng: " + idUser);
+                    })
+                    .addOnFailureListener(e -> {
+                        // Xử lý lỗi
+                        Log.e("TruyCap", "Lỗi khi thêm truy cập: " + e.getMessage());
+                    });
+        }
+
+
+
+
+
         private void laythongtinUser(){
             SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
             idUser = sharedPreferences.getString("id_user", null);

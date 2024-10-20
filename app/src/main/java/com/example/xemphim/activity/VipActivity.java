@@ -22,6 +22,7 @@ public class VipActivity extends AppCompatActivity {
     private  String nameUser;
     private String emailUser;
     private int idLoaiND;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +33,8 @@ public class VipActivity extends AppCompatActivity {
         // Đặt item mặc định được chọn là màn hình Home
         bottomNavigationView.setSelectedItemId(R.id.nav_vip);
         laythongtinUser();
+        //kiem tra truy cap
+        MainActivity.kiemTraTruyCap(idUser);
         Toast.makeText(VipActivity.this, "Xin chào " + idUser, Toast.LENGTH_SHORT).show();
         // Xử lý sự kiện chọn item của Bottom Navigation
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

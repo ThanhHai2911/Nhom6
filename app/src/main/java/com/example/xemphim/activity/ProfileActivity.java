@@ -77,14 +77,24 @@ public class ProfileActivity extends AppCompatActivity {
     }
     public void setEven(){
         laythongtinUser();
+        //kiem tra truy cap
+        MainActivity.kiemTraTruyCap(idUser);
         Toast.makeText(ProfileActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
         binding.tvTenNguoiDung.setText(nameUser);
         binding.tvEmail.setText(emailUser);
 
         // Kiểm tra trạng thái đăng nhập
         if (idUser != null) {
-            isUserLoggedIn = true; // Người dùng đã đăng nhập
-            binding.btnDangNhap.setVisibility(View.GONE);
+            if (idLoaiND == 3 || idLoaiND == 2){
+                isUserLoggedIn = true;
+                binding.btnDangNhap.setVisibility(View.VISIBLE);
+                binding.btnDangNhap.setText("Admin");
+            }else{
+
+                isUserLoggedIn = true; // Người dùng đã đăng nhập
+                binding.btnDangNhap.setVisibility(View.GONE);
+            }
+
         } else {
             isUserLoggedIn = false; // Người dùng chưa đăng nhập
             binding.btnDangNhap.setVisibility(View.VISIBLE);
@@ -94,8 +104,15 @@ public class ProfileActivity extends AppCompatActivity {
         binding.btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
-                startActivity(intent);
+                if (binding.btnDangNhap.getText().equals("Admin")){
+                    Intent intent = new Intent(ProfileActivity.this, AdminActivity.class );
+                    startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(ProfileActivity.this, DangNhapActivity.class);
+                    startActivity(intent);
+                }
+
             }
         });
 

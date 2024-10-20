@@ -74,6 +74,14 @@
             android:layout_marginStart="8dp"
             android:backgroundTint="#E0E0E0"
             android:textColor="#000000" />
+        <Button
+            android:id="@+id/btnThang"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1 tháng qua"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#E0E0E0"
+            android:textColor="#000000" />
     </LinearLayout>
 
     <!-- Stats Section with icons -->
@@ -113,7 +121,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Doanh thu"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textColor="#000000" />
 
                 <TextView
@@ -155,7 +163,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Truy cập"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textColor="#000000" />
 
                 <TextView
@@ -197,14 +205,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Lượt đăng ký"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textColor="#000000" />
 
                 <TextView
                     android:id="@+id/tvLuotDangKyAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2"
+                    android:text="0"
                     android:textSize="20sp"
                     android:textColor="#424242"
                     android:layout_marginTop="4dp" />
@@ -239,7 +247,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Gói VIP"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textColor="#000000" />
 
                 <TextView
