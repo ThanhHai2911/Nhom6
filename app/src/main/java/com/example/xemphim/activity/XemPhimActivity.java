@@ -1,5 +1,6 @@
 package com.example.xemphim.activity;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -53,6 +55,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -65,6 +69,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +101,8 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
     private DatabaseReference lichSuXemRef;
     private DatabaseReference usersRef;
     private BinhLuanPhimAdapter binhLuanPhimAdapter;
-    private List<BinhLuanPhim> binhLuanPhimList = new ArrayList<>(); // Khởi tạo danh sách bình luận
+    private List<BinhLuanPhim> binhLuanPhimList = new ArrayList<>();
+    private DatabaseReference ratingsRef;
 
 
     @Override
@@ -152,7 +158,104 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
         });
         // Gọi hàm này sau khi người dùng nhấn vào phim hoặc sau khi thêm bình luận
         loadCommentsForMovie(this.movieSlug);
+
+        ratingsRef = FirebaseDatabase.getInstance().getReference("Ratings");
+        // Xử lý khi người dùng đánh giá phim
+        binding.ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            if (fromUser) {
+                saveRating(movieSlug, idUser, rating);  // Lưu đánh giá
+            }
+        });
+
+        // Tính và hiển thị trung bình sao và số lượt đánh giá
+        calculateAverageRating(movieSlug);
+        // Gọi hàm này sau khi người dùng đánh giá phim
+        kiemTraDanhGia();
     }
+    public void saveRating(String movieSlug, String userId, float rating) {
+        // Tạo một bản ghi cho đánh giá của người dùng
+        Map<String, Object> ratingData = new HashMap<>();
+        ratingData.put("userId", userId);
+        ratingData.put("rating", rating);
+        ratingData.put("ratedAt", System.currentTimeMillis());
+
+        // Lưu dữ liệu vào Firebase
+        ratingsRef.child(movieSlug).child(userId).setValue(ratingData)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(XemPhimActivity.this, "Đánh giá đã được lưu!", Toast.LENGTH_SHORT).show();
+                    // Gọi hàm tính toán điểm trung bình sau khi lưu thành công
+                    calculateAverageRating(movieSlug);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(XemPhimActivity.this, "Lỗi khi lưu đánh giá: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void calculateAverageRating(String movieSlug) {
+        ratingsRef.child(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int totalRatings = 0;
+                float sumRatings = 0;
+
+                for (DataSnapshot ratingSnapshot : snapshot.getChildren()) {
+                    float rating = ratingSnapshot.child("rating").getValue(Float.class);
+                    sumRatings += rating;
+                    totalRatings++;
+                }
+
+                if (totalRatings > 0) {
+                    float averageRating = sumRatings / totalRatings;
+                    // Cập nhật giao diện với tổng số đánh giá và trung bình sao
+                    binding.tvAverageRating.setText("( " + averageRating + " điểm / " + totalRatings + " lượt)");
+                    binding.ratingBar.setRating(averageRating); // Cập nhật ratingBar
+                } else {
+                    binding.tvAverageRating.setText("Không có đánh giá");
+                    binding.ratingBar.setRating(0); // Reset ratingBar nếu không có đánh giá
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý lỗi
+            }
+        });
+    }
+
+
+    private void kiemTraDanhGia(){
+        // Lấy thông tin cần thiết
+        String userId = idUser; // ID của người dùng hiện tại
+        String movieSlug = this.movieSlug; // Slug của phim
+        // Kiểm tra nếu người dùng đã đánh giá phim hay chưa
+        DatabaseReference ratingRef = FirebaseDatabase.getInstance().getReference("Ratings")
+                .child(movieSlug)  // slug của phim
+                .child(userId);  // ID người dùng
+
+        ratingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Người dùng đã đánh giá, lấy rating
+                    int userRating = dataSnapshot.child("rating").getValue(Integer.class);
+                    // Highlight sao đã đánh giá
+                    binding.ratingBar.setRating(userRating);
+                } else {
+                    // Người dùng chưa đánh giá
+                    binding.ratingBar.setRating(0);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Xử lý lỗi
+            }
+        });
+    }
+
+
+
+
     private void addCommentToMovie(String comment) {
         // Lấy thông tin cần thiết
         String userId = idUser; // ID của người dùng hiện tại

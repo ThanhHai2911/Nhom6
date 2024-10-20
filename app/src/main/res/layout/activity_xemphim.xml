@@ -135,6 +135,30 @@
                     android:background="#FF4500"
                     android:layout_gravity="end"
                     android:layout_marginBottom="8dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-40dp"
+                    android:orientation="horizontal">
+                    <RatingBar
+                        android:id="@+id/ratingBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:numStars="5"
+                        android:stepSize="1.0"
+                        android:progressTint="#FFEB3B"
+                        android:rating="0"
+                        android:scaleX="0.7"
+                        android:scaleY="0.7" />
+
+
+                    <TextView
+                        android:id="@+id/tvAverageRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="( 0 điểm / 0 lượt )" />
+                </LinearLayout>
 
                 <!-- Comment List -->
                 <androidx.recyclerview.widget.RecyclerView
