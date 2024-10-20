@@ -86,6 +86,10 @@ dependencies {
     implementation ("androidx.constraintlayout:constraintlayout:2.0.4")
 
 
+    implementation ("com.google.android.material:material:1.7.0")
+
+
+
 
 
 }

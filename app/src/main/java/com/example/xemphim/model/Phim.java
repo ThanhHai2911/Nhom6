@@ -8,7 +8,7 @@ public class Phim {
     private String release_date;
     private String duration;
     private float rating;
-    private String poster_url;
+    private String poster_url;;
     private String url_phim;
     private int year;
 

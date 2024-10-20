@@ -299,6 +299,8 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
                 // Lưu bình luận vào Firebase
                 commentsRef.push().setValue(newComment)
                         .addOnSuccessListener(aVoid -> {
+                            if (binding.commentInput.getText() != null)
+
                             // Thêm bình luận vào adapter và cập nhật UI ngay lập tức
                             binhLuanPhimAdapter.addComment(newComment); // Giả sử bạn có phương thức này trong adapter
                             binhLuanPhimAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView

@@ -65,7 +65,7 @@ public class Series implements Parcelable {
     }
 
     public String getPosterUrl() {
-        return APP_DOMAIN_CDN_IMAGE + thumb_url; // Kết hợp để tạo URL đầy đủ
+        return APP_DOMAIN_CDN_IMAGE + getPoster_url(); // Kết hợp để tạo URL đầy đủ
     }
 
     public int getYear() {
