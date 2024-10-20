@@ -84,7 +84,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAdapter.OnCommentDeleteListener{
+public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAdapter.OnCommentDeleteListener {
     private ActivityXemphimBinding binding; // Khai báo View Binding
     private ExoPlayer exoPlayer; // ExoPlayer để phát video
     private boolean isFullScreen = false;
@@ -179,26 +179,33 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
         // Kiểm tra xem người dùng đã đánh giá phim hay chưa
         kiemTraDanhGia();
     }
+
     public void saveRating(String movieSlug, String userId, float rating) {
         Map<String, Object> ratingData = new HashMap<>();
         ratingData.put("userId", userId);
         ratingData.put("rating", rating);
         ratingData.put("ratedAt", System.currentTimeMillis());
 
-        ratingsRef.child(movieSlug).child(userId).setValue(ratingData)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(XemPhimActivity.this, "Đánh giá đã được lưu!", Toast.LENGTH_SHORT).show();
-                    // Cập nhật rating cho RatingBar
-                    binding.ratingBar.setRating(rating); // Cập nhật số sao đã đánh giá
-                    binding.ratingBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.color_your_rating))); // Đặt màu sắc cho RatingBar
-                    // Gọi hàm tính toán điểm trung bình
-                    calculateAverageRating(movieSlug);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(XemPhimActivity.this, "Lỗi khi lưu đánh giá: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
+        new AlertDialog.Builder(XemPhimActivity.this)
+                .setTitle("Đánh Giá")
+                .setMessage("Cảm ơn bạn đã đáng giá")
+                .setPositiveButton("Ok", (dialog, which) -> {
 
+                    ratingsRef.child(movieSlug).child(userId).setValue(ratingData)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(XemPhimActivity.this, "Đánh giá đã được lưu!", Toast.LENGTH_SHORT).show();
+                                // Cập nhật rating cho RatingBar
+                                binding.ratingBar.setRating(rating); // Cập nhật số sao đã đánh giá
+                                binding.ratingBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.color_your_rating))); // Đặt màu sắc cho RatingBar
+                                // Gọi hàm tính toán điểm trung bình
+                                calculateAverageRating(movieSlug);
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(XemPhimActivity.this, "Lỗi khi lưu đánh giá: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .show(); // Hiển thị hộp thoại
+    }
 
 
     public void calculateAverageRating(String movieSlug) {
@@ -567,7 +574,6 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
 
         isFullScreen = !isFullScreen; // Đổi trạng thái fullscreen
     }
-
 
 
     private void loadMovieDetails() {
