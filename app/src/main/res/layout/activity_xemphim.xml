@@ -5,8 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#696969">
     <RelativeLayout
+        android:id="@+id/videoContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
         <!-- Video Player -->
         <androidx.media3.ui.PlayerView
             android:id="@+id/playerView"
