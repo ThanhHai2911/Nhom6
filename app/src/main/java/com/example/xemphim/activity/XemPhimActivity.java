@@ -120,6 +120,7 @@ public class XemPhimActivity extends AppCompatActivity {
         initializePlayer();
         // Thiết lập sự kiện cho nút toàn màn hình
         movieSlug = getIntent().getStringExtra("slug");
+
         btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
@@ -136,11 +137,14 @@ public class XemPhimActivity extends AppCompatActivity {
                 Toast.makeText(XemPhimActivity.this, "Liên kết phim không hợp lệ!", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
+
     private void addToFavorites() {
         // Lấy thông tin cần thiết
         String userId = idUser; // ID của người dùng hiện tại
         String movieSlug = this.movieSlug; // Slug của phim
+
         // Tham chiếu đến bảng Favorite
         DatabaseReference favoritesRef = FirebaseDatabase.getInstance().getReference("Favorite");
 

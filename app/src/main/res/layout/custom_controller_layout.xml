@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+    <!-- Nút quay lại tập trước -->
+    <ImageButton
+        android:id="@+id/exo_prev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_previous_24" />
+    <!-- Nút tua lại -->
+    <ImageButton
+        android:id="@+id/exo_rew"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_rewind_24" />
+    <!-- Nút Play/Pause -->
+    <ImageButton
+        android:id="@+id/exo_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_play_24" />
+    <ImageButton
+        android:id="@+id/exo_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_pause_24" />
+    <!-- Nút tua nhanh -->
+    <ImageButton
+        android:id="@+id/exo_ffwd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_forward_24" />
+    <!-- Nút full screen -->
+    <ImageButton
+        android:id="@+id/exo_fullscreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_fullscreen" />
+    <!-- Nút qua tập mới -->
+    <ImageButton
+        android:id="@+id/exo_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_next_24" />
+</LinearLayout>
