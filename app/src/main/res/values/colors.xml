@@ -7,4 +7,6 @@
     <color name="pink_nhat">#FFCDD2</color>
     <color name="bottom_nav_selected">#0000FF</color> <!-- Màu xanh cho mục được chọn -->
     <color name="bottom_nav_unselected">#808080</color> <!-- Màu xám cho mục không được chọn -->
+    <color name="color_your_rating">#FFEB3B</color> <!-- Màu cho 1 sao -->
+    <color name="color_default">#808080</color> <!-- Màu cho 1 sao -->
 </resources>

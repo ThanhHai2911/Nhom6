@@ -2,6 +2,7 @@ package com.example.xemphim.activity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -103,6 +104,7 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
     private BinhLuanPhimAdapter binhLuanPhimAdapter;
     private List<BinhLuanPhim> binhLuanPhimList = new ArrayList<>();
     private DatabaseReference ratingsRef;
+    private String currentUserId;
 
 
     @Override
@@ -169,27 +171,35 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
 
         // Tính và hiển thị trung bình sao và số lượt đánh giá
         calculateAverageRating(movieSlug);
-        // Gọi hàm này sau khi người dùng đánh giá phim
+        // Giả sử bạn đã đăng nhập và lấy ID người dùng từ Firebase Auth
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            currentUserId = currentUser.getUid(); // Lấy ID người dùng
+        }
+        // Kiểm tra xem người dùng đã đánh giá phim hay chưa
         kiemTraDanhGia();
     }
     public void saveRating(String movieSlug, String userId, float rating) {
-        // Tạo một bản ghi cho đánh giá của người dùng
         Map<String, Object> ratingData = new HashMap<>();
         ratingData.put("userId", userId);
         ratingData.put("rating", rating);
         ratingData.put("ratedAt", System.currentTimeMillis());
 
-        // Lưu dữ liệu vào Firebase
         ratingsRef.child(movieSlug).child(userId).setValue(ratingData)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(XemPhimActivity.this, "Đánh giá đã được lưu!", Toast.LENGTH_SHORT).show();
-                    // Gọi hàm tính toán điểm trung bình sau khi lưu thành công
+                    // Cập nhật rating cho RatingBar
+                    binding.ratingBar.setRating(rating); // Cập nhật số sao đã đánh giá
+                    binding.ratingBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.color_your_rating))); // Đặt màu sắc cho RatingBar
+                    // Gọi hàm tính toán điểm trung bình
                     calculateAverageRating(movieSlug);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(XemPhimActivity.this, "Lỗi khi lưu đánh giá: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+
 
     public void calculateAverageRating(String movieSlug) {
         ratingsRef.child(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -208,9 +218,8 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
                     float averageRating = sumRatings / totalRatings;
                     // Cập nhật giao diện với tổng số đánh giá và trung bình sao
                     binding.tvAverageRating.setText("( " + averageRating + " điểm / " + totalRatings + " lượt)");
-                    binding.ratingBar.setRating(averageRating); // Cập nhật ratingBar
                 } else {
-                    binding.tvAverageRating.setText("Không có đánh giá");
+                    binding.tvAverageRating.setText("( 0 điểm / 0 lượt )");
                     binding.ratingBar.setRating(0); // Reset ratingBar nếu không có đánh giá
                 }
             }
@@ -222,11 +231,11 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
         });
     }
 
-
-    private void kiemTraDanhGia(){
+    private void kiemTraDanhGia() {
         // Lấy thông tin cần thiết
         String userId = idUser; // ID của người dùng hiện tại
         String movieSlug = this.movieSlug; // Slug của phim
+
         // Kiểm tra nếu người dùng đã đánh giá phim hay chưa
         DatabaseReference ratingRef = FirebaseDatabase.getInstance().getReference("Ratings")
                 .child(movieSlug)  // slug của phim
@@ -238,11 +247,14 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
                 if (dataSnapshot.exists()) {
                     // Người dùng đã đánh giá, lấy rating
                     int userRating = dataSnapshot.child("rating").getValue(Integer.class);
-                    // Highlight sao đã đánh giá
+                    // Highlight sao đã đánh giá với màu sắc tương ứng
                     binding.ratingBar.setRating(userRating);
+                    binding.ratingBar.setIsIndicator(false); // Cho phép người dùng chỉnh sửa
+                    binding.ratingBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.color_your_rating))); // Đặt màu sao theo rating
                 } else {
                     // Người dùng chưa đánh giá
                     binding.ratingBar.setRating(0);
+                    binding.ratingBar.setIsIndicator(false); // Cho phép đánh giá
                 }
             }
 
@@ -252,8 +264,6 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
             }
         });
     }
-
-
 
 
     private void addCommentToMovie(String comment) {

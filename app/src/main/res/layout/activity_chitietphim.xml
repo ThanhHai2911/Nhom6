@@ -191,7 +191,7 @@
                     android:layout_height="wrap_content"
                     android:numStars="5"
                     android:stepSize="1.0"
-                    android:progressTint="#FFEB3B"
+                    android:progressTint="@color/color_your_rating"
                     android:rating="0"
                     android:scaleX="0.7"
                     android:scaleY="0.7" />

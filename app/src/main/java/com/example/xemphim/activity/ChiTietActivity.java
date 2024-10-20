@@ -99,16 +99,8 @@ public class ChiTietActivity extends AppCompatActivity {
         lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
         laythongtinUser();
         ratingsRef = FirebaseDatabase.getInstance().getReference("Ratings");
-        // Xử lý khi người dùng đánh giá phim
-        binding.ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-            if (fromUser) {
-                saveRating(movieSlug, idUser, rating);  // Lưu đánh giá
-            }
-        });
         // Tính và hiển thị trung bình sao và số lượt đánh giá
         calculateAverageRating(movieSlug);
-        // Gọi hàm này sau khi người dùng đánh giá phim
-        kiemTraDanhGia();
     }
 
     private void luuLichSuXem(String movieSlug) {
@@ -339,25 +331,6 @@ public class ChiTietActivity extends AppCompatActivity {
             }
         });
     }
-    public void saveRating(String movieSlug, String userId, float rating) {
-        // Tạo một bản ghi cho đánh giá của người dùng
-        Map<String, Object> ratingData = new HashMap<>();
-        ratingData.put("userId", userId);
-        ratingData.put("rating", rating);
-        ratingData.put("ratedAt", System.currentTimeMillis());
-
-        // Lưu dữ liệu vào Firebase
-        ratingsRef.child(movieSlug).child(userId).setValue(ratingData)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(ChiTietActivity.this, "Đánh giá đã được lưu!", Toast.LENGTH_SHORT).show();
-                    // Gọi hàm tính toán điểm trung bình sau khi lưu thành công
-                    calculateAverageRating(movieSlug);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(ChiTietActivity.this, "Lỗi khi lưu đánh giá: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
-
     public void calculateAverageRating(String movieSlug) {
         ratingsRef.child(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -375,10 +348,12 @@ public class ChiTietActivity extends AppCompatActivity {
                     float averageRating = sumRatings / totalRatings;
                     // Cập nhật giao diện với tổng số đánh giá và trung bình sao
                     binding.tvAverageRating.setText("( " + averageRating + " điểm / " + totalRatings + " lượt)");
-                    binding.ratingBar.setRating(averageRating); // Cập nhật ratingBar
+                    binding.ratingBar.setRating(averageRating);
+                    binding.ratingBar.setIsIndicator(true);
                 } else {
-                    binding.tvAverageRating.setText("Không có đánh giá");
+                    binding.tvAverageRating.setText("( 0 điểm / 0 lượt )");
                     binding.ratingBar.setRating(0); // Reset ratingBar nếu không có đánh giá
+                    binding.ratingBar.setIsIndicator(true);
                 }
             }
 
@@ -389,36 +364,6 @@ public class ChiTietActivity extends AppCompatActivity {
         });
     }
 
-
-    private void kiemTraDanhGia(){
-        // Lấy thông tin cần thiết
-        String userId = idUser; // ID của người dùng hiện tại
-        String movieSlug = this.movieSlug; // Slug của phim
-        // Kiểm tra nếu người dùng đã đánh giá phim hay chưa
-        DatabaseReference ratingRef = FirebaseDatabase.getInstance().getReference("Ratings")
-                .child(movieSlug)  // slug của phim
-                .child(userId);  // ID người dùng
-
-        ratingRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    // Người dùng đã đánh giá, lấy rating
-                    int userRating = dataSnapshot.child("rating").getValue(Integer.class);
-                    // Highlight sao đã đánh giá
-                    binding.ratingBar.setRating(userRating);
-                } else {
-                    // Người dùng chưa đánh giá
-                    binding.ratingBar.setRating(0);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Xử lý lỗi
-            }
-        });
-    }
 
     @Override
     protected void onResume() {
