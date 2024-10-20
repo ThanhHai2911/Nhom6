@@ -22,6 +22,7 @@ import com.example.xemphim.R;
 import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.adapter.SeriesAdapter;
 import com.example.xemphim.databinding.ActivityLichSuXemBinding;
+import com.example.xemphim.model.BinhLuanPhim;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.Series;

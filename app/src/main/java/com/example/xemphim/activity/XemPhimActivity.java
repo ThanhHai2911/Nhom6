@@ -1,11 +1,17 @@
 package com.example.xemphim.activity;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -17,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.OptIn;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
@@ -33,8 +40,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
+import com.example.xemphim.adapter.BinhLuanPhimAdapter;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityXemphimBinding; // Import View Binding
+import com.example.xemphim.model.BinhLuanPhim;
 import com.example.xemphim.model.FavoriteMovie;
 import com.example.xemphim.model.MovieDetail;
 
@@ -47,6 +56,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -59,6 +70,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,17 +84,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class XemPhimActivity extends AppCompatActivity {
+public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAdapter.OnCommentDeleteListener {
     private ActivityXemphimBinding binding; // Khai báo View Binding
     private ExoPlayer exoPlayer; // ExoPlayer để phát video
-    private ImageButton btnFullScreen;
     private boolean isFullScreen = false;
     private TapPhimAdapter tapPhimAdapter;
     private List<MovieDetail.Episode.ServerData> serverDataList = new ArrayList<>();
     private String movieLink;
     private ApiService apiService;
     private String movieSlug;
-    private ImageButton btnAddToFavorites; // Thêm biến cho nút yêu thích
     private DatabaseReference favoritesRef;
     private String idUser;
     private String nameUser;
@@ -90,6 +100,12 @@ public class XemPhimActivity extends AppCompatActivity {
     private int idLoaiND;
     private MovieDownloader movieDownloader;
     private DatabaseReference lichSuXemRef;
+    private DatabaseReference usersRef;
+    private BinhLuanPhimAdapter binhLuanPhimAdapter;
+    private List<BinhLuanPhim> binhLuanPhimList = new ArrayList<>();
+    private DatabaseReference ratingsRef;
+    private String currentUserId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,20 +116,15 @@ public class XemPhimActivity extends AppCompatActivity {
         movieDownloader = new MovieDownloader(apiService, this);
         setControl();
         setEvent();
-        // Kiểm tra và cập nhật màu nút trái tim
-        checkAndToggleFavorite();
-        // Thêm sự kiện nhấn cho nút thêm vào danh sách yêu thích
-        btnAddToFavorites.setOnClickListener(v -> addToFavorites());
-
     }
 
     public void setControl() {
-        // Gán View cho các biến
-        btnFullScreen = binding.btnFullScreen; // Gán nút toàn màn hình
-        btnAddToFavorites = binding.btnAddToFavorites; // Gán nút yêu thích
         binding.rcvTapPhim.setLayoutManager(new GridLayoutManager(this, 2, RecyclerView.HORIZONTAL, false)); // Thiết lập RecyclerView
         // Khởi tạo Firebase Database
         favoritesRef = FirebaseDatabase.getInstance().getReference("favorites"); // Thay "favorites" bằng tên bảng của bạn
+        binhLuanPhimAdapter = new BinhLuanPhimAdapter(this, binhLuanPhimList, this);
+        binding.rvComments.setLayoutManager(new GridLayoutManager(this, 1));
+        binding.rvComments.setAdapter(binhLuanPhimAdapter);
     }
 
     public void setEvent() {
@@ -121,10 +132,11 @@ public class XemPhimActivity extends AppCompatActivity {
         // Thiết lập sự kiện cho nút toàn màn hình
         movieSlug = getIntent().getStringExtra("slug");
 
-        btnFullScreen.setOnClickListener(v -> toggleFullScreen());
+        binding.btnFullScreen.setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
         lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
+        usersRef = FirebaseDatabase.getInstance().getReference("Users");
         laythongtinUser();
         binding.btnDowload.setOnClickListener(v -> {
             String movieName = binding.tvMovieTitle.getText().toString();
@@ -137,8 +149,279 @@ public class XemPhimActivity extends AppCompatActivity {
                 Toast.makeText(XemPhimActivity.this, "Liên kết phim không hợp lệ!", Toast.LENGTH_SHORT).show();
             }
         });
+        // Kiểm tra và cập nhật màu nút trái tim
+        checkAndToggleFavorite();
+        // Thêm sự kiện nhấn cho nút thêm vào danh sách yêu thích
+        binding.btnAddToFavorites.setOnClickListener(v -> addToFavorites());
+        // Thêm sự kiện nhấn cho nút bình luận
+        binding.btnSubmitComment.setOnClickListener(v -> {
+            String comment = binding.commentInput.getText().toString();
+            addCommentToMovie(comment);
+        });
+        // Gọi hàm này sau khi người dùng nhấn vào phim hoặc sau khi thêm bình luận
+        loadCommentsForMovie(this.movieSlug);
 
+        ratingsRef = FirebaseDatabase.getInstance().getReference("Ratings");
+        // Xử lý khi người dùng đánh giá phim
+        binding.ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            if (fromUser) {
+                saveRating(movieSlug, idUser, rating);  // Lưu đánh giá
+            }
+        });
+
+        // Tính và hiển thị trung bình sao và số lượt đánh giá
+        calculateAverageRating(movieSlug);
+        // Giả sử bạn đã đăng nhập và lấy ID người dùng từ Firebase Auth
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            currentUserId = currentUser.getUid(); // Lấy ID người dùng
+        }
+        // Kiểm tra xem người dùng đã đánh giá phim hay chưa
+        kiemTraDanhGia();
     }
+
+    public void saveRating(String movieSlug, String userId, float rating) {
+        Map<String, Object> ratingData = new HashMap<>();
+        ratingData.put("userId", userId);
+        ratingData.put("rating", rating);
+        ratingData.put("ratedAt", System.currentTimeMillis());
+
+        new AlertDialog.Builder(XemPhimActivity.this)
+                .setTitle("Đánh Giá")
+                .setMessage("Cảm ơn bạn đã đáng giá")
+                .setPositiveButton("Ok", (dialog, which) -> {
+
+                    ratingsRef.child(movieSlug).child(userId).setValue(ratingData)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(XemPhimActivity.this, "Đánh giá đã được lưu!", Toast.LENGTH_SHORT).show();
+                                // Cập nhật rating cho RatingBar
+                                binding.ratingBar.setRating(rating); // Cập nhật số sao đã đánh giá
+                                binding.ratingBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.color_your_rating))); // Đặt màu sắc cho RatingBar
+                                // Gọi hàm tính toán điểm trung bình
+                                calculateAverageRating(movieSlug);
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(XemPhimActivity.this, "Lỗi khi lưu đánh giá: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .show(); // Hiển thị hộp thoại
+    }
+
+
+    public void calculateAverageRating(String movieSlug) {
+        ratingsRef.child(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int totalRatings = 0;
+                float sumRatings = 0;
+
+                for (DataSnapshot ratingSnapshot : snapshot.getChildren()) {
+                    float rating = ratingSnapshot.child("rating").getValue(Float.class);
+                    sumRatings += rating;
+                    totalRatings++;
+                }
+
+                if (totalRatings > 0) {
+                    float averageRating = sumRatings / totalRatings;
+                    // Cập nhật giao diện với tổng số đánh giá và trung bình sao
+                    binding.tvAverageRating.setText("( " + averageRating + " điểm / " + totalRatings + " lượt)");
+                } else {
+                    binding.tvAverageRating.setText("( 0 điểm / 0 lượt )");
+                    binding.ratingBar.setRating(0); // Reset ratingBar nếu không có đánh giá
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý lỗi
+            }
+        });
+    }
+
+    private void kiemTraDanhGia() {
+        // Lấy thông tin cần thiết
+        String userId = idUser; // ID của người dùng hiện tại
+        String movieSlug = this.movieSlug; // Slug của phim
+
+        // Kiểm tra nếu người dùng đã đánh giá phim hay chưa
+        DatabaseReference ratingRef = FirebaseDatabase.getInstance().getReference("Ratings")
+                .child(movieSlug)  // slug của phim
+                .child(userId);  // ID người dùng
+
+        ratingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Người dùng đã đánh giá, lấy rating
+                    int userRating = dataSnapshot.child("rating").getValue(Integer.class);
+                    // Highlight sao đã đánh giá với màu sắc tương ứng
+                    binding.ratingBar.setRating(userRating);
+                    binding.ratingBar.setIsIndicator(false); // Cho phép người dùng chỉnh sửa
+                    binding.ratingBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.color_your_rating))); // Đặt màu sao theo rating
+                } else {
+                    // Người dùng chưa đánh giá
+                    binding.ratingBar.setRating(0);
+                    binding.ratingBar.setIsIndicator(false); // Cho phép đánh giá
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Xử lý lỗi
+            }
+        });
+    }
+
+
+    private void addCommentToMovie(String comment) {
+        // Lấy thông tin cần thiết
+        String userId = idUser; // ID của người dùng hiện tại
+        String movieSlug = this.movieSlug; // Slug của phim
+
+        // Lấy tên người dùng
+        usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                String name = nameUser; // Tên người dùng
+                if (name == null) {
+                    name = "Người dùng ẩn danh"; // Hoặc một tên mặc định
+                }
+
+                // Định dạng ngày giờ
+                String formattedDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
+
+                // Tạo một đối tượng Comment
+                BinhLuanPhim newComment = new BinhLuanPhim(userId, movieSlug, comment, System.currentTimeMillis(), name, formattedDate);
+
+                // Tham chiếu đến bảng Comments
+                DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments");
+
+                // Lưu bình luận vào Firebase
+                commentsRef.push().setValue(newComment)
+                        .addOnSuccessListener(aVoid -> {
+                            // Thêm bình luận vào adapter và cập nhật UI ngay lập tức
+                            binhLuanPhimAdapter.addComment(newComment); // Giả sử bạn có phương thức này trong adapter
+                            binhLuanPhimAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
+
+                            Toast.makeText(XemPhimActivity.this, "Bình luận đã được lưu!", Toast.LENGTH_SHORT).show();
+                            // Xóa nội dung bình luận trong EditText nếu cần
+                            binding.commentInput.setText("");
+                        })
+                        .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(XemPhimActivity.this, "Lỗi khi lấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadCommentsForMovie(String movieSlug) {
+        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments");
+
+        commentsRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("LoadComments", "Number of comments: " + dataSnapshot.getChildrenCount());
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String userId = snapshot.child("userId").getValue(String.class);
+                        String commentText = snapshot.child("commentText").getValue(String.class);
+                        String userName = snapshot.child("userName").getValue(String.class); // Lấy tên người dùng từ bình luận
+                        long timestamp = snapshot.child("timestamp").getValue(Long.class);
+
+
+                        Log.d("LoadComments", "Current comment UserId: " + userId); // Log userId
+                        Log.d("LoadComments", "Current comment Text: " + commentText); // Log commentText
+
+                        if (userId != null && commentText != null) {
+                            // Lấy tên người dùng từ bảng users
+                            usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+
+                                    // Định dạng ngày giờ
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+                                    String formattedDate = sdf.format(new Date(timestamp));
+
+                                    // Tạo bình luận và thêm vào adapter
+                                    BinhLuanPhim comment = new BinhLuanPhim(userId, movieSlug, commentText, timestamp, userName, formattedDate);
+                                    binhLuanPhimAdapter.addComment(comment);
+                                    binhLuanPhimAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Toast.makeText(XemPhimActivity.this, "Lỗi khi lấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                } else {
+                    Log.d("LoadComments", "No comments found for this movie.");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(XemPhimActivity.this, "Lỗi khi tải bình luận", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onCommentDelete(int position) {
+        // Lấy thông tin người dùng và phim
+        String userId = binhLuanPhimAdapter.getCommentUserId(position);
+        String movieSlug = this.movieSlug; // Slug của phim
+
+        // Kiểm tra người dùng có quyền xóa bình luận
+        if (userId.equals(idUser)) {
+            // Tạo hộp thoại xác nhận
+            new AlertDialog.Builder(XemPhimActivity.this)
+                    .setTitle("Xóa bình luận")
+                    .setMessage("Bạn có chắc chắn muốn xóa bình luận này không?")
+                    .setPositiveButton("Có", (dialog, which) -> {
+                        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments");
+
+                        // Xác định bình luận cần xóa
+                        commentsRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                    String commentUserId = snapshot.child("userId").getValue(String.class);
+                                    if (commentUserId != null && commentUserId.equals(userId)) {
+                                        // Xóa bình luận khỏi Firebase
+                                        snapshot.getRef().removeValue()
+                                                .addOnSuccessListener(aVoid -> {
+                                                    // Xóa bình luận khỏi adapter
+                                                    binhLuanPhimAdapter.removeComment(position);
+                                                    Toast.makeText(XemPhimActivity.this, "Bình luận đã được xóa!", Toast.LENGTH_SHORT).show();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(XemPhimActivity.this, "Lỗi khi xóa bình luận: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                });
+                                        break; // Đã xóa bình luận, không cần tiếp tục tìm kiếm
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Toast.makeText(XemPhimActivity.this, "Lỗi khi kiểm tra bình luận", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    })
+                    .setNegativeButton("Không", (dialog, which) -> {
+                        dialog.dismiss(); // Đóng hộp thoại nếu người dùng không muốn xóa
+                    })
+                    .show(); // Hiển thị hộp thoại
+        } else {
+            Toast.makeText(XemPhimActivity.this, "Bạn không có quyền xóa bình luận này!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     private void addToFavorites() {
         // Lấy thông tin cần thiết
@@ -170,7 +453,7 @@ public class XemPhimActivity extends AppCompatActivity {
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(XemPhimActivity.this, "Đã xóa khỏi danh sách yêu thích!", Toast.LENGTH_SHORT).show();
                                 // Đổi màu trái tim về trắng
-                                btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24);
+                                binding.btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24);
                             })
                             .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                 } else {
@@ -180,7 +463,7 @@ public class XemPhimActivity extends AppCompatActivity {
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(XemPhimActivity.this, "Đã thêm vào yêu thích!", Toast.LENGTH_SHORT).show();
                                 // Đổi màu trái tim thành đỏ
-                                btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
+                                binding.btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
                             })
                             .addOnFailureListener(e -> Toast.makeText(XemPhimActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                 }
@@ -214,10 +497,10 @@ public class XemPhimActivity extends AppCompatActivity {
                 }
                 // Nếu phim đã tồn tại, đổi màu nút thành đỏ
                 if (movieExists) {
-                    btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
+                    binding.btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24_red);
                 } else {
                     // Nếu phim chưa tồn tại, để màu trắng
-                    btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24);
+                    binding.btnAddToFavorites.setImageResource(R.drawable.baseline_favorite_24);
                 }
             }
 
@@ -242,6 +525,7 @@ public class XemPhimActivity extends AppCompatActivity {
                     Toast.makeText(XemPhimActivity.this, "Phim lỗi vui lòng báo cáo cho admin hoặc xem phim khác: " + error.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
+
             // Tạo MediaItem từ đường dẫn video
             MediaItem mediaItem = MediaItem.fromUri(movieLink);
             exoPlayer.setMediaItem(mediaItem);
@@ -259,17 +543,38 @@ public class XemPhimActivity extends AppCompatActivity {
     }
 
     private void toggleFullScreen() {
-        // Lưu lại thời điểm hiện tại của video
-
         if (isFullScreen) {
-            // Chuyển về chế độ portrait
+            // Quay về chế độ portrait
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+            // Hiện thanh trạng thái và thanh điều hướng
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+
+            // Thiết lập chiều cao của PlayerView về 250dp
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) binding.playerView.getLayoutParams();
+            params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
+            binding.playerView.setLayoutParams(params);
         } else {
             // Chuyển sang chế độ landscape
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+            // Ẩn thanh trạng thái và thanh điều hướng
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+            // Thiết lập chiều cao của PlayerView để chiếm toàn bộ chiều cao màn hình
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) binding.playerView.getLayoutParams();
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            binding.playerView.setLayoutParams(params);
         }
-        isFullScreen = !isFullScreen;// Đổi trạng thái fullscreen
+
+        isFullScreen = !isFullScreen; // Đổi trạng thái fullscreen
     }
+
 
     private void loadMovieDetails() {
         Call<MovieDetail> call = apiService.getMovieDetail(movieSlug);
@@ -296,6 +601,7 @@ public class XemPhimActivity extends AppCompatActivity {
                         tapPhimAdapter.setRecyclerViewItemClickListener(new TapPhimAdapter.OnRecyclerViewItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
+                                MovieDetail.MovieItem movieItem = new MovieDetail.MovieItem();
                                 MovieDetail.Episode.ServerData selectedEpisode = serverDataList.get(position);
                                 String newMovieLink = selectedEpisode.getLinkM3u8();
                                 //Hien thi ten tap phim  dang xem
@@ -413,40 +719,6 @@ public class XemPhimActivity extends AppCompatActivity {
 //                });
 //    }
 
-    //config
-    @OptIn(markerClass = UnstableApi.class)
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // Ở chế độ ngang, vào fullscreen
-            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
-            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT
-            ));
-
-            // Ẩn thanh trạng thái và thanh điều hướng
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_FULLSCREEN   // Ẩn thanh trạng thái (status bar)
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION   // Ẩn thanh điều hướng (navigation bar)
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY  // Ở chế độ immersive (toàn màn hình)
-            );
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            // Thoát fullscreen khi về portrait
-            binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
-            binding.playerView.setLayoutParams(new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT  // Trở về chiều cao ban đầu (ban đầu như thế nào thì set lại)
-            ));
-
-            // Hiển thị lại các thanh trạng thái và điều hướng
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-
-        }
-    }
 
     @Override
     protected void onDestroy() {
