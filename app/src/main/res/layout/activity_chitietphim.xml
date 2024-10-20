@@ -10,6 +10,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="visible" />
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -184,9 +188,33 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="-40dp"
+                android:orientation="horizontal">
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="1.0"
+                    android:progressTint="@color/color_your_rating"
+                    android:rating="0"
+                    android:scaleX="0.7"
+                    android:scaleY="0.7" />
+
+
+                <TextView
+                    android:id="@+id/tvAverageRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="( 0 điểm / 0 lượt )" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@drawable/text_description_background"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="7dp"
                 android:layout_marginBottom="5dp"
                 >
                 <TextView
@@ -206,7 +234,6 @@
                     android:textColor="#9CFFFFFF"
                     android:textSize="16sp" />
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -258,5 +285,6 @@
 
         </LinearLayout>
     </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </FrameLayout>
 
