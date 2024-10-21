@@ -1,45 +1,26 @@
 package com.example.xemphim.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import androidx.annotation.OptIn;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
-import androidx.media3.common.util.UnstableApi;
-import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.hls.HlsMediaSource;
-import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.xemphim.API.ApiClient;
 import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
@@ -50,10 +31,8 @@ import com.example.xemphim.databinding.CustomPlayerControlsBinding;
 import com.example.xemphim.model.BinhLuanPhim;
 import com.example.xemphim.model.DSPhimYeuThich;
 import com.example.xemphim.model.DanhGiaPhim;
-import com.example.xemphim.model.FavoriteMovie;
 import com.example.xemphim.model.LichSuPhim;
 import com.example.xemphim.model.MovieDetail;
-
 import com.example.xemphim.model.MovieDownloader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -61,32 +40,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -374,10 +333,6 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
                             // Thêm bình luận vào adapter và cập nhật UI ngay lập tức
                             binhLuanPhimList.add(0, newComment);
                             binhLuanPhimAdapter.notifyItemInserted(0);
-                            if (binding.commentInput.getText() != null)
-
-                                // Thêm bình luận vào adapter và cập nhật UI ngay lập tức
-                                binhLuanPhimAdapter.addComment(newComment); // Giả sử bạn có phương thức này trong adapter
                             binhLuanPhimAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
 
                             Toast.makeText(XemPhimActivity.this, "Bình luận đã được lưu!", Toast.LENGTH_SHORT).show();
