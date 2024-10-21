@@ -21,15 +21,6 @@ public class BinhLuanPhimAdapter extends RecyclerView.Adapter<BinhLuanPhimAdapte
     private List<BinhLuanPhim> binhLuanPhimList;
     private OnCommentDeleteListener deleteListener;
 
-    // Phương thức thêm bình luận
-    public void addComment(BinhLuanPhim comment) {
-        binhLuanPhimList.add(comment);
-    }
-
-    // Phương thức xóa tất cả bình luận
-    public void clearComments() {
-        binhLuanPhimList.clear();
-    }
     public BinhLuanPhimAdapter(Activity context, List<BinhLuanPhim> binhLuanPhims, OnCommentDeleteListener listener) {
         this.context = context;
         this.binhLuanPhimList = binhLuanPhims;

@@ -14,17 +14,7 @@
             android:layout_height="250dp"
             app:resize_mode="fill"
             android:background="#000">
-
-            <ImageButton
-                android:id="@+id/btnFullScreen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="8dp"
-                android:background="?android:selectableItemBackgroundBorderless"
-                android:text="@string/fullscreen"
-                android:src="@drawable/ic_fullscreen" />
-
+            <include layout="@layout/custom_player_controls" />
         </androidx.media3.ui.PlayerView>
         <ScrollView
             android:layout_width="match_parent"

@@ -25,17 +25,10 @@ public class BinhLuanPhim {
         return userName;
     }
 
-    public String getFormattedDate() {
-        return formattedDate;
-    }
-
     public String getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public String getSlug() {
         return slug;
@@ -49,15 +42,4 @@ public class BinhLuanPhim {
         return commentText;
     }
 
-    public void setCommentText(String commentText) {
-        this.commentText = commentText;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
 }
