@@ -87,7 +87,7 @@ public class ChiTietActivity extends AppCompatActivity {
 
                 String episodeCurrent = serverDataList.get(0).getName();
                 // Lưu lịch sử xem phim
-                luuLichSuXem(movieSlug);
+                luuLichSuXem(movieSlug,episodeCurrent,serverDataList);
                 // Khởi động activity phát video
                 Intent intent = new Intent(this, XemPhimActivity.class);
                 intent.putExtra("movie_link", movieLink);  // Truyền link phim
@@ -110,46 +110,70 @@ public class ChiTietActivity extends AppCompatActivity {
         calculateAverageRating(movieSlug);
     }
 
-    private void luuLichSuXem(String movieSlug) {
-        if (idUser == null || movieSlug == null) {
-            Toast.makeText(ChiTietActivity.this, "Không thể lưu lịch sử, thiếu thông tin", Toast.LENGTH_SHORT).show();
+    public void luuLichSuXem(String movieSlug, String episodeName, List<MovieDetail.Episode.ServerData> serverDataList) {
+        if (movieSlug == null) {
+            Toast.makeText(this, "Không thể lưu lịch sử, thiếu thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Query để kiểm tra xem slug đã tồn tại cho user này chưa
-        Query query = lichSuXemRef.orderByChild("id_user").equalTo(idUser);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                boolean exists = false;
+        // Check if the user is logged in
+        if (idUser == null) {
+            // User is not logged in, save to LichSuXemKhongDangNhap
+            saveHistoryForGuest(movieSlug, episodeName);
+        } else {
+            // User is logged in, proceed with existing logic
+            Query query = lichSuXemRef.orderByChild("id_user").equalTo(idUser);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String idLichSuXem = null;
 
-                // Duyệt qua các bản ghi lịch sử xem phim của user
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String existingSlug = snapshot.child("slug").getValue(String.class);
-                    if (existingSlug != null && existingSlug.equals(movieSlug)) {
-                        exists = true; // Slug đã tồn tại
-                        break;
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String existingSlug = snapshot.child("slug").getValue(String.class);
+                        if (existingSlug != null && existingSlug.equals(movieSlug)) {
+                            idLichSuXem = snapshot.getKey();
+                            break;
+                        }
+                    }
+
+                    if (idLichSuXem != null) {
+
+                    } else {
+                        addNewMovieHistory(movieSlug, episodeName);
                     }
                 }
 
-                if (exists) {
-                    // Slug đã tồn tại, không thêm lịch sử xem phim mới
-                    Toast.makeText(ChiTietActivity.this, "Phim này đã có trong lịch sử xem của bạn", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Slug chưa tồn tại, tiến hành thêm mới
-                    addNewMovieHistory(movieSlug);
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(ChiTietActivity.this, "Lỗi khi kiểm tra lịch sử", Toast.LENGTH_SHORT).show();
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(ChiTietActivity.this, "Lỗi khi kiểm tra lịch sử", Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
+        }
     }
 
+    private void saveHistoryForGuest(String movieSlug, String episodeName) {
+        DatabaseReference lichSuKhongDangNhapRef = FirebaseDatabase.getInstance().getReference("LichSuXemKhongDangNhap");
+        String idLichSuXem = lichSuKhongDangNhapRef.push().getKey();
+        String watchedAt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+        Map<String, Object> lichSuXem = new HashMap<>();
+        lichSuXem.put("slug", movieSlug);
+        lichSuXem.put("watched_at", watchedAt);
+        lichSuXem.put("tapphim", episodeName);
+
+        lichSuKhongDangNhapRef.child(idLichSuXem).setValue(lichSuXem)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Lưu lịch sử xem phim thành công cho người dùng không đăng nhập", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Lưu lịch sử xem phim thất bại cho người dùng không đăng nhập", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
     // Hàm để thêm mới lịch sử xem phim nếu slug chưa tồn tại
-    private void addNewMovieHistory(String movieSlug) {
+    private void addNewMovieHistory(String movieSlug,String episode) {
         // Tạo ID mới cho lịch sử xem phim
         String idLichSuXem = lichSuXemRef.push().getKey();
 
@@ -161,6 +185,7 @@ public class ChiTietActivity extends AppCompatActivity {
         lichSuXem.put("id_user", idUser);
         lichSuXem.put("slug", movieSlug); // slug của phim
         lichSuXem.put("watched_at", watchedAt);
+        lichSuXem.put("episode", episode);
 
         // Lưu vào Firebase dưới node `LichSuXem`
         lichSuXemRef.child(idLichSuXem).setValue(lichSuXem)

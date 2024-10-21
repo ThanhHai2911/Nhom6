@@ -11,8 +11,7 @@
         android:id="@+id/drawerlayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/meBlack"
-        android:layout_marginBottom="65dp">
+        android:background="@color/meBlack">
 
         <!-- Phần giao diện chính của ứng dụng -->
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -369,7 +368,8 @@
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="selected"
-        android:background="@color/bottom_nav_unselected"/>
+        android:background="@color/bottom_nav_unselected"
+        android:visibility="gone"/>
 
     <!-- ProgressBar (nếu cần) -->
     <FrameLayout

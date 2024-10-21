@@ -50,6 +50,7 @@ public class LichSuXemActivity extends AppCompatActivity {
     private ActivityLichSuXemBinding binding;
     private LichSuAdapter lichSuAdapter;
     private List<MovieDetail.MovieItem> watchedMoviesList;
+    private List<MovieDetail.Episode.ServerData> tapPhimList = new ArrayList<>();
     private DatabaseReference lichSuXemRef;
     private String idUser;
     private ApiService apiService;
@@ -164,7 +165,7 @@ public class LichSuXemActivity extends AppCompatActivity {
     }
 
 
-    //Load thong tin phim
+    // Load thong tin phim
     private void chiTietPhim(String slug, MovieDetail.MovieItem movieItem) {
         Call<MovieDetail> call = apiService.getMovieDetail(slug);
         call.enqueue(new Callback<MovieDetail>() {
@@ -175,16 +176,54 @@ public class LichSuXemActivity extends AppCompatActivity {
                     movieItem.setName(movieDetail.getMovie().getName());
                     movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
                     lichSuAdapter.notifyDataSetChanged();
+
+                    // Set click listener for each movie item in the history
                     lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
-                            // Lấy thông tin chi tiết phim từ slug truyền đến màn hình xem phim
-                            Intent intent = new Intent(view.getContext(), ChiTietActivity.class);
+                            // Get the clicked movie item
                             MovieDetail.MovieItem movie = watchedMoviesList.get(position);
-                            intent.putExtra("slug", movie.getSlug()); // Truyền slug tới WatchMovieActivity
-                            view.getContext().startActivity(intent);
+                            MovieDetail.Episode.ServerData episode = tapPhimList.get(position);
+
+                            // Get the movie slug and episode name
+                            String movieSlug = movie.getSlug();
+                            String episodeName = movie.getEpisodeCurrent();
+
+                            // Reference to Firebase to get the movie link
+                            DatabaseReference moviesRef = FirebaseDatabase.getInstance().getReference("Movies");
+                            moviesRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                            // Assuming your movie data includes a link field
+                                            String movieLink = snapshot.child("link").getValue(String.class);
+
+                                            if (movieLink != null) {
+                                                // Create an intent to open the movie player activity
+                                                Intent intent = new Intent(view.getContext(), XemPhimActivity.class);
+                                                intent.putExtra("movie_link", movieLink); // Pass the movie link
+                                                intent.putExtra("episode", episodeName); // Pass the episode name
+
+                                                // Start the movie player activity
+                                                view.getContext().startActivity(intent);
+                                            } else {
+                                                Log.e("LichSuXemActivity", "Movie link is null for slug: " + movieSlug);
+                                            }
+                                        }
+                                    } else {
+                                        Log.e("LichSuXemActivity", "No movie found for slug: " + movieSlug);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Log.e("LichSuXemActivity", "Error fetching movie link", databaseError.toException());
+                                }
+                            });
                         }
                     });
+
                     binding.progressBar.setVisibility(View.GONE);
                     binding.layout.setVisibility(View.VISIBLE);
                 } else {
@@ -198,6 +237,8 @@ public class LichSuXemActivity extends AppCompatActivity {
             }
         });
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_timkiem, menu);
