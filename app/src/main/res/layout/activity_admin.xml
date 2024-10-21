@@ -57,31 +57,47 @@
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:layout_marginTop="8dp">
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnHômNay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hôm nay"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="#000000" />
 
-        <Button
-            android:id="@+id/btnHômNay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hôm nay"
-            android:backgroundTint="#E0E0E0"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/btn7Ngày"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="7 ngày qua"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#E0E0E0"
-            android:textColor="#000000" />
-        <Button
-            android:id="@+id/btnThang"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1 tháng qua"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#E0E0E0"
-            android:textColor="#000000" />
+            <Button
+                android:id="@+id/btn7Ngày"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7 ngày qua"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="#000000" />
+            <Button
+                android:id="@+id/btnThang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 tháng qua"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="#000000" />
+            <Button
+                android:id="@+id/btnnam"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 nam qua"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="#000000" />
+            </LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
 
     <!-- Stats Section with icons -->

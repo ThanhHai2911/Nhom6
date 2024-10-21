@@ -72,6 +72,8 @@
         private List<Series> seriesPhimBo;
         private List<Series> seriesPhimHoatHinh;
         private List<Series> seriesTvShow;
+        // bien de kiểm tra người dùng có đang ỏ trong ứng dụng hay không
+        private static Boolean truycap = false;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -186,8 +188,12 @@
                 truyCapRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        // neu truycap == false thì sẽ thêm vào TruyCap trên firebase
+                        if (truycap == false){
+                            themTruyCap(idUser);
+                            truycap = true;
+                        }
 
-                        themTruyCap(idUser);
 //                        boolean exists = false;
 //
 //                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
