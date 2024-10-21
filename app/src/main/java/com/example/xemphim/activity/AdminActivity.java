@@ -29,6 +29,7 @@ public class AdminActivity extends AppCompatActivity {
     private ActivityAdminBinding binding;
     private DatabaseReference dataUser;
     private DatabaseReference dataTruyCap;
+    private DatabaseReference dataThanhToan;
     private long startOfDay;
     private long endOfDay;
     private Calendar calendar = Calendar.getInstance();
@@ -44,14 +45,24 @@ public class AdminActivity extends AppCompatActivity {
 
         dataUser = FirebaseDatabase.getInstance().getReference("Users");
         dataTruyCap = FirebaseDatabase.getInstance().getReference("TruyCap");
+        dataThanhToan = FirebaseDatabase.getInstance().getReference("ThanhToan");
         // Đặt lại khoảng thời gian cho hôm nay
-        layThongTinUserVaDoanhThu();
+        layThongTinUser();
+        updateSelectedButton(binding.btnHMNay);
+        layThongTInDoanhThu();
         layThongTinTruyCapHomNay(); // Gọi hàm lấy thông tin truy cập hôm nay
 
+
+        xulyXemThongTin();
+
+    }
+
+    private void xulyXemThongTin() {
         // Lắng nghe sự kiện khi nhấn nút "Hôm nay"
         binding.btnHMNay.setOnClickListener(view -> {
-            layThongTinUserVaDoanhThu();
+            layThongTinUser();
             updateSelectedButton(binding.btnHMNay);
+            layThongTInDoanhThu();
             layThongTinTruyCapHomNay(); // Gọi hàm lấy thông tin truy cập hôm nay
         });
 
@@ -59,6 +70,7 @@ public class AdminActivity extends AppCompatActivity {
         binding.btn7NgY.setOnClickListener(view -> {
             layThongTinTrongKhoangThoiGian(7);
             updateSelectedButton(binding.btn7NgY);
+            laythongtinDoanhThuTrongKhoang(7);
             layThongTinTruyCapTrongKhoangThoiGian(7); // Gọi hàm lấy thông tin truy cập 7 ngày qua
         });
 
@@ -66,13 +78,76 @@ public class AdminActivity extends AppCompatActivity {
         binding.btnThang.setOnClickListener(view -> {
             layThongTinTrongKhoangThoiGian(30);
             updateSelectedButton(binding.btnThang);
+            laythongtinDoanhThuTrongKhoang(30);
             layThongTinTruyCapTrongKhoangThoiGian(30); // Cập nhật số lượng truy cập 1 tháng qua
         });
     }
+
+
+    // doanh thu
+    private void laythongtinDoanhThuTrongKhoang(int soNgay) {
+
+        long startTime = LayThoigianCachDay(soNgay);
+        long endTime = System.currentTimeMillis();
+
+        dataThanhToan.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double doanhthu = 0;
+                for (DataSnapshot data : snapshot.getChildren()){
+                    Long amount = data.child("amount").getValue(Long.class);
+                    Long ngaymua = data.child("paymentDate").getValue(Long.class);
+                    if (ngaymua != null && ngaymua >= startTime && ngaymua <= endTime){
+                        doanhthu += amount;
+                    }
+
+                }
+                // Định dạng và hiển thị số lượng gói VIP
+                DecimalFormat decimalFormat = new DecimalFormat("#,###");
+                String formattedDoanhThu = decimalFormat.format(doanhthu);
+                binding.tvDoanhThuAmount.setText(formattedDoanhThu + " đ");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+    }
+    private void layThongTInDoanhThu() {
+        LayThoigianNgayHomNay(); // 23:59:59 hôm nay
+
+        dataThanhToan.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double doanhthu = 0;
+                for (DataSnapshot data : snapshot.getChildren()){
+                    Long amount = data.child("amount").getValue(Long.class);
+                    Long ngaymua = data.child("paymentDate").getValue(Long.class);
+                    if (ngaymua != null && ngaymua >= startOfDay && ngaymua <= endOfDay){
+                        doanhthu += amount;
+                    }
+
+                }
+                // Định dạng và hiển thị số lượng gói VIP
+                DecimalFormat decimalFormat = new DecimalFormat("#,###");
+                String formattedDoanhThu = decimalFormat.format(doanhthu);
+                binding.tvDoanhThuAmount.setText(formattedDoanhThu + " đ");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Lỗi khi đọc dữ liệu: " + error.getMessage());
+            }
+        });
+    }
+
+    // Truy Caap
     private void layThongTinTruyCapHomNay() {
-        long currentTime = System.currentTimeMillis();
-        long startOfDay = currentTime - (currentTime % (24 * 60 * 60 * 1000)); // 00:00:00 hôm nay
-        long endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1; // 23:59:59 hôm nay
+        LayThoigianNgayHomNay(); // 23:59:59 hôm nay
 
         dataTruyCap.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -94,14 +169,11 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
     private void layThongTinTruyCapTrongKhoangThoiGian(int soNgay) {
 
-        long currentTime = System.currentTimeMillis();
         long startTime = LayThoigianCachDay(soNgay);
-        long endTime = currentTime;
+        long endTime = System.currentTimeMillis();
+
 
         dataTruyCap.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -124,11 +196,8 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
-
-
-
-
-    private void layThongTinUserVaDoanhThu() {
+    // lay thong tin user va goi vip
+    private void layThongTinUser() {
         // Reset calendar về ngày hiện tại
         calendar.setTimeInMillis(System.currentTimeMillis());
         LayThoigianNgayHomNay();
@@ -136,7 +205,7 @@ public class AdminActivity extends AppCompatActivity {
         dataUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                double DoanhThu = 0;
+
                 int soluongVip = 0;
                 int userTodayCount = 0;
 
@@ -150,17 +219,15 @@ public class AdminActivity extends AppCompatActivity {
 
                         if (idLoaiND != null && idLoaiND == 1) {
                             soluongVip++; // Tăng số lượng gói VIP
-                            DoanhThu += 99000; // Cộng doanh thu
+
                         }
                     }
                 }
 
-                // Định dạng và hiển thị số lượng gói VIP
-                DecimalFormat decimalFormat = new DecimalFormat("#,###");
-                String formattedDoanhThu = decimalFormat.format(DoanhThu);
+
 
                 binding.tvGoiVIPAmount.setText("" + soluongVip);
-                binding.tvDoanhThuAmount.setText(formattedDoanhThu + " đ");
+
                 binding.tvLuotDangKyAmount.setText("" + userTodayCount);
             }
 
@@ -170,7 +237,6 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
     }
-
     // Phương thức để cập nhật màu của các nút
     private void updateSelectedButton(Button newButton) {
         // Nếu nút đã được chọn khác nút hiện tại, đổi màu
@@ -185,7 +251,7 @@ public class AdminActivity extends AppCompatActivity {
         selectedButton.setTextColor(getResources().getColor(R.color.selectedTextColor)); // Màu chữ đã chọn
     }
 
-
+    //Lay thoi gian ngay hom nay
     private void LayThoigianNgayHomNay() {
         // Đặt thời gian về 00:00:00 hôm nay
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -210,7 +276,7 @@ public class AdminActivity extends AppCompatActivity {
         dataUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                double DoanhThu = 0;
+
                 int soluongVip = 0;
                 int userCount = 0;
 
@@ -222,16 +288,12 @@ public class AdminActivity extends AppCompatActivity {
                         userCount++;
                         if (idLoaiND == 1) {
                             soluongVip++;
-                            DoanhThu += 99000;
                         }
                     }
                 }
 
-                DecimalFormat decimalFormat = new DecimalFormat("#,###");
-                String formattedDoanhThu = decimalFormat.format(DoanhThu);
 
                 binding.tvGoiVIPAmount.setText("" + soluongVip);
-                binding.tvDoanhThuAmount.setText(formattedDoanhThu + " đ");
                 binding.tvLuotDangKyAmount.setText("" + userCount);
             }
 

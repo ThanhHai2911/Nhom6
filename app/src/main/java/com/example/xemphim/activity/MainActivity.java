@@ -72,6 +72,8 @@
         private List<Series> seriesPhimBo;
         private List<Series> seriesPhimHoatHinh;
         private List<Series> seriesTvShow;
+        // bien de kiểm tra người dùng có đang ỏ trong ứng dụng hay không
+        private static Boolean truycap = false;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -186,8 +188,12 @@
                 truyCapRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        // neu truycap == false thì sẽ thêm vào TruyCap trên firebase
+                        if (truycap == false){
+                            themTruyCap(idUser);
+                            truycap = true;
+                        }
 
-                        themTruyCap(idUser);
 //                        boolean exists = false;
 //
 //                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -270,13 +276,11 @@
             }
         }
         private void navigationBottom() {
-            BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-
             // Đặt item mặc định được chọn là màn hình Home
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
 
             // Xử lý sự kiện chọn item của Bottom Navigation
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            binding.bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Intent intent = null;
@@ -475,6 +479,8 @@
                     // Ẩn ProgressBar và hiển thị nội dung chính
                     binding.progressBar.setVisibility(View.GONE);
                     binding.mainContent.setVisibility(View.VISIBLE);
+                    binding.bottomNavigation.setVisibility(View.VISIBLE);
+                    // Ngừng loading
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
@@ -486,6 +492,7 @@
                 @Override
                 public void onFailure(Call<SeriesResponse> call, Throwable t) {
                     binding.progressBar.setVisibility(View.GONE);
+                    binding.bottomNavigation.setVisibility(View.GONE);
                     Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu", Toast.LENGTH_SHORT).show();
                     binding.mainContent.setVisibility(View.VISIBLE); // Hiển thị lại nội dung chính
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
@@ -500,6 +507,7 @@
                     // Ẩn ProgressBar và hiển thị nội dung chính
                     binding.progressBar.setVisibility(View.GONE);
                     binding.mainContent.setVisibility(View.VISIBLE);
+                    binding.bottomNavigation.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
@@ -511,6 +519,7 @@
                 @Override
                 public void onFailure(Call<SeriesResponse> call, Throwable t) {
                     binding.progressBar.setVisibility(View.GONE);
+                    binding.bottomNavigation.setVisibility(View.GONE);
                     Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu", Toast.LENGTH_SHORT).show();
                     binding.mainContent.setVisibility(View.VISIBLE); // Hiển thị lại nội dung chính
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
@@ -526,6 +535,7 @@
                     // Ẩn ProgressBar và hiển thị nội dung chính
                     binding.progressBar.setVisibility(View.GONE);
                     binding.mainContent.setVisibility(View.VISIBLE);
+                    binding.bottomNavigation.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
@@ -537,6 +547,7 @@
                 @Override
                 public void onFailure(Call<SeriesResponse> call, Throwable t) {
                     binding.progressBar.setVisibility(View.GONE);
+                    binding.bottomNavigation.setVisibility(View.GONE);
                     Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu", Toast.LENGTH_SHORT).show();
                     binding.mainContent.setVisibility(View.VISIBLE); // Hiển thị lại nội dung chính
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
@@ -552,6 +563,7 @@
                     // Ẩn ProgressBar và hiển thị nội dung chính
                     binding.progressBar.setVisibility(View.GONE);
                     binding.mainContent.setVisibility(View.VISIBLE);
+                    binding.bottomNavigation.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
 
                     if (response.isSuccessful() && response.body() != null) {
@@ -563,6 +575,7 @@
                 @Override
                 public void onFailure(Call<SeriesResponse> call, Throwable t) {
                     binding.progressBar.setVisibility(View.GONE);
+                    binding.bottomNavigation.setVisibility(View.GONE);
                     Toast.makeText(MainActivity.this, "Lỗi khi tải dữ liệu", Toast.LENGTH_SHORT).show();
                     binding.mainContent.setVisibility(View.VISIBLE); // Hiển thị lại nội dung chính
                     swipeRefreshLayout.setRefreshing(false); // Ngừng loading
