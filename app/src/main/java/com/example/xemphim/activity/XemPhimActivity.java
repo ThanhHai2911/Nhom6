@@ -9,6 +9,8 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RatingBar;
@@ -43,6 +45,7 @@ import com.example.xemphim.R;
 import com.example.xemphim.adapter.BinhLuanPhimAdapter;
 import com.example.xemphim.adapter.TapPhimAdapter;
 import com.example.xemphim.databinding.ActivityXemphimBinding; // Import View Binding
+import com.example.xemphim.databinding.CustomPlayerControlsBinding;
 import com.example.xemphim.model.BinhLuanPhim;
 import com.example.xemphim.model.FavoriteMovie;
 import com.example.xemphim.model.MovieDetail;
@@ -86,6 +89,7 @@ import retrofit2.Response;
 
 public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAdapter.OnCommentDeleteListener {
     private ActivityXemphimBinding binding; // Khai báo View Binding
+    private CustomPlayerControlsBinding controlsBinding;
     private ExoPlayer exoPlayer; // ExoPlayer để phát video
     private boolean isFullScreen = false;
     private TapPhimAdapter tapPhimAdapter;
@@ -105,8 +109,6 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
     private List<BinhLuanPhim> binhLuanPhimList = new ArrayList<>();
     private DatabaseReference ratingsRef;
     private String currentUserId;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,13 +128,11 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
         binding.rvComments.setLayoutManager(new GridLayoutManager(this, 1));
         binding.rvComments.setAdapter(binhLuanPhimAdapter);
     }
-
     public void setEvent() {
         initializePlayer();
         // Thiết lập sự kiện cho nút toàn màn hình
         movieSlug = getIntent().getStringExtra("slug");
-
-        binding.btnFullScreen.setOnClickListener(v -> toggleFullScreen());
+        binding.playerView.findViewById(R.id.btnFullScreen).setOnClickListener(v -> toggleFullScreen());
         apiService = ApiClient.getClient().create(ApiService.class);
         loadMovieDetails();
         lichSuXemRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
@@ -301,8 +301,8 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
                         .addOnSuccessListener(aVoid -> {
                             if (binding.commentInput.getText() != null)
 
-                            // Thêm bình luận vào adapter và cập nhật UI ngay lập tức
-                            binhLuanPhimAdapter.addComment(newComment); // Giả sử bạn có phương thức này trong adapter
+                                // Thêm bình luận vào adapter và cập nhật UI ngay lập tức
+                                binhLuanPhimAdapter.addComment(newComment); // Giả sử bạn có phương thức này trong adapter
                             binhLuanPhimAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
 
                             Toast.makeText(XemPhimActivity.this, "Bình luận đã được lưu!", Toast.LENGTH_SHORT).show();
