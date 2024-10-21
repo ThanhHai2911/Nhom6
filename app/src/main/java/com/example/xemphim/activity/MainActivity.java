@@ -175,7 +175,6 @@
 
          public static void kiemTraTruyCap(String idUser) {
             // Kiểm tra xem id_user có null hay không và xem ngày truy cập đã tồn tại hay chưa
-            if (idUser != null && !idUser.isEmpty()) {
                 DatabaseReference truyCapRef = FirebaseDatabase.getInstance().getReference("TruyCap");
                 long currentTime = System.currentTimeMillis();
 
@@ -187,28 +186,30 @@
                 truyCapRef.orderByChild("id_user").equalTo(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        boolean exists = false;
 
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            TruyCap truyCap = snapshot.getValue(TruyCap.class);
-                            if (truyCap != null) {
-                                // So sánh ngày truy cập
-                                long timeStamp = truyCap.getThoigiantruycap();
-                                String truyCapDate = sdf.format(new Date(timeStamp));
-
-                                if (truyCapDate.equals(currentDate)) {
-                                    exists = true; // Nếu đã có bản ghi cho ngày hôm nay
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!exists) {
-                            // Nếu không có bản ghi nào, gọi phương thức thêm truy cập
-                            themTruyCap(idUser);
-                        } else {
-                            Log.d("TruyCap", "Người dùng đã truy cập hôm nay.");
-                        }
+                        themTruyCap(idUser);
+//                        boolean exists = false;
+//
+//                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                            TruyCap truyCap = snapshot.getValue(TruyCap.class);
+//                            if (truyCap != null) {
+//                                // So sánh ngày truy cập
+//                                long timeStamp = truyCap.getThoigiantruycap();
+//                                String truyCapDate = sdf.format(new Date(timeStamp));
+//
+//                                if (truyCapDate.equals(currentDate)) {
+//                                    exists = true; // Nếu đã có bản ghi cho ngày hôm nay
+//                                    break;
+//                                }
+//                            }
+//                        }
+//
+//                        if (!exists) {
+//                            // Nếu không có bản ghi nào, gọi phương thức thêm truy cập
+//
+//                        } else {
+//                            Log.d("TruyCap", "Người dùng đã truy cập hôm nay.");
+//                        }
                     }
 
                     @Override
@@ -217,10 +218,8 @@
                     }
                 });
             }
-            else{
-                Log.e("kiem tra id", "iduser rong" );
-            }
-        }
+
+
         public static void themTruyCap(String idUser) {
             DatabaseReference truyCapRef = FirebaseDatabase.getInstance().getReference("TruyCap");
             long currentTime = System.currentTimeMillis();

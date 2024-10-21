@@ -78,7 +78,7 @@ public class ProfileActivity extends AppCompatActivity {
     public void setEven(){
         laythongtinUser();
         //kiem tra truy cap
-        MainActivity.kiemTraTruyCap(idUser);
+        //MainActivity.kiemTraTruyCap(idUser);
         Toast.makeText(ProfileActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
         binding.tvTenNguoiDung.setText(nameUser);
         binding.tvEmail.setText(emailUser);
