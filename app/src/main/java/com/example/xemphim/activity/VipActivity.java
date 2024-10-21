@@ -34,7 +34,7 @@ public class VipActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.nav_vip);
         laythongtinUser();
         //kiem tra truy cap
-        MainActivity.kiemTraTruyCap(idUser);
+        //MainActivity.kiemTraTruyCap(idUser);
         Toast.makeText(VipActivity.this, "Xin chào " + idUser, Toast.LENGTH_SHORT).show();
         // Xử lý sự kiện chọn item của Bottom Navigation
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
