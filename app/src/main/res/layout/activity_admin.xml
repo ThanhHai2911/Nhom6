@@ -38,16 +38,40 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Tổng quan Title -->
-    <TextView
-        android:id="@+id/tvTổngQuan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tổng quan"
-        android:textSize="30sp"
-        android:layout_gravity="center"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="16dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:padding="7dp"
+        android:layout_height="wrap_content">
+        <!-- Tổng quan Title -->
+        <ImageView
+            android:id="@+id/ivButtonMenu"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="@drawable/menu"
+            android:padding="10dp"
+            android:textColor="#FFFFFF"
+            android:clickable="true"
+        />
+
+        <TextView
+            android:id="@+id/tvTổngQuan"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"
+            android:text="Tổng quan"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:layout_gravity="center"
+            android:textColor="#FFFFFF"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
 
     <!-- Today and 7-day buttons -->
     <LinearLayout
@@ -200,6 +224,7 @@
             android:layout_columnWeight="1"
             android:background="@drawable/rounded_corner"
             android:padding="16dp"
+
             android:layout_margin="9dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
@@ -280,26 +305,29 @@
 
     <!-- Top phim section -->
     <LinearLayout
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="#FFFFFF"
-        android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/ivTopPhim"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            />
-
+        android:padding="8dp">
         <TextView
-            android:id="@+id/tvTopPhim"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Top phim"
-            android:textSize="18sp"
-            android:textColor="#000000"
-            android:layout_marginTop="8dp" />
+            android:textSize="26dp"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:text="Biểu Đồ"/>
+
+        <!-- BarChart to display the data -->
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="16dp"/>
+
+
     </LinearLayout>
+
 
 </LinearLayout>

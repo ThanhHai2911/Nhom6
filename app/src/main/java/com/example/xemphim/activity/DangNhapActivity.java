@@ -44,6 +44,7 @@ public class DangNhapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dang_nhap);
+        MainActivity.truycap = false;
 //// Khởi tạo Firebase Database reference
 //        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Movies");
 //

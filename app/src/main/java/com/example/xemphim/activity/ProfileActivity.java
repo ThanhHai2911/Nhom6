@@ -96,6 +96,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
 
         } else {
+
             isUserLoggedIn = false; // Người dùng chưa đăng nhập
             binding.btnDangNhap.setVisibility(View.VISIBLE);
             binding.btnDangNhap.setText("Đăng Nhập"); // Đổi văn bản nút thành "Đăng Nhập"

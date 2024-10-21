@@ -67,6 +67,9 @@
         <activity android:name=".activity.ThanhToanActivity" />
         <activity android:name=".activity.CaiDatActivity" />
         <activity android:name=".activity.PlayDownload" />
+        <activity android:name=".activity.QLTheLoaiActivity" />
+        <activity android:name=".activity.QLQuocGiaActivity" />
+        <activity android:name=".activity.QuanLyAPI" />
     </application>
 
 </manifest>

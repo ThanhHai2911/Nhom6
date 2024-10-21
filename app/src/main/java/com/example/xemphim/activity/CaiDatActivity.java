@@ -54,7 +54,7 @@ public class CaiDatActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.clear(); // Xóa tất cả thông tin
                 editor.apply();
-
+                MainActivity.truycap = false;
                 Intent intent = new Intent(CaiDatActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

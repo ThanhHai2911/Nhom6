@@ -46,6 +46,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
     // Retrofit for networking
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
@@ -87,9 +89,5 @@ dependencies {
 
     implementation ("com.google.firebase:firebase-database:20.3.0")
     implementation ("com.google.android.material:material:1.7.0")
-
-
-
-
 
 }

@@ -73,7 +73,7 @@
         private List<Series> seriesPhimHoatHinh;
         private List<Series> seriesTvShow;
         // bien de kiểm tra người dùng có đang ỏ trong ứng dụng hay không
-        private static Boolean truycap = false;
+        public static Boolean truycap = false;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
