@@ -120,7 +120,7 @@
                 <EditText
                     android:id="@+id/commentInput"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="50dp"
                     android:hint="Viết bình luận của bạn..."
                     android:background="@drawable/text_description_background"
                     android:textColor="@android:color/black"
