@@ -70,9 +70,7 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
     private void layThongTinTruyCapHomNay() {
-        long currentTime = System.currentTimeMillis();
-        long startOfDay = currentTime - (currentTime % (24 * 60 * 60 * 1000)); // 00:00:00 hôm nay
-        long endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1; // 23:59:59 hôm nay
+        LayThoigianNgayHomNay(); // 23:59:59 hôm nay
 
         dataTruyCap.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -99,9 +97,9 @@ public class AdminActivity extends AppCompatActivity {
 
     private void layThongTinTruyCapTrongKhoangThoiGian(int soNgay) {
 
-        long currentTime = System.currentTimeMillis();
         long startTime = LayThoigianCachDay(soNgay);
-        long endTime = currentTime;
+        long endTime = System.currentTimeMillis();
+
 
         dataTruyCap.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
