@@ -185,6 +185,7 @@ public class ChiTietActivity extends AppCompatActivity {
         lichSuXem.put("id_user", idUser);
         lichSuXem.put("slug", movieSlug); // slug của phim
         lichSuXem.put("watched_at", watchedAt);
+        lichSuXem.put("movie_link", movieLink);
         lichSuXem.put("episode", episode);
 
         // Lưu vào Firebase dưới node `LichSuXem`
