@@ -261,9 +261,19 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
                     MovieDetail movieDetails = response.body();
                     List<MovieDetail.Episode> tapPhim = movieDetails.getEpisodes();
                     String movieTitle = movieDetails.getMovie().getName();
-                    String episodeName = getIntent().getStringExtra("episodeCurrent");
-                    binding.tvMovieTitle.setText(movieDetails.getMovie().getName());
+
+                    // Check if coming from watch history or details
+                    String episodeName;
+                    if (getIntent().getBooleanExtra("from_watch_history", false)) {
+                        // Get episode name from the watch history
+                        episodeName = getIntent().getStringExtra("episode");
+                    } else {
+                        // Get episode name from the details screen
+                        episodeName = getIntent().getStringExtra("episodeCurrent");
+                    }
+
                     binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
+
                     if (tapPhim != null && !tapPhim.isEmpty()) {
                         serverDataList.clear();
                         for (MovieDetail.Episode episode : tapPhim) {
@@ -273,17 +283,17 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
                             }
                         }
                         tapPhimAdapter = new TapPhimAdapter(XemPhimActivity.this, serverDataList);
-                        // Cập nhật RecyclerView với danh sách tập phim
+
+                        // Set up click listener for episodes
                         tapPhimAdapter.setRecyclerViewItemClickListener(new TapPhimAdapter.OnRecyclerViewItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
                                 MovieDetail.Episode.ServerData selectedEpisode = serverDataList.get(position);
                                 String newMovieLink = selectedEpisode.getLinkM3u8();
-                                //Hien thi ten tap phim  dang xem
-                                String movieTitle = movieDetails.getMovie().getName();
-                                String episodeName = selectedEpisode.getName();
-                                binding.tvMovieTitle.setText(movieTitle + " - " + episodeName);
-                                lichSuPhim.luuLichSuXem(movieSlug, episodeName,serverDataList);
+
+                                // Display the name of the episode being watched
+                                binding.tvMovieTitle.setText(movieTitle + " - " + selectedEpisode.getName());
+                                lichSuPhim.luuLichSuXem(movieSlug, selectedEpisode.getName(), serverDataList);
                                 playEpisode(newMovieLink);
                             }
                         });
@@ -305,6 +315,8 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
             }
         });
     }
+
+
 
     private void laythongtinUser() {
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);

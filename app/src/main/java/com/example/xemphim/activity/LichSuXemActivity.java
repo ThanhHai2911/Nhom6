@@ -177,48 +177,55 @@ public class LichSuXemActivity extends AppCompatActivity {
                     movieItem.setPosterUrl(movieDetail.getMovie().getPosterUrl());
                     lichSuAdapter.notifyDataSetChanged();
 
-                    // Set click listener for each movie item in the history
+                    // Đặt listener cho mỗi mục phim trong lịch sử
                     lichSuAdapter.setRecyclerViewItemClickListener(new LichSuAdapter.OnRecyclerViewItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
-                            // Get the clicked movie item
-                            MovieDetail.MovieItem movie = watchedMoviesList.get(position);
-                            MovieDetail.Episode.ServerData episode = tapPhimList.get(position);
+                            // Lấy mục phim đã nhấn
+                            MovieDetail.MovieItem clickedMovie = watchedMoviesList.get(position);
+                            String movieSlug = clickedMovie.getSlug();
 
-                            // Get the movie slug and episode name
-                            String movieSlug = movie.getSlug();
-                            String episodeName = movie.getEpisodeCurrent();
+                            if (movieSlug == null) {
+                                Log.e("LichSuXemActivity", "Slug phim là null. Không thể lấy liên kết phim.");
+                                return; // Kết thúc hàm nếu slug là null
+                            }
 
-                            // Reference to Firebase to get the movie link
-                            DatabaseReference moviesRef = FirebaseDatabase.getInstance().getReference("Movies");
+                            // Tham chiếu đến Firebase để lấy liên kết phim
+                            DatabaseReference moviesRef = FirebaseDatabase.getInstance().getReference("LichSuXem");
                             moviesRef.orderByChild("slug").equalTo(movieSlug).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.exists()) {
                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                            // Assuming your movie data includes a link field
-                                            String movieLink = snapshot.child("link").getValue(String.class);
+                                            // Lấy liên kết phim
+                                            String movieLink = snapshot.child("movie_link").getValue(String.class);
+                                            String episodeName = snapshot.child("episode").getValue(String.class);
+                                            String slug = snapshot.child("slug").getValue(String.class);
 
                                             if (movieLink != null) {
-                                                // Create an intent to open the movie player activity
-                                                Intent intent = new Intent(view.getContext(), XemPhimActivity.class);
-                                                intent.putExtra("movie_link", movieLink); // Pass the movie link
-                                                intent.putExtra("episode", episodeName); // Pass the episode name
+                                                Log.d("LichSuXemActivity", "Liên kết phim: " + movieLink);
 
-                                                // Start the movie player activity
+                                                // Tạo intent để mở màn hình phát phim
+                                                Intent intent = new Intent(view.getContext(), XemPhimActivity.class);
+                                                intent.putExtra("movie_link", movieLink);
+                                                intent.putExtra("episode", episodeName);
+                                                intent.putExtra("slug", slug);
+                                                intent.putExtra("from_watch_history", true);
+
+                                                // Bắt đầu màn hình phát phim
                                                 view.getContext().startActivity(intent);
                                             } else {
-                                                Log.e("LichSuXemActivity", "Movie link is null for slug: " + movieSlug);
+                                                Log.e("LichSuXemActivity", "Liên kết phim là null cho slug: " + movieSlug);
                                             }
                                         }
                                     } else {
-                                        Log.e("LichSuXemActivity", "No movie found for slug: " + movieSlug);
+                                        Log.e("LichSuXemActivity", "Không tìm thấy phim cho slug: " + movieSlug);
                                     }
                                 }
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    Log.e("LichSuXemActivity", "Error fetching movie link", databaseError.toException());
+                                    Log.e("LichSuXemActivity", "Lỗi khi lấy liên kết phim", databaseError.toException());
                                 }
                             });
                         }
@@ -227,16 +234,19 @@ public class LichSuXemActivity extends AppCompatActivity {
                     binding.progressBar.setVisibility(View.GONE);
                     binding.layout.setVisibility(View.VISIBLE);
                 } else {
-                    Log.e("LichSuXemActivity", "Failed to fetch movie details for slug: " + slug);
+                    Log.e("LichSuXemActivity", "Không thể lấy chi tiết phim cho slug: " + slug);
                 }
             }
 
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
-                Log.e("LichSuXemActivity", "Error fetching movie details", t);
+                Log.e("LichSuXemActivity", "Lỗi khi lấy thông tin chi tiết phim", t);
             }
         });
     }
+
+
+
 
 
     @Override
