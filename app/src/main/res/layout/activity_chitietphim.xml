@@ -23,13 +23,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="invisible">
 
             <ImageView
                 android:id="@+id/imageViewthumburl"
                 android:layout_width="wrap_content"
                 android:layout_height="242dp"
                 android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
                 android:src="@drawable/thumb_url" />
 
             <LinearLayout

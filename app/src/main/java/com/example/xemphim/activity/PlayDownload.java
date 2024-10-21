@@ -1,6 +1,5 @@
 package com.example.xemphim.activity;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,10 +17,9 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 
 import java.io.File;
-import java.util.Arrays;
 
 @OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
-public class PlayDownloadedMovieActivity extends AppCompatActivity {
+public class PlayDownload extends AppCompatActivity {
     private ExoPlayer player;
     private PlayerView playerView;
 

@@ -321,6 +321,7 @@ public class ChiTietActivity extends AppCompatActivity {
                         swipeRefreshLayout.setRefreshing(false); // Ngừng loading
                         binding.progressBar.setVisibility(View.GONE);
                         binding.scvChitiet.setVisibility(View.VISIBLE);
+                        binding.imageViewthumburl.requestLayout();
                     } else {
                         Toast.makeText(ChiTietActivity.this, "Không có tập phim nào", Toast.LENGTH_SHORT).show();
                         swipeRefreshLayout.setRefreshing(false); // Ngừng loading

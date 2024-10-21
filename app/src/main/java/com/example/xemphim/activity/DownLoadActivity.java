@@ -4,38 +4,21 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.R;
 import com.example.xemphim.adapter.DownloadedMoviesAdapter;
-import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.databinding.ActivityDownLoadBinding;
-import com.example.xemphim.databinding.ActivityLichSuXemBinding;
-import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.MovieItem;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 public class DownLoadActivity extends AppCompatActivity {
     private ActivityDownLoadBinding binding; // Sử dụng Binding
     private DownloadedMoviesAdapter adapter;
@@ -111,7 +94,7 @@ public class DownLoadActivity extends AppCompatActivity {
 
     // Phát phim đã tải khi nhấn vào
     private void playDownloadedMovie(MovieItem movieItem) {
-        Intent intent = new Intent(this, PlayDownloadedMovieActivity.class);
+        Intent intent = new Intent(this, PlayDownload.class);
         intent.putExtra("movie_name", movieItem.getName());
         startActivity(intent);
     }
