@@ -240,8 +240,6 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void xulyXemThongTin() {
         // Lắng nghe sự kiện khi nhấn nút "Hôm nay"
         binding.btnHMNay.setOnClickListener(view -> {
@@ -270,7 +268,6 @@ public class AdminActivity extends AppCompatActivity {
            // Cập nhật số lượng truy cập 1 tháng qua
         });
     }
-
 
     // doanh thu
     private void laythongtinDoanhThuTrongKhoang(int soNgay) {

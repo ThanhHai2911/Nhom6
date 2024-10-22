@@ -14,4 +14,8 @@
     <color name="defaultTextColor">#000000</color> <!-- Màu chữ mặc định -->
     <color name="colorSelected">#F06292</color> <!-- Màu cho nút đã chọn -->
     <color name="selectedTextColor">#FFFFFF</color> <!-- Màu chữ cho nút đã chọn -->
+    <color name="colorPrimary">#FF5722</color>
+    <color name="colorPrimaryDark">#E64A19</color>
+    <color name="colorAccent">#FF9800</color>
+    <color name="gray_light">#CCCCCC</color>
 </resources>

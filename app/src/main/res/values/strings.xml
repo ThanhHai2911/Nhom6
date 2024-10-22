@@ -26,4 +26,10 @@
         <item>Trung Quốc</item>
         <item>Thái Lan</item>
     </string-array>
+    <string-array name="status_options">
+        <item>Online</item>
+        <item>Offline</item>
+    </string-array>
+    <string name="back">Quay lại</string>
+    <string name="submit_request">Gửi yêu cầu hỗ trợ</string>
 </resources>
