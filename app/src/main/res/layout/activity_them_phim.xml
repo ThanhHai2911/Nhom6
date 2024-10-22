@@ -8,13 +8,13 @@
     android:orientation="vertical"
     android:background="#4D4D4D"
     tools:context=".activity.ThemPhimActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:background="#323131"
-        >
+        android:background="#323131">
 
         <ImageView
             android:padding="30dp"
@@ -30,20 +30,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="Them Phim"
+            android:text="Thêm Phim"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:gravity="center"
-            android:layout_gravity="center"
-            />
-        <!-- View trống để đảm bảo tiêu đề nằm chính giữa -->
+            android:layout_gravity="center" />
+
         <View
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
     </LinearLayout>
-    
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -60,7 +59,7 @@
             android:padding="16dp"
             android:background="@drawable/rounded_background">
 
-            <!-- Hình ảnh phim ở trên cùng -->
+            <!-- Hình ảnh phim -->
             <ImageView
                 android:id="@+id/posterImage"
                 android:layout_width="match_parent"
@@ -80,7 +79,6 @@
 
             <EditText
                 android:layout_marginTop="5dp"
-
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -89,13 +87,22 @@
                 android:padding="12dp"
                 android:textColor="#000000" />
 
-
             <EditText
                 android:layout_marginTop="5dp"
                 android:id="@+id/cast"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Diễn viên"
+                android:background="@drawable/edit_text_background"
+                android:padding="12dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:layout_marginTop="5dp"
+                android:id="@+id/actor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tác giả"
                 android:background="@drawable/edit_text_background"
                 android:padding="12dp"
                 android:textColor="#000000" />
@@ -122,9 +129,7 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-
             <Spinner
-
                 android:id="@+id/country_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -132,15 +137,7 @@
                 android:background="@drawable/edit_text_background"
                 android:padding="12dp" />
 
-            <EditText
-                android:layout_marginTop="5dp"
-                android:id="@+id/status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Trạng thái"
-                android:background="@drawable/edit_text_background"
-                android:padding="12dp"
-                android:textColor="#000000" />
+            <!-- Bỏ ô trạng thái -->
 
             <EditText
                 android:layout_marginTop="5dp"
@@ -162,15 +159,15 @@
                 android:padding="12dp"
                 android:textColor="#000000" />
 
-            <EditText
-                android:layout_marginTop="5dp"
-                android:id="@+id/goi"
+            <!-- Spinner để chọn gói (Thường/Vip) -->
+            <Spinner
+                android:id="@+id/goi_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Gói"
+                android:spinnerMode="dropdown"
+                android:entries="@array/goi_array"
                 android:background="@drawable/edit_text_background"
-                android:padding="12dp"
-                android:textColor="#000000" />
+                android:padding="12dp" />
 
             <EditText
                 android:layout_marginTop="5dp"
@@ -184,6 +181,16 @@
 
             <EditText
                 android:layout_marginTop="5dp"
+                android:id="@+id/thumb_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="thumb_url"
+                android:background="@drawable/edit_text_background"
+                android:padding="12dp"
+                android:textColor="#000000" />
+
+            <EditText
+                android:layout_marginTop="5dp"
                 android:id="@+id/movie_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -191,19 +198,16 @@
                 android:background="@drawable/edit_text_background"
                 android:padding="12dp"
                 android:textColor="#000000" />
-
-
-
         </LinearLayout>
     </ScrollView>
+
     <!-- Nút Reset và Thêm -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:gravity="center"
-        >
+        android:gravity="center">
 
         <Button
             android:id="@+id/reset_button"
@@ -213,23 +217,21 @@
             android:text="Reset"
             android:backgroundTint="#FFA500"
             android:textColor="#ffffff"
-
             android:layout_marginEnd="8dp" />
 
         <Button
             android:layout_weight="3"
             android:id="@+id/submit_button"
-
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Thêm"
             android:backgroundTint="#FF69B4"
             android:textColor="#ffffff"
             android:padding="12dp" />
+
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
     </LinearLayout>
-
 </LinearLayout>

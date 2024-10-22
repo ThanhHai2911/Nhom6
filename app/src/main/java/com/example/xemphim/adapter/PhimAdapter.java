@@ -34,7 +34,7 @@ public class PhimAdapter extends RecyclerView.Adapter<PhimAdapter.PhimViewHolder
         Phim movie = movieList.get(position);
 
         // Đặt dữ liệu vào các thành phần view
-        holder.binding.movieTitle.setText(movie.getTitle());
+        holder.binding.movieTitle.setText(movie.getName());
         holder.binding.movieYear.setText(String.valueOf(movie.getYear()));
 
         // Sử dụng Glide để load ảnh từ URL

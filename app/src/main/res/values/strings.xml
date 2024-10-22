@@ -26,4 +26,10 @@
         <item>Trung Quốc</item>
         <item>Thái Lan</item>
     </string-array>
+
+    <string-array name="goi_array">
+        <item>Chọn Gói</item> <!-- Giá trị mặc định -->
+        <item>Thường</item>
+        <item>Vip</item>
+    </string-array>
 </resources>
