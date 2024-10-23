@@ -187,9 +187,9 @@ public class AdminActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         // Chuyển sang trang Quản lý User
-//                        Intent intent = new Intent(AdminActivity.this, QLPhimActivity.class);
-//                        startActivity(intent);
-//                        popupWindow.dismiss();  // Đóng PopupWindow sau khi nhấn
+                        Intent intent = new Intent(AdminActivity.this, QLUserActivity.class);
+                        startActivity(intent);
+                        popupWindow.dismiss();  // Đóng PopupWindow sau khi nhấn
                     }
                 });
 

@@ -61,6 +61,14 @@ public class CaiDatActivity extends AppCompatActivity {
                 Toast.makeText(CaiDatActivity.this, "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        binding.troGiup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent a = new Intent(CaiDatActivity.this, HoTroActivity.class);
+                startActivity(a);
+            }
+        });
     }
     private void laythongtinUser(){
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);

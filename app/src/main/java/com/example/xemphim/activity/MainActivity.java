@@ -173,6 +173,8 @@
 
             navigationBottom();
 
+
+
         }
 
          public static void kiemTraTruyCap(String idUser) {
@@ -386,6 +388,8 @@
                 return true;
             } else if (id == R.id.nav_phimbo) {
                 // Xử lý sự kiện khi nhấn vào thông báo
+                Intent a = new Intent(MainActivity.this,ThongBaoActivity.class);
+                startActivity(a);
                 Toast.makeText(this, "Thông báo được nhấn", Toast.LENGTH_SHORT).show();
                 return true;
             }else if (id == R.id.nav_theloai) {
