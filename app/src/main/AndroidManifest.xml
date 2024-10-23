@@ -25,7 +25,7 @@
             android:exported="true" />
         <activity
             android:name=".activity.QLPhimActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".activity.AllMovie"
             android:exported="false" />
@@ -55,6 +55,9 @@
             android:exported="false" />
         <activity
             android:name=".activity.DangNhapActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.ThemPhimActivity"
             android:exported="true" />
         <activity
             android:name=".activity.MainActivity"
