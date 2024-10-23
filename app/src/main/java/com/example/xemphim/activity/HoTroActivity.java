@@ -1,7 +1,9 @@
 package com.example.xemphim.activity;
 
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,10 +14,13 @@ import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityHoTroBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -29,6 +34,7 @@ public class HoTroActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 1; // Mã yêu cầu chọn ảnh
     private ActivityHoTroBinding binding;  // View Binding
     private Uri imageUri;  // Để lưu URI của ảnh đã chọn
+    private String idUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +47,18 @@ public class HoTroActivity extends AppCompatActivity {
 
         // Lắng nghe sự kiện khi người dùng nhấn vào nút gửi yêu cầu
         binding.btnSubmit.setOnClickListener(view -> submitForm());
+        laythongtinUser();
+        binding.btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+    }
+    private void laythongtinUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        idUser = sharedPreferences.getString("id_user", null);
+
     }
 
     // Mở thư viện ảnh để chọn
@@ -70,29 +88,52 @@ public class HoTroActivity extends AppCompatActivity {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
+        // Lấy ID của người dùng đã đăng nhập
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Bạn cần đăng nhập để gửi yêu cầu hỗ trợ.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Tải ảnh lên Firebase Storage trước, rồi sau đó lưu thông tin vào Firebase Realtime Database
-        uploadImageAndSubmitRequest(name, description);
+        uploadImageAndSubmitRequest(name, description,idUser);
     }
 
     // Tải ảnh lên Firebase Storage và lưu thông tin vào Realtime Database
-    private void uploadImageAndSubmitRequest(String name, String description) {
+    private void uploadImageAndSubmitRequest(String name, String description, String userId) {
         if (imageUri == null) {
             Toast.makeText(this, "Không tìm thấy ảnh. Vui lòng chọn lại ảnh.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Tham chiếu tới Firebase Storage
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("support_images")
-                .child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
+        // Kiểm tra file extension
+        String fileExtension = getFileExtension(imageUri);
+        if (fileExtension == null || fileExtension.isEmpty()) {
+            Toast.makeText(this, "Phần mở rộng tệp không hợp lệ.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        // Tham chiếu tới Firebase Storage
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("hinhAnhHoTro")
+                .child(System.currentTimeMillis() + "." + fileExtension);
 
         // Thực hiện tải lên tệp
         storageRef.putFile(imageUri)
+                .addOnProgressListener(taskSnapshot -> {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    Log.d("Upload Progress", "Tải lên được " + progress + "%");
+                })
                 .addOnSuccessListener(taskSnapshot -> {
+                    // Lấy URL của ảnh đã tải lên
                     storageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
                         String imageUrl = downloadUri.toString();
-                        saveToFirebaseRealtimeDatabase(name, description, imageUrl);
+                        // Lưu thông tin vào Firebase Realtime Database
+                        saveToFirebaseRealtimeDatabase(name, description, imageUrl,userId);
+                        Toast.makeText(this, "Tải ảnh lên thành công.", Toast.LENGTH_SHORT).show();
+                        resetForm();
+                    }).addOnFailureListener(e -> {
+                        Log.e("Get URL Error", "Không thể lấy URL của hình ảnh: " + e.getMessage());
+                        Toast.makeText(this, "Lỗi khi lấy URL ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
                 })
                 .addOnFailureListener(e -> {
@@ -101,35 +142,49 @@ public class HoTroActivity extends AppCompatActivity {
                 });
     }
 
-    // Phương thức để lấy phần mở rộng của tệp ảnh
+    // Phương thức lấy phần mở rộng tệp từ Uri
     private String getFileExtension(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
-    // Lưu thông tin vào Firebase Realtime Database
-    private void saveToFirebaseRealtimeDatabase(String name, String description, String imageUrl) {
+    // Phương thức lưu thông tin vào Firebase Realtime Database
+    private void saveToFirebaseRealtimeDatabase(String name, String description, String imageUrl, String userId) {
+        // Tạo đối tượng để lưu
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("description", description);
+        data.put("imageUrl", imageUrl);
+        data.put("userId", userId);  // Lưu ID của người dùng đã đăng nhập
+
+        // Tham chiếu đến Firebase Realtime Database
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("HoTro");
 
-        String requestId = databaseRef.push().getKey(); // Tạo ID duy nhất cho yêu cầu
-        Map<String, Object> supportRequest = new HashMap<>();
-        supportRequest.put("name", name);
-        supportRequest.put("description", description);
-        supportRequest.put("imageUrl", imageUrl);
-
-        if (requestId != null) {
-            databaseRef.child(requestId)
-                    .setValue(supportRequest)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Gửi yêu cầu thành công", Toast.LENGTH_SHORT).show();
-                        resetForm();  // Xóa form sau khi gửi thành công
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Không thể gửi yêu cầu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        // Lưu dữ liệu vào Firebase
+        databaseRef.push().setValue(data)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Lưu yêu cầu thành công.", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Thông báo");
+                    builder.setMessage("Chúng tôi đã ghi nhận yêu cầu hỗ trợ của bạn. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể.");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss(); // Đóng dialog
+                        }
                     });
-        }
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show(); // Hiển thị dialog
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Database Error", "Không thể lưu yêu cầu: " + e.getMessage());
+                    Toast.makeText(this, "Lỗi khi lưu yêu cầu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
+
+
 
     // Xóa form sau khi gửi thành công
     private void resetForm() {

@@ -386,11 +386,10 @@
                 // Xử lý sự kiện khi nhấn vào tìm kiếm
                 Toast.makeText(this, "Bạn muốn tìm kiếm gì", Toast.LENGTH_SHORT).show();
                 return true;
-            } else if (id == R.id.nav_phimbo) {
+            } else if (id == R.id.nav_thongBao) {
                 // Xử lý sự kiện khi nhấn vào thông báo
-                Toast.makeText(this, "Thông báo được nhấn", Toast.LENGTH_SHORT).show();
-                return true;
-            }else if (id == R.id.nav_theloai) {
+                Intent intent = new Intent(MainActivity.this, ThongBaoActivity.class);
+                startActivity(intent);
                 return true;
             }
 
