@@ -3,6 +3,7 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
+    private boolean doubleBackToExitPressedOnce = false;
     private ActivityProfileBinding binding;
     private LichSuAdapter lichSuAdapter;
     private List<MovieDetail.MovieItem> watchedMoviesList;
@@ -351,4 +353,18 @@ public class ProfileActivity extends AppCompatActivity {
         // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.finishAffinity();  // Exit the app
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Nhấn thoát thêm một lần nữa", Toast.LENGTH_SHORT).show();
+
+        // Reset the flag after 2 seconds
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+    }
+
 }

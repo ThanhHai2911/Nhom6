@@ -53,6 +53,7 @@
     import com.google.firebase.database.ValueEventListener;
 
     public class MainActivity extends AppCompatActivity {
+        private boolean doubleBackToExitPressedOnce = false;
         private ActivityMainBinding binding;
         private ApiService apiService;
         private SwipeRefreshLayout swipeRefreshLayout;
@@ -641,6 +642,18 @@
             // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
+        @Override
+        public void onBackPressed() {
+            if (doubleBackToExitPressedOnce) {
+                super.finishAffinity();  // Exit the app
+                return;
+            }
 
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Nhấn thoát thêm một lần nữa", Toast.LENGTH_SHORT).show();
+
+            // Reset the flag after 2 seconds
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+        }
 
     }

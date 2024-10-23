@@ -4,6 +4,9 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownLoadActivity extends AppCompatActivity {
+    private boolean doubleBackToExitPressedOnce = false;
     private ActivityDownLoadBinding binding; // Sử dụng Binding
     private DownloadedMoviesAdapter adapter;
     private List<MovieItem> downloadedMovies = new ArrayList<>(); // Danh sách phim đã tải
@@ -98,5 +102,32 @@ public class DownLoadActivity extends AppCompatActivity {
         intent.putExtra("movie_name", movieItem.getName());
         startActivity(intent);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Giữ màn hình sáng khi ứng dụng hoạt động
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.finishAffinity();  // Exit the app
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Nhấn thoát thêm một lần nữa", Toast.LENGTH_SHORT).show();
+
+        // Reset the flag after 2 seconds
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+    }
+
 }
 

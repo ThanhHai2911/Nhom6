@@ -2,6 +2,7 @@ package com.example.xemphim.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.xemphim.R;
 
 public class VipActivity extends AppCompatActivity {
+    private boolean doubleBackToExitPressedOnce = false;
     Button vip_plan_button;
     private String idUser;
     private  String nameUser;
@@ -94,4 +96,18 @@ public class VipActivity extends AppCompatActivity {
         // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.finishAffinity();  // Exit the app
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Nhấn thoát thêm một lần nữa", Toast.LENGTH_SHORT).show();
+
+        // Reset the flag after 2 seconds
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+    }
+
 }
