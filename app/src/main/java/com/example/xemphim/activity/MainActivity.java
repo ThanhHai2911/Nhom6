@@ -26,8 +26,10 @@
 
     import java.text.SimpleDateFormat;
     import java.util.ArrayList;
+    import java.util.HashMap;
     import java.util.List;
     import java.util.Locale;
+    import java.util.Map;
 
     import retrofit2.Call;
     import retrofit2.Callback;
@@ -75,7 +77,7 @@
         private List<Series> seriesTvShow;
         // bien de kiểm tra người dùng có đang ỏ trong ứng dụng hay không
         public static Boolean truycap = false;
-
+        private DatabaseReference databaseReference;
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -175,7 +177,6 @@
             navigationBottom();
 
         }
-
          public static void kiemTraTruyCap(String idUser) {
             // Kiểm tra xem id_user có null hay không và xem ngày truy cập đã tồn tại hay chưa
                 DatabaseReference truyCapRef = FirebaseDatabase.getInstance().getReference("TruyCap");
@@ -412,8 +413,10 @@
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     movieList.clear(); // Xóa dữ liệu cũ (nếu có)
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        // Lấy dữ liệu từ snapshot
                         Phim movie = snapshot.getValue(Phim.class);
                         if (movie != null) {
+                            // Kiểm tra và thêm vào danh sách
                             movieList.add(movie);
                         }
                     }
@@ -427,6 +430,7 @@
                 }
             });
         }
+
 //        private void loadMovies() {
 //            // Hiển thị ProgressBar và ẩn nội dung chính
 //            binding.progressBar.setVisibility(View.VISIBLE);
