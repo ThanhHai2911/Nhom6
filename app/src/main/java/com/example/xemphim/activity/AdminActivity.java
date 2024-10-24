@@ -221,9 +221,9 @@ public class AdminActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         // Chuyển sang trang Hỗ trợ
-//                        Intent intent = new Intent(AdminActivity.this, QLPhimActivity.class);
-//                        startActivity(intent);
-//                        popupWindow.dismiss();  // Đóng PopupWindow sau khi nhấn
+                        Intent intent = new Intent(AdminActivity.this, DSHoTroActivity.class);
+                        startActivity(intent);
+                        popupWindow.dismiss();
                     }
                 });
 

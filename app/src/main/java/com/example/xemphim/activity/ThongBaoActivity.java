@@ -68,7 +68,7 @@ public class ThongBaoActivity extends AppCompatActivity {
                 for (DataSnapshot thongBaoSnapshot : snapshot.getChildren()) {
                     ThongBao thongBao = thongBaoSnapshot.getValue(ThongBao.class);
                     if (thongBao != null && thongBao.getId_user().equals(idUser)) { // Kiểm tra userId
-                        thongBaoList.add(thongBao);
+                        thongBaoList.add(0,thongBao);
                     }
                 }
                 // Cập nhật RecyclerView với danh sách thông báo mới

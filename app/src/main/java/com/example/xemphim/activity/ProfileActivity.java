@@ -73,8 +73,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
     public void setControl(){
-
-
         watchedMoviesList = new ArrayList<>();
         lichSuAdapter = new LichSuAdapter(ProfileActivity.this, watchedMoviesList);
         binding.rcvLichSu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));

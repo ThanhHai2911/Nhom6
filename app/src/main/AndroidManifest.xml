@@ -88,7 +88,8 @@
         <activity android:name=".activity.QuanLyAPI" />
         <activity android:name=".activity.DSThongBaoActivity" />
         <activity android:name=".activity.QLThongBaoActivity" />
-
+        <activity android:name=".activity.DSHoTroActivity" />
+        <activity android:name=".activity.QLHoTroActivity" />
 
     </application>
 

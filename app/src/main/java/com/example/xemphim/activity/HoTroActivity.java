@@ -26,7 +26,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class HoTroActivity extends AppCompatActivity {
@@ -127,8 +130,9 @@ public class HoTroActivity extends AppCompatActivity {
                     // Lấy URL của ảnh đã tải lên
                     storageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
                         String imageUrl = downloadUri.toString();
+                        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                         // Lưu thông tin vào Firebase Realtime Database
-                        saveToFirebaseRealtimeDatabase(name, description, imageUrl,userId);
+                        saveToFirebaseRealtimeDatabase(name, description, imageUrl,userId,time);
                         Toast.makeText(this, "Tải ảnh lên thành công.", Toast.LENGTH_SHORT).show();
                         resetForm();
                     }).addOnFailureListener(e -> {
@@ -150,12 +154,13 @@ public class HoTroActivity extends AppCompatActivity {
     }
 
     // Phương thức lưu thông tin vào Firebase Realtime Database
-    private void saveToFirebaseRealtimeDatabase(String name, String description, String imageUrl, String userId) {
+    private void saveToFirebaseRealtimeDatabase(String name, String description, String imageUrl, String userId, String time) {
         // Tạo đối tượng để lưu
         HashMap<String, Object> data = new HashMap<>();
         data.put("name", name);
         data.put("description", description);
         data.put("imageUrl", imageUrl);
+        data.put("time", time);
         data.put("userId", userId);  // Lưu ID của người dùng đã đăng nhập
 
         // Tham chiếu đến Firebase Realtime Database
