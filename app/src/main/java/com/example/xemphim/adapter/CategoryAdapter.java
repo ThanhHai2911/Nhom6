@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.R;
@@ -18,11 +18,23 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     private List<String> categoryList;
     private Context context;
+    private OnEditClickListener onEditClickListener;
+    private OnDeleteClickListener onDeleteClickListener;
 
-    public CategoryAdapter(Context context, List<String> categoryList) {
+    public interface OnDeleteClickListener {
+        void onDeleteClick(int position);
+    }
+    // Interface để gọi lại khi người dùng nhấn vào nút chỉnh sửa
+    public interface OnEditClickListener {
+        void onEditClick(int position, String currentName);
+    }
+    public CategoryAdapter(Context context, List<String> categoryList, OnEditClickListener onEditClickListener, OnDeleteClickListener onDeleteClickListener) {
         this.context = context;
         this.categoryList = categoryList;
+        this.onEditClickListener = onEditClickListener;
+        this.onDeleteClickListener = onDeleteClickListener; // Gán giá trị cho biến này
     }
+
 
     @Override
     public CategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -35,17 +47,29 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         String category = categoryList.get(position);
         holder.categoryName.setText(category);
 
-        // Sự kiện khi nhấn vào nút sửa
         holder.editIcon.setOnClickListener(v -> {
-            // Code chỉnh sửa thể loại
-            Toast.makeText(context, "Sửa " + category, Toast.LENGTH_SHORT).show();
+            // Kiểm tra nếu onEditClickListener không null
+            if (onEditClickListener != null) {
+                onEditClickListener.onEditClick(position, category);
+            }
         });
+
 
         // Sự kiện khi nhấn vào nút xóa
         holder.deleteIcon.setOnClickListener(v -> {
-            // Code xóa thể loại
-            Toast.makeText(context, "Xóa " + category, Toast.LENGTH_SHORT).show();
+            // Kiểm tra nếu onDeleteClickListener không null
+            if (onDeleteClickListener != null) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Xác nhận xóa")
+                        .setMessage("Bạn có muốn xóa thể loại này không?")
+                        .setPositiveButton("Có", (dialog, which) -> {
+                            onDeleteClickListener.onDeleteClick(position);
+                        })
+                        .setNegativeButton("Không", null) // Không làm gì nếu nhấn "Không"
+                        .show();
+            }
         });
+
     }
 
     @Override

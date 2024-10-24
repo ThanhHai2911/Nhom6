@@ -31,8 +31,7 @@ public class CaiDatActivity extends AppCompatActivity {
         binding = ActivityCaiDatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
+
 
         setEvent();
 

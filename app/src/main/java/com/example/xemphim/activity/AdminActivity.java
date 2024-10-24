@@ -250,7 +250,14 @@ public class AdminActivity extends AppCompatActivity {
             layThongTinTruyCapHomNay();
             // Gọi hàm lấy thông tin truy cập hôm nay
         });
-
+// Lắng nghe sự kiện khi nhấn nút "3 ngày qua"
+        binding.btn3ngay.setOnClickListener(view -> {
+            layThongTinTrongKhoangThoiGian(3);
+            updateSelectedButton(binding.btn7NgY);
+            laythongtinDoanhThuTrongKhoang(3);
+            layThongTinTruyCapTrongKhoangThoiGian(3);
+            // Gọi hàm lấy thông tin truy cập 7 ngày qua
+        });
         // Lắng nghe sự kiện khi nhấn nút "7 ngày qua"
         binding.btn7NgY.setOnClickListener(view -> {
             layThongTinTrongKhoangThoiGian(7);
@@ -259,7 +266,6 @@ public class AdminActivity extends AppCompatActivity {
             layThongTinTruyCapTrongKhoangThoiGian(7);
             // Gọi hàm lấy thông tin truy cập 7 ngày qua
         });
-
         // Lắng nghe sự kiện khi nhấn nút "1 tháng qua"
         binding.btnThang.setOnClickListener(view -> {
             layThongTinTrongKhoangThoiGian(30);
@@ -267,6 +273,14 @@ public class AdminActivity extends AppCompatActivity {
             laythongtinDoanhThuTrongKhoang(30);
             layThongTinTruyCapTrongKhoangThoiGian(30);
            // Cập nhật số lượng truy cập 1 tháng qua
+        });
+        // Lắng nghe sự kiện khi nhấn nút "1 năm qua"
+        binding.btnnam.setOnClickListener(view -> {
+            layThongTinTrongKhoangThoiGian(365);
+            updateSelectedButton(binding.btnThang);
+            laythongtinDoanhThuTrongKhoang(365);
+            layThongTinTruyCapTrongKhoangThoiGian(365);
+            // Cập nhật số lượng truy cập 1 tháng qua
         });
     }
 
