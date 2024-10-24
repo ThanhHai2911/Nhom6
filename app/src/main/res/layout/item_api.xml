@@ -1,52 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@drawable/border_item_api"
-    android:padding="16dp"
-    android:layout_margin="5dp"
-    android:gravity="center_vertical">
+    android:padding="16dp">
 
-    <!-- Logo của API -->
-    <ImageView
-        android:id="@+id/apiLogo"
-        android:layout_width="0dp"
-        android:layout_weight="3"
-        android:layout_height="50dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_kkphim_logo" />
+    <!-- TextViews chứa tên API và URL -->
+    <LinearLayout
+        android:id="@+id/llApiInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true">
 
-    <!-- Tên API -->
-    <TextView
+        <TextView
+            android:id="@+id/tvApiName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="API Name" />
 
-        android:id="@+id/apiName"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_weight="3"
-        android:gravity="center"
-        android:text="KKPHIM"
-        android:textSize="20sp"
-        android:layout_marginEnd="16dp"
-        android:textColor="@android:color/black"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tvApiUrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="API URL" />
+    </LinearLayout>
 
-    <!-- Nút Chỉnh sửa -->
-    <ImageView
-        android:id="@+id/btnEditApi"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="50dp"
-        android:src="@drawable/ic_edit"
-        android:contentDescription="Edit API"
-        android:layout_marginEnd="16dp" />
+    <!-- Nút chỉnh sửa và xóa được căn phải -->
+    <LinearLayout
+        android:id="@+id/llButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true">
 
-    <!-- Nút Xóa -->
-    <ImageView
-        android:id="@+id/btnDeleteApi"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:src="@drawable/ic_delete"
-        android:contentDescription="Delete API" />
-</LinearLayout>
+        <Button
+            android:id="@+id/btnEditApi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sửa" />
+
+        <Button
+            android:id="@+id/btnDeleteApi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xóa" />
+        <Button
+            android:id="@+id/btnUseSelectedApi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chọn" />
+    </LinearLayout>
+
+</RelativeLayout>
