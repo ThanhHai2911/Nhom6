@@ -107,6 +107,19 @@
             android:layout_weight="8"
 
             android:padding="16dp"/>
+        <Button
+            android:textSize="25sp"
+            android:id="@+id/btnAddPhim"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thêm Phim"
+            android:backgroundTint="#ca8dbd"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="12dp"
+            android:layout_margin="14dp"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
