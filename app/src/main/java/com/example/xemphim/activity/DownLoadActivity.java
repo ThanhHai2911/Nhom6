@@ -16,6 +16,7 @@ import com.example.xemphim.R;
 import com.example.xemphim.adapter.DownloadedMoviesAdapter;
 import com.example.xemphim.databinding.ActivityDownLoadBinding;
 import com.example.xemphim.model.MovieItem;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
@@ -35,6 +36,10 @@ public class DownLoadActivity extends AppCompatActivity {
         // Khởi tạo binding
         binding = ActivityDownLoadBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
         // Thiết lập RecyclerView với GridLayoutManager (3 cột)
         binding.recyclerViewDownloadedMovies.setLayoutManager(new GridLayoutManager(this, 3));
 

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityCaiDatBinding;
 import com.example.xemphim.databinding.ActivityChinhSuaThongTinBinding;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class CaiDatActivity extends AppCompatActivity {
@@ -26,6 +27,10 @@ public class CaiDatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityCaiDatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
+
         setEvent();
 
     }

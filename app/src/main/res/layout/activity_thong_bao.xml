@@ -15,6 +15,7 @@
         android:layout_weight="1"
         android:orientation="horizontal"
         android:background="#F06292"
+        android:layout_marginBottom="10dp"
         android:gravity="center_vertical">
 
         <!-- Nút quay lại -->

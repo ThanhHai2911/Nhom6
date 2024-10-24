@@ -13,6 +13,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.example.xemphim.R;
@@ -30,6 +31,10 @@ public class VipActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_vip);
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         vip_plan_button = findViewById(R.id.vip_plan_button);
         // Đặt item mặc định được chọn là màn hình Home

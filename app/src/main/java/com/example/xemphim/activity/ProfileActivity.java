@@ -22,6 +22,7 @@ import com.example.xemphim.R;
 import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.databinding.ActivityProfileBinding;
 import com.example.xemphim.model.MovieDetail;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,6 +64,9 @@ public class ProfileActivity extends AppCompatActivity {
         // Initialize Data Binding
         binding = ActivityProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
 
         setControl();
         setEven();

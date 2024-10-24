@@ -24,6 +24,7 @@ import com.example.xemphim.databinding.ActivityChitietphimBinding;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.Series;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -71,6 +72,9 @@ public class ChiTietActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChitietphimBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
         setEvent();
     }
 

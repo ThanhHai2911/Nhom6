@@ -19,6 +19,7 @@
     import com.example.xemphim.model.Movie;
     import com.example.xemphim.model.Phim;
     import com.example.xemphim.model.Series;
+    import com.example.xemphim.model.ThongBaoTrenManHinh;
     import com.example.xemphim.model.TruyCap;
     import com.example.xemphim.response.MovieResponse;
     import com.example.xemphim.response.SeriesResponse;
@@ -78,11 +79,18 @@
         // bien de kiểm tra người dùng có đang ỏ trong ứng dụng hay không
         public static Boolean truycap = false;
         private DatabaseReference databaseReference;
+
+
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
+
+            Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+            startService(serviceIntent);
+
             seriesPhimLe = new ArrayList<>();
             seriesPhimBo = new ArrayList<>();
             seriesPhimHoatHinh = new ArrayList<>();

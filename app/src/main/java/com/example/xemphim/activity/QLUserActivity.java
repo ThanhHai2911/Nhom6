@@ -36,8 +36,8 @@ public class QLUserActivity extends AppCompatActivity {
 
     private void loadDuLieu() {
         // Thêm dữ liệu vào danh sách người dùng
-        userList.add(new User("Nguyễn Văn A", "online", true, false));
-        userList.add(new User("Trần Thị B", "offline", false, true));
+        userList.add(new User("1","Nguyễn Văn A", "online", true, false));
+        userList.add(new User("2","Trần Thị B", "offline", false, true));
         // Thêm nhiều người dùng hơn nếu cần
 
         // Thông báo adapter cập nhật dữ liệu
