@@ -23,7 +23,7 @@
             >
 
             <ImageView
-                android:padding="22dp"
+                android:padding="30dp"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -87,30 +87,14 @@
             android:layout_height="0dp"
             android:layout_weight="8"
             />
-        <LinearLayout
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/border_radiu_caidat"
-            android:gravity="center"
-            android:padding="8dp"
-            android:layout_marginTop="16dp">
 
-            <ImageButton
-                android:id="@+id/btnAddApi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add"
-                />
-        </LinearLayout>
 
         <Button
             android:textSize="25sp"
-            android:id="@+id/btnSaveChanges"
+            android:id="@+id/btnAddTheLoai"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lưu thay đổi"
+            android:text="Thêm Thể loại"
             android:backgroundTint="#ca8dbd"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
