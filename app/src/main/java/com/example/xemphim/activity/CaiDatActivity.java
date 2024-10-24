@@ -13,7 +13,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityCaiDatBinding;
 import com.example.xemphim.databinding.ActivityChinhSuaThongTinBinding;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class CaiDatActivity extends AppCompatActivity {
     private ActivityCaiDatBinding binding;
@@ -50,8 +54,15 @@ public class CaiDatActivity extends AppCompatActivity {
             }
         });
         binding.ivdangxuat.setOnClickListener(new View.OnClickListener() {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             @Override
             public void onClick(View view) {
+                // Lấy ID người dùng
+                String userId = user.getUid();
+                DatabaseReference userStatusRef = FirebaseDatabase.getInstance().getReference("Users").child(userId).child("status");
+
+                // Đặt trạng thái là "offline"
+                userStatusRef.setValue("offline");
                 FirebaseAuth.getInstance().signOut();
                 SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();

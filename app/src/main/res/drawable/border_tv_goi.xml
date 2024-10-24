@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Màu nền -->
+    <solid android:color="#878787"/>
+
+    <!-- Viền -->
+<!--    <stroke-->
+<!--        android:width="2dp"-->
+<!--        android:color="#4EFF03" /> &lt;!&ndash; Màu viền là cam, bạn có thể thay đổi &ndash;&gt;-->
+
+    <!-- Bo tròn góc -->
+    <corners android:radius="8dp" />
+
+    <!-- Đổ bóng bên trong -->
+    <padding
+        android:left="10dp"
+        android:right="10dp"
+        android:top="5dp"
+        android:bottom="5dp"/>
+</shape>

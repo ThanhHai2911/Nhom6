@@ -49,6 +49,8 @@
     import android.widget.Toast;
     import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
     import com.google.android.material.bottomnavigation.BottomNavigationView;
+    import com.google.firebase.auth.FirebaseAuth;
+    import com.google.firebase.auth.FirebaseUser;
     import com.google.firebase.database.DataSnapshot;
     import com.google.firebase.database.DatabaseError;
     import com.google.firebase.database.DatabaseReference;
@@ -87,7 +89,10 @@
             super.onCreate(savedInstanceState);
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
-
+            // truy cập thông tin người dùng.
+            laythongtinUser();
+            Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
+            updateUser();
             Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
             startService(serviceIntent);
 
@@ -122,10 +127,7 @@
                 startActivity(intent);
             });
 
-            // truy cập thông tin người dùng.
-            laythongtinUser();
-            Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
-            updateUser();
+
 
             // Kiểm tra và thêm thông tin truy cập
             kiemTraTruyCap(idUser);
@@ -183,7 +185,70 @@
             loadPhimHoatHinh();
 
             navigationBottom();
+            ghiLaiTrangThai();
+        }
 
+        private void ghiLaiTrangThai() {
+            // Lấy user hiện tại
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) { // Kiểm tra user có phải là null hay không
+                String userId = user.getUid();
+                DatabaseReference userStatusRef = FirebaseDatabase.getInstance().getReference("Users").child(userId).child("status");
+
+                // Theo dõi trạng thái kết nối Firebase
+                DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+                connectedRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean connected = snapshot.getValue(Boolean.class);
+                        if (connected) {
+                            // Khi người dùng kết nối với Firebase, đặt trạng thái là "online"
+                            userStatusRef.setValue("online");
+
+                            // Khi người dùng ngắt kết nối, đặt trạng thái là "offline"
+                            userStatusRef.onDisconnect().setValue("offline");
+                        } else {
+                            // Khi không kết nối, bạn cũng có thể cập nhật lại "offline" nếu cần
+                            userStatusRef.setValue("offline");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.w("Firebase", "Không thể lấy trạng thái kết nối.", error.toException());
+                    }
+                });
+            } else {
+                // Nếu không có user (trạng thái khách), có thể không cần thực hiện gì thêm
+                updateUser(); // Cập nhật thông tin người dùng để hiển thị trạng thái "Khách"
+                Log.w("Firebase", "Trạng thái Khách");
+            }
+        }
+
+        private void laythongtinUser(){
+            SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            idUser = sharedPreferences.getString("id_user", null);
+            nameUser = sharedPreferences.getString("name", null);
+            emailUser  = sharedPreferences.getString("email", null);
+            idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
+
+        }
+        private void updateUser(){
+            // Tham chiếu đến NavigationView
+            NavigationView navigationView = findViewById(R.id.navigationView);  // Giả sử NavigationView có id là nav_view
+
+            // Lấy header view từ NavigationView
+            View headerView = navigationView.getHeaderView(0);
+
+            // Tham chiếu đến TextView trong header view
+            TextView textView = headerView.findViewById(R.id.tvTenNguoiDung); // Thay bằng id của TextView trong layout_header
+
+            if(nameUser != null){
+                // Thay đổi nội dung TextView
+                textView.setText(nameUser);
+            }else{
+                textView.setText("Khách");
+            }
         }
          public static void kiemTraTruyCap(String idUser) {
             // Kiểm tra xem id_user có null hay không và xem ngày truy cập đã tồn tại hay chưa
@@ -260,31 +325,8 @@
 
 
 
-        private void laythongtinUser(){
-            SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-            idUser = sharedPreferences.getString("id_user", null);
-            nameUser = sharedPreferences.getString("name", null);
-            emailUser  = sharedPreferences.getString("email", null);
-            idLoaiND = sharedPreferences.getInt("id_loaiND", 0);
 
-        }
-        private void updateUser(){
-            // Tham chiếu đến NavigationView
-            NavigationView navigationView = findViewById(R.id.navigationView);  // Giả sử NavigationView có id là nav_view
 
-            // Lấy header view từ NavigationView
-            View headerView = navigationView.getHeaderView(0);
-
-            // Tham chiếu đến TextView trong header view
-            TextView textView = headerView.findViewById(R.id.tvTenNguoiDung); // Thay bằng id của TextView trong layout_header
-
-            if(nameUser != null){
-                // Thay đổi nội dung TextView
-                textView.setText(nameUser);
-            }else{
-                textView.setText("Khách");
-            }
-        }
         private void navigationBottom() {
             // Đặt item mặc định được chọn là màn hình Home
             binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
@@ -655,6 +697,7 @@
         }
         @Override
         public void onBackPressed() {
+            super.onBackPressed();
             if (doubleBackToExitPressedOnce) {
                 super.finishAffinity();  // Exit the app
                 return;
