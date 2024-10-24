@@ -253,7 +253,7 @@ public class AdminActivity extends AppCompatActivity {
 // Lắng nghe sự kiện khi nhấn nút "3 ngày qua"
         binding.btn3ngay.setOnClickListener(view -> {
             layThongTinTrongKhoangThoiGian(3);
-            updateSelectedButton(binding.btn7NgY);
+            updateSelectedButton(binding.btn3ngay);
             laythongtinDoanhThuTrongKhoang(3);
             layThongTinTruyCapTrongKhoangThoiGian(3);
             // Gọi hàm lấy thông tin truy cập 7 ngày qua
@@ -277,7 +277,7 @@ public class AdminActivity extends AppCompatActivity {
         // Lắng nghe sự kiện khi nhấn nút "1 năm qua"
         binding.btnnam.setOnClickListener(view -> {
             layThongTinTrongKhoangThoiGian(365);
-            updateSelectedButton(binding.btnThang);
+            updateSelectedButton(binding.btnnam);
             laythongtinDoanhThuTrongKhoang(365);
             layThongTinTruyCapTrongKhoangThoiGian(365);
             // Cập nhật số lượng truy cập 1 tháng qua
