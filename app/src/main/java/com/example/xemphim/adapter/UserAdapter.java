@@ -55,9 +55,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             super(itemView);
             tvUserName = itemView.findViewById(R.id.tvUserName);
             tvUserStatus = itemView.findViewById(R.id.tvUserStatus);
-            rgUserType = itemView.findViewById(R.id.rgUserType);
-            rbNormal = itemView.findViewById(R.id.rbNormal);
-            rbVIP = itemView.findViewById(R.id.rbVIP);
+
         }
     }
 }

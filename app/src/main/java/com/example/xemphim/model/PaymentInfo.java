@@ -5,12 +5,12 @@ public class PaymentInfo {
     public String idUser;
     public String content;
     public int amount;
-    public long paymentDate;
+    public String paymentDate;
     public int idTrangThai;
 
     public PaymentInfo() {}
 
-    public PaymentInfo(String idLichSuTT, String idUser, String content, int amount, long paymentDate, int idTrangThai) {
+    public PaymentInfo(String idLichSuTT, String idUser, String content, int amount, String paymentDate, int idTrangThai) {
         this.idLichSuTT = idLichSuTT;
         this.idUser = idUser;
         this.content = content;

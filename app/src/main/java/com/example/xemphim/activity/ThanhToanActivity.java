@@ -26,6 +26,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 public class ThanhToanActivity extends AppCompatActivity {
@@ -49,7 +52,7 @@ public class ThanhToanActivity extends AppCompatActivity {
         btnCopy = findViewById(R.id.btnCopy); // Nút sao chép nội dung thanh toán
 
         // Khởi tạo Firebase database reference
-        paymentRef = FirebaseDatabase.getInstance().getReference("ThanhToan");
+        paymentRef = FirebaseDatabase.getInstance().getReference("YeuCau");
 
         // Lấy thông tin người dùng từ SharedPreferences
         laythongtinUser();
@@ -163,8 +166,12 @@ public class ThanhToanActivity extends AppCompatActivity {
             return;
         }
 
+        // Lấy ngày giờ hiện tại và định dạng
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        String ngayThanhToan = sdf.format(new Date());
+
         String idLichSuTT = paymentRef.push().getKey(); // Tạo id lịch sử thanh toán mới
-        PaymentInfo paymentInfo = new PaymentInfo(idLichSuTT, idUser, content, 99000, System.currentTimeMillis(), 0);
+        PaymentInfo paymentInfo = new PaymentInfo(idLichSuTT, idUser, content, 99000, ngayThanhToan, 0); // Lưu ngày thanh toán
 
         paymentRef.child(idLichSuTT).setValue(paymentInfo)
                 .addOnCompleteListener(task -> {
