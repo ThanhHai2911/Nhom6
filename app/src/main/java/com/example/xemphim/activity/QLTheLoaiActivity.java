@@ -15,6 +15,7 @@ import com.example.xemphim.R;
 import com.example.xemphim.adapter.CategoryAdapter;
 import com.example.xemphim.databinding.ActivityQltheLoaiBinding;
 import com.example.xemphim.databinding.DialogAddCategoryBinding;
+import com.example.xemphim.model.Category;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,7 +29,7 @@ import java.util.List;
 public class QLTheLoaiActivity extends AppCompatActivity {
 
     private CategoryAdapter categoryAdapter;
-    private List<String> categoryList;
+    private List<Category> categoryList = new ArrayList<>();
     private ActivityQltheLoaiBinding binding;
     private DatabaseReference databaseReference;
 
@@ -61,6 +62,7 @@ public class QLTheLoaiActivity extends AppCompatActivity {
         // Đặt tên thể loại hiện tại vào EditText nếu là sửa
         if (position != -1) { // Nếu position khác -1 thì là sửa
             dialogBinding.editTextCategoryName.setText(currentName);
+            dialogBinding.buttonAddCategory.setText("Cập nhâp");
         } else {
             dialogBinding.editTextCategoryName.setText(""); // Nếu là thêm, thì để trống
         }
@@ -74,7 +76,7 @@ public class QLTheLoaiActivity extends AppCompatActivity {
             String newCategoryName = dialogBinding.editTextCategoryName.getText().toString();
             if (!newCategoryName.isEmpty()) {
                 if (position != -1) {
-                    // Nếu là sửa
+
                     // Nếu là sửa
                     new AlertDialog.Builder(QLTheLoaiActivity.this)
                             .setTitle("Xác nhận cập nhật")
@@ -107,36 +109,42 @@ public class QLTheLoaiActivity extends AppCompatActivity {
     }
 //xoa the loai
 private void deleteCategory(int position) {
-    // Xóa thể loại từ danh sách
-    String categoryName = categoryList.get(position);
-    categoryList.remove(position); // Xóa thể loại khỏi danh sách
-    categoryAdapter.notifyItemRemoved(position); // Cập nhật RecyclerView
+    // Lấy ID từ categoryList
+    String categoryId = categoryList.get(position).getId();
 
-    // Xóa thể loại từ Firebase
+    // Xóa thể loại khỏi Firebase dựa trên ID thực
     FirebaseDatabase.getInstance()
             .getReference("theLoai")
-            .child(String.valueOf(position)) // Giả định rằng ID là vị trí, có thể cần thay đổi nếu ID khác
+            .child(categoryId) // Xóa bằng ID từ Firebase
             .removeValue();
 
-    Toast.makeText(QLTheLoaiActivity.this, "Xóa thể loại " + categoryName + " thành công", Toast.LENGTH_SHORT).show();
+    // Xóa thể loại khỏi danh sách và cập nhật RecyclerView
+    categoryList.remove(position);
+    categoryAdapter.notifyItemRemoved(position);
+
+    Toast.makeText(QLTheLoaiActivity.this, "Xóa thể loại thành công", Toast.LENGTH_SHORT).show();
 }
+
 
     // sửa thể loại
     private void updateCategory(int position, String newCategoryName) {
-        // Cập nhật tên thể loại trong danh sách
-        categoryList.set(position, newCategoryName);
-        categoryAdapter.notifyItemChanged(position); // Cập nhật item trong RecyclerView
+        // Lấy ID từ categoryList
+        String categoryId = categoryList.get(position).getId();
 
-        // Cập nhật tên thể loại trong Firebase
-        // Tìm id tương ứng với position và cập nhật
+        // Cập nhật tên thể loại trong Firebase dựa trên ID
         FirebaseDatabase.getInstance()
                 .getReference("theLoai")
-                .child(String.valueOf(position)) // Dùng vị trí để lấy id
+                .child(categoryId) // Cập nhật theo ID từ Firebase
                 .child("name")
                 .setValue(newCategoryName);
 
+        // Cập nhật tên trong danh sách và RecyclerView
+        categoryList.get(position).name = newCategoryName;
+        categoryAdapter.notifyItemChanged(position);
+
         Toast.makeText(QLTheLoaiActivity.this, "Cập nhật thể loại thành công", Toast.LENGTH_SHORT).show();
     }
+
 
     private void xulyThem() {
         binding.btnAddTheLoai.setOnClickListener(v -> {
@@ -151,8 +159,9 @@ private void deleteCategory(int position) {
         // Khởi tạo adapter và set cho RecyclerView
         categoryAdapter = new CategoryAdapter(this, categoryList, new CategoryAdapter.OnEditClickListener() {
             @Override
-            public void onEditClick(int position, String currentName) {
-               showCategoryDialog(position, currentName);
+            public void onEditClick(int position, Category currentCategory) {
+                // Truyền cả đối tượng Category (bao gồm id và name)
+                showCategoryDialog(position, currentCategory.getName());
             }
         }, new CategoryAdapter.OnDeleteClickListener() {
             @Override
@@ -164,6 +173,7 @@ private void deleteCategory(int position) {
         binding.recyclerView.setAdapter(categoryAdapter);
     }
 
+
     private void docDuLieuFirebase() {
         // Lắng nghe dữ liệu từ Firebase Realtime Database
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -173,14 +183,18 @@ private void deleteCategory(int position) {
 
                 // Duyệt qua tất cả các thể loại trong "theLoai"
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    // Lấy giá trị "name" từ từng mục
+                    // Lấy giá trị "id" và "name" từ từng mục
+                    String id = snapshot.getKey(); // Sử dụng key từ Firebase
                     String categoryName = snapshot.child("name").getValue(String.class);
-                    categoryList.add(categoryName); // Thêm tên thể loại vào danh sách
+
+                    // Thêm đối tượng Category vào danh sách
+                    categoryList.add(new Category(id, categoryName));
                 }
 
                 // Cập nhật adapter
                 categoryAdapter.notifyDataSetChanged();
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -191,51 +205,38 @@ private void deleteCategory(int position) {
     }
 
     private void themTheLoaiFirebase(String categoryName) {
-        // Đọc dữ liệu từ Firebase để lấy id tiếp theo
+        // Lấy số lượng thể loại hiện tại để tạo id mới
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                long maxId = -1;
+                long count = dataSnapshot.getChildrenCount(); // Đếm số lượng hiện có để tạo id mới
 
-                // Duyệt qua các thể loại hiện có để tìm ID lớn nhất
-                for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
-                    Object idObject = categorySnapshot.child("id").getValue();
-                    if (idObject != null) {
-                        try {
-                            long idLong = Long.parseLong(idObject.toString());  // Chuyển đổi từ chuỗi sang số
-                            if (idLong > maxId) {
-                                maxId = idLong;
-                            }
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                // ID mới sẽ là maxId + 1
-                long newId = maxId + 1;
-                String idString = String.valueOf(newId);
+                // Tạo id mới
+                String newId = String.valueOf(count + 1); // Nếu count bắt đầu từ 0, id đầu tiên sẽ là 1
 
                 // Tạo một HashMap để thêm dữ liệu
                 HashMap<String, Object> newCategory = new HashMap<>();
-                newCategory.put("id", idString);
+                newCategory.put("id", newId);  // Sử dụng id vừa tạo
                 newCategory.put("name", categoryName);
 
-                // Thêm thể loại mới vào Firebase với key là số thứ tự mới
-                databaseReference.child(idString).setValue(newCategory);
-
-                Toast.makeText(QLTheLoaiActivity.this, "Thêm thể loại thành công", Toast.LENGTH_SHORT).show();
+                // Thêm thể loại mới vào Firebase
+                databaseReference.child(newId).setValue(newCategory)
+                        .addOnSuccessListener(aVoid ->
+                                Toast.makeText(QLTheLoaiActivity.this, "Thêm thể loại thành công", Toast.LENGTH_SHORT).show()
+                        )
+                        .addOnFailureListener(e ->
+                                Toast.makeText(QLTheLoaiActivity.this, "Lỗi khi thêm thể loại", Toast.LENGTH_SHORT).show()
+                        );
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Xử lý lỗi (nếu có)
-                Toast.makeText(QLTheLoaiActivity.this, "Lỗi khi thêm thể loại", Toast.LENGTH_SHORT).show();
+                Toast.makeText(QLTheLoaiActivity.this, "Lỗi khi lấy dữ liệu", Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
+
+
 
     @Override
     protected void onDestroy() {
