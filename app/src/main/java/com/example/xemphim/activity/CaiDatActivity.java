@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityCaiDatBinding;
 import com.example.xemphim.databinding.ActivityChinhSuaThongTinBinding;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class CaiDatActivity extends AppCompatActivity {

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Màu nền -->
-    <solid android:color="#FFFFFF"/>
+    <solid android:color="#878787"/>
 
     <!-- Viền -->
-    <stroke
-        android:width="2dp"
-        android:color="#4EFF03" /> <!-- Màu viền là cam, bạn có thể thay đổi -->
+<!--    <stroke-->
+<!--        android:width="2dp"-->
+<!--        android:color="#4EFF03" /> &lt;!&ndash; Màu viền là cam, bạn có thể thay đổi &ndash;&gt;-->
 
     <!-- Bo tròn góc -->
     <corners android:radius="8dp" />

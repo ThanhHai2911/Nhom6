@@ -49,6 +49,7 @@
     import android.widget.Toast;
     import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
     import com.google.android.material.bottomnavigation.BottomNavigationView;
+    import com.google.firebase.auth.FirebaseAuth;
     import com.google.firebase.database.DataSnapshot;
     import com.google.firebase.database.DatabaseError;
     import com.google.firebase.database.DatabaseReference;
@@ -87,7 +88,10 @@
             super.onCreate(savedInstanceState);
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
-
+            // truy cập thông tin người dùng.
+            laythongtinUser();
+            Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
+            updateUser();
             Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
             startService(serviceIntent);
 
@@ -122,10 +126,7 @@
                 startActivity(intent);
             });
 
-            // truy cập thông tin người dùng.
-            laythongtinUser();
-            Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
-            updateUser();
+
 
             // Kiểm tra và thêm thông tin truy cập
             kiemTraTruyCap(idUser);
@@ -183,7 +184,37 @@
             loadPhimHoatHinh();
 
             navigationBottom();
+            ghiLaiTrangThai();
+        }
 
+        private void ghiLaiTrangThai() {
+            // Lấy user hiện tại
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            DatabaseReference userStatusRef = FirebaseDatabase.getInstance().getReference("Users").child(userId).child("status");
+
+            // Theo dõi trạng thái kết nối Firebase
+            DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+            connectedRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    boolean connected = snapshot.getValue(Boolean.class);
+                    if (connected) {
+                        // Khi người dùng kết nối với Firebase, đặt trạng thái là "online"
+                        userStatusRef.setValue("online");
+
+                        // Khi người dùng ngắt kết nối, đặt trạng thái là "offline"
+                        userStatusRef.onDisconnect().setValue("offline");
+                    } else {
+                        // Khi không kết nối, bạn cũng có thể cập nhật lại "offline" nếu cần
+                        userStatusRef.setValue("offline");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.w("Firebase", "Không thể lấy trạng thái kết nối.", error.toException());
+                }
+            });
         }
          public static void kiemTraTruyCap(String idUser) {
             // Kiểm tra xem id_user có null hay không và xem ngày truy cập đã tồn tại hay chưa
@@ -655,6 +686,7 @@
         }
         @Override
         public void onBackPressed() {
+            super.onBackPressed();
             if (doubleBackToExitPressedOnce) {
                 super.finishAffinity();  // Exit the app
                 return;

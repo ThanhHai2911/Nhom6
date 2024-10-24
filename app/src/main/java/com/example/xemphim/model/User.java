@@ -6,9 +6,25 @@ public class User {
     private String status;
     private boolean isNormal;
     private boolean isVIP;
+    private String goi;
     private boolean isChecked; // Thêm thuộc tính isChecked
 
     public User() {
+    }
+
+    public User(String id_user, String name, String status, String goi) {
+        this.id_user = id_user;
+        this.name = name;
+        this.status = status;
+        this.goi = goi;
+    }
+
+    public String getGoi() {
+        return goi;
+    }
+
+    public void setGoi(String goi) {
+        this.goi = goi;
     }
 
     public User(String id_user, String name, String status, boolean isNormal, boolean isVIP) {

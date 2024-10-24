@@ -45,7 +45,6 @@
                 android:layout_marginBottom="8dp"/>
         </LinearLayout>
 
-
         <!-- Trạng thái người dùng -->
         <TextView
             android:id="@+id/tvUserStatus"
@@ -53,10 +52,8 @@
             android:layout_height="wrap_content"
             android:text="online"
             android:textSize="14sp"
-            android:textColor="#1eee5c"
             android:layout_marginBottom="8dp"/>
     </LinearLayout>
-
 
     <!-- Lựa chọn Thường hoặc VIP -->
     <LinearLayout
@@ -68,13 +65,12 @@
 
         <TextView
             android:id="@+id/tvGoi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thường"
-            android:padding="8dp"
-            android:background="@drawable/border_tv_goi" /> <!-- Áp dụng viền -->
-
+            android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:text="Thường"
+        android:padding="8dp"
+            android:textStyle="bold"
+        android:background="@drawable/border_tv_goi" />
 
     </LinearLayout>
-
 </LinearLayout>
