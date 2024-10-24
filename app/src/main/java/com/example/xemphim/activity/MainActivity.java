@@ -22,6 +22,7 @@
     import com.example.xemphim.model.TruyCap;
     import com.example.xemphim.response.MovieResponse;
     import com.example.xemphim.response.SeriesResponse;
+    import com.example.xemphim.response.SeriesResponse2;
     import com.google.android.material.navigation.NavigationView;
 
     import java.text.SimpleDateFormat;

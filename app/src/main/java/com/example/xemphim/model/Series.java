@@ -19,7 +19,8 @@ public class Series implements Parcelable {
     private int year;
 
     // Thêm trường này để lấy APP_DOMAIN_CDN_IMAGE
-    private static final String APP_DOMAIN_CDN_IMAGE = "https://phimimg.com/";
+    private static final String APP_DOMAIN_CDN_IMAGE = "https://img.ophim.live/uploads/movies/";
+
     private Modified modified;
     private List<Category> category;
     private List<Country> country;

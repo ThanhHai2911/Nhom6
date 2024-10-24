@@ -43,6 +43,6 @@ public interface ApiService {
     @GET
     Call<ResponseBody> downloadMovie(@Url String movieLink);
     @GET("v1/api/danh-sach/phim-bo")
-    Call<SeriesResponse2> getSeriesResponse2();
+    Call<SeriesResponse2> getSeries2(@Query("page") int page);
 }
 
