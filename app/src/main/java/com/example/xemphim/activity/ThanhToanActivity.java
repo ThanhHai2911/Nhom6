@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
 import com.example.xemphim.model.PaymentInfo;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

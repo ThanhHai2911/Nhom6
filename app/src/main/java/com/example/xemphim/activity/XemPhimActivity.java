@@ -81,8 +81,6 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
         binding = ActivityXemphimBinding.inflate(getLayoutInflater()); // Khởi tạo View Binding
         setContentView(binding.getRoot()); // Đặt layout cho Activity
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
 
         apiService = ApiClient.getClient().create(ApiService.class);
         movieDownloader = new MovieDownloader(apiService, this);

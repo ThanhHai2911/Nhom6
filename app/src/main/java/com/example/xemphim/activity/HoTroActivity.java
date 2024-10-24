@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityHoTroBinding;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -44,6 +45,8 @@ public class HoTroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityHoTroBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
 
         // Lắng nghe sự kiện khi người dùng nhấn vào imgUpload để chọn ảnh
         binding.imgUpload.setOnClickListener(view -> openGallery());

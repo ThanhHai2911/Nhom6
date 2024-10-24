@@ -41,9 +41,6 @@ public class ThongBaoActivity extends AppCompatActivity {
        binding = ActivityThongBaoBinding.inflate(getLayoutInflater());
        setContentView(binding.getRoot());
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
-
        xulyrecyclerView();
        getThongBaoFromDatabase();
        laythongtinUser();

@@ -65,8 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
         binding = ActivityProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
+
 
         setControl();
         setEven();

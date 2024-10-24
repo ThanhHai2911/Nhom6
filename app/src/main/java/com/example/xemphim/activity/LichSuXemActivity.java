@@ -65,8 +65,7 @@ public class LichSuXemActivity extends AppCompatActivity {
         binding = ActivityLichSuXemBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
+
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {

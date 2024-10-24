@@ -19,6 +19,7 @@
     import com.example.xemphim.model.Movie;
     import com.example.xemphim.model.Phim;
     import com.example.xemphim.model.Series;
+    import com.example.xemphim.model.ThongBaoKhiUngDungTat;
     import com.example.xemphim.model.ThongBaoTrenManHinh;
     import com.example.xemphim.model.TruyCap;
     import com.example.xemphim.response.MovieResponse;
@@ -93,8 +94,21 @@
             laythongtinUser();
             Toast.makeText(MainActivity.this, "Xin chào " + nameUser, Toast.LENGTH_SHORT).show();
             updateUser();
-            Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-            startService(serviceIntent);
+
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (firebaseUser != null) {
+                // Khởi tạo ThongBaoTrenManHinh
+                ThongBaoTrenManHinh thongBao = new ThongBaoTrenManHinh(getApplicationContext());
+                // Bắt đầu dịch vụ để lắng nghe thông báo
+                thongBao.batDichVuThongBao();
+                // Lấy ID người dùng và bắt đầu lắng nghe
+                thongBao.layIdNguoiDungHienTai();
+                // Khởi động dịch vụ khi nhận được thông báo
+                Intent serviceIntent = new Intent(MainActivity.this, ThongBaoKhiUngDungTat.class);
+                MainActivity.this.startForegroundService(serviceIntent);
+            } else {
+                Toast.makeText(this, "User not logged in. Notifications will not be received.", Toast.LENGTH_SHORT).show();
+            }
 
             seriesPhimLe = new ArrayList<>();
             seriesPhimBo = new ArrayList<>();
@@ -697,7 +711,6 @@
         }
         @Override
         public void onBackPressed() {
-            super.onBackPressed();
             if (doubleBackToExitPressedOnce) {
                 super.finishAffinity();  // Exit the app
                 return;

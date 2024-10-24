@@ -28,6 +28,7 @@ import com.example.xemphim.model.Series;
 import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +51,6 @@ public class AllMovie extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAllMovieBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
 
         type = getIntent().getStringExtra("type");
         seriesList = new ArrayList<>(); // Khởi tạo danh sách series

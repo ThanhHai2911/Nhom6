@@ -14,6 +14,7 @@ import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityQlHoTroBinding;
 import com.example.xemphim.model.HoTro;
 import com.example.xemphim.model.ThongBao;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +40,7 @@ public class QLHoTroActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityQlHoTroBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         // Nhận dữ liệu từ Intent
         title = getIntent().getStringExtra("title");

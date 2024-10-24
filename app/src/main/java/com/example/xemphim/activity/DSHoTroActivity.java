@@ -20,6 +20,8 @@ import com.example.xemphim.adapter.HoTroAdapter;
 import com.example.xemphim.databinding.ActivityDsHoTroBinding;
 import com.example.xemphim.model.HoTro;
 import com.example.xemphim.model.ThongBao;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,6 +42,9 @@ public class DSHoTroActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityDsHoTroBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+
 
         hoTroAdapter = new HoTroAdapter(DSHoTroActivity.this,hoTroList);
         binding.recyclerViewApis.setLayoutManager(new LinearLayoutManager(this));

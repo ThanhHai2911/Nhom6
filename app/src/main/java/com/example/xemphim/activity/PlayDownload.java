@@ -32,8 +32,7 @@ public class PlayDownload extends AppCompatActivity {
         setContentView(R.layout.activity_play_downloaded_movie);
         playerView = findViewById(R.id.playerView);
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
+
 
         // Lấy tên phim từ Intent
         String movieName = getIntent().getStringExtra("movie_name");

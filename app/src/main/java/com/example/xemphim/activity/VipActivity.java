@@ -17,6 +17,7 @@ import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.example.xemphim.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class VipActivity extends AppCompatActivity {
     private boolean doubleBackToExitPressedOnce = false;
@@ -32,8 +33,6 @@ public class VipActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_vip);
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         vip_plan_button = findViewById(R.id.vip_plan_button);

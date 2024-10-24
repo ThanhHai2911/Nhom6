@@ -59,8 +59,7 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
         binding = ActivityFavoriteMoviesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot()); // Gán layout cho a
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
+
 
         apiService = ApiClient.getClient().create(ApiService.class);
 

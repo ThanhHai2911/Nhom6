@@ -73,8 +73,7 @@ public class ChiTietActivity extends AppCompatActivity {
         binding = ActivityChitietphimBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
+
         setEvent();
     }
 

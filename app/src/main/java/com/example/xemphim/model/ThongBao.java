@@ -6,6 +6,7 @@ public class ThongBao {
     private String time;
     private String content;
     private String id_user;
+    private long createdAt;
 
     public ThongBao() {
     }
@@ -44,6 +45,9 @@ public class ThongBao {
 
     public void setId_user(String id_user) {
         this.id_user = id_user;
+    }
+    public long getCreatedAt() {
+        return createdAt;
     }
 }
 

@@ -35,8 +35,6 @@ public class ChinhSuaThongTinActivity extends AppCompatActivity {
         binding = ActivityChinhSuaThongTinBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
-        startService(serviceIntent);
 
         // Khởi tạo Firebase Realtime Database
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
