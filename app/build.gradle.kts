@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -88,5 +89,9 @@ dependencies {
 
     implementation ("com.google.firebase:firebase-database:20.3.0")
     implementation ("com.google.android.material:material:1.7.0")
+    implementation ("com.google.firebase:firebase-messaging:23.0.0")
+    implementation ("com.google.android.material:material:1.8.0")
+
+
 
 }

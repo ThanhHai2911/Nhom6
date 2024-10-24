@@ -6,6 +6,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.xemphim.R;
@@ -100,6 +103,9 @@ public class QLUserActivity extends AppCompatActivity {
         // Thêm dữ liệu vào danh sách người dùng
         userList.add(new User("Nguyễn Văn A", "online", true, false));
         userList.add(new User("Trần Thị B", "offline", false, true));
+        userList.add(new User("1","Nguyễn Văn A", "online", true, false));
+        userList.add(new User("2","Trần Thị B", "offline", false, true));
+        // Thêm nhiều người dùng hơn nếu cần
 
         // Thông báo adapter cập nhật dữ liệu
         userAdapter.notifyDataSetChanged();

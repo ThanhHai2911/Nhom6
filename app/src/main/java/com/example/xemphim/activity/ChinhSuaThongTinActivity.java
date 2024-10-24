@@ -1,5 +1,6 @@
 package com.example.xemphim.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityChinhSuaThongTinBinding;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +34,9 @@ public class ChinhSuaThongTinActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityChinhSuaThongTinBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
 
         // Khởi tạo Firebase Realtime Database
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");

@@ -26,6 +26,7 @@ import com.example.xemphim.model.BinhLuanPhim;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.Series;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,6 +64,9 @@ public class LichSuXemActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityLichSuXemBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {

@@ -34,6 +34,7 @@ import com.example.xemphim.model.DanhGiaPhim;
 import com.example.xemphim.model.LichSuPhim;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.model.MovieDownloader;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -79,6 +80,10 @@ public class XemPhimActivity extends AppCompatActivity implements BinhLuanPhimAd
         super.onCreate(savedInstanceState);
         binding = ActivityXemphimBinding.inflate(getLayoutInflater()); // Khởi tạo View Binding
         setContentView(binding.getRoot()); // Đặt layout cho Activity
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
+
         apiService = ApiClient.getClient().create(ApiService.class);
         movieDownloader = new MovieDownloader(apiService, this);
         setControl();

@@ -1,19 +1,32 @@
 package com.example.xemphim.model;
 
 public class ThongBao {
-
+    private String idThongBao;
     private String title;
     private String time;
     private String content;
+    private String id_user;
+
+    public ThongBao() {
+    }
 
     // Constructor
-    public ThongBao(String title, String time, String content) {
+    public ThongBao(String idThongBao,String id_user,String title, String time, String content) {
+        this.idThongBao = idThongBao;
         this.title = title;
         this.time = time;
         this.content = content;
+        this.id_user = id_user;
     }
 
     // Getter và setter
+    public String getIdThongBao() {
+        return idThongBao;
+    }
+    public void setIdThongBao(String idThongBao) {
+        this.idThongBao = idThongBao;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -24,6 +37,13 @@ public class ThongBao {
 
     public String getContent() {
         return content;
+    }
+    public String getId_user() {
+        return id_user;
+    }
+
+    public void setId_user(String id_user) {
+        this.id_user = id_user;
     }
 }
 

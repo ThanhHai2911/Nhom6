@@ -6,16 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.HoTroActivity">
-
+    android:background="#4D4D4D"
+    tools:context=".activity.QLThongBaoActivity">
     <!-- Nút quay lại và tiêu đề -->
     <LinearLayout
+        android:background="#d155bc"
         android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:background="#F06292"
         android:gravity="center_vertical">
 
         <!-- Nút quay lại -->
@@ -26,7 +26,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/ic_back"
             android:contentDescription="@string/back"
-             />
+            />
 
         <!-- Tiêu đề -->
         <TextView
@@ -35,7 +35,7 @@
             android:layout_weight="4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Hỗ trợ khác"
+            android:text="Quản lý thông báo"
             android:textSize="26sp"
             android:textColor="@android:color/black" />
         <TextView
@@ -51,23 +51,23 @@
         android:layout_weight="8">
         <!-- Mô tả vấn đề -->
         <TextView
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Họ Tên"
+            android:text="Tiêu đề"
             android:textSize="14sp"
-            android:textColor="@color/white"
+            android:textColor="#FFFFFF"
             android:layout_marginTop="16dp" />
         <!-- Mã vé hỗ trợ -->
         <EditText
-            android:id="@+id/inputTicketCode"
+            android:id="@+id/edtTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập họ tên"
+            android:hint="Nhập tiêu đề"
             android:background="@drawable/bg_edittext"
             android:padding="16dp"
             android:inputType="text"
             android:textSize="16sp"
-            android:textColor="#000"
             android:layout_marginTop="16dp" />
 
         <!-- Mô tả vấn đề -->
@@ -75,13 +75,13 @@
             android:id="@+id/labelDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mô tả vấn đề"
+            android:text="Nội dung thông báo"
             android:textSize="14sp"
-            android:textColor="@color/white"
+            android:textColor="#FFFFFF"
             android:layout_marginTop="16dp" />
 
         <EditText
-            android:id="@+id/inputDescription"
+            android:id="@+id/edtNoiDung"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Mô tả ít nhất 6 kí tự"
@@ -92,36 +92,34 @@
             android:maxLines="5"
             android:layout_marginTop="8dp" />
 
-        <!-- Ảnh mô tả -->
         <TextView
-            android:id="@+id/labelImage"
+            android:id="@+id/labelchonnguoidung"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thêm hình ảnh mô tả vấn đề/lỗi để được hỗ trợ nhanh hơn"
+            android:text="Thông tin nguoi dung"
             android:textSize="14sp"
-            android:textColor="@color/white"
-            android:layout_marginTop="16dp" />
-
-        <ImageView
-            android:id="@+id/imgUpload"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_image_placeholder"
-            android:src="@drawable/baseline_upload_file_24"
-            android:contentDescription="Upload Image" />
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp"/>
+       <androidx.recyclerview.widget.RecyclerView
+           android:id="@+id/rcvNguoiDung"
+           tools:listitem="@layout/item_user_thongbao"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"/>
     </LinearLayout>
-
-
-
-    <!-- Nút gửi yêu cầu -->
+    <!-- Save Changes Button -->
     <Button
-        android:id="@+id/btnSubmit"
+        android:textSize="25sp"
+        android:id="@+id/btnSaveChanges"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Gửi yêu cầu hỗ trợ"
-        android:textColor="#000"
-        android:backgroundTint="#F06292"
-        android:layout_marginBottom="40dp" />
+        android:text="Gửi Thông báo"
+        android:backgroundTint="#ca8dbd"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="8dp"
+        android:layout_margin="14dp"/>
 
 </LinearLayout>

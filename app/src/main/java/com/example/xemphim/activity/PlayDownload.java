@@ -1,5 +1,6 @@
 package com.example.xemphim.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,6 +14,8 @@ import androidx.media3.datasource.DefaultDataSource;
 import androidx.media3.exoplayer.hls.HlsMediaSource;
 import androidx.media3.ui.PlayerView;
 import com.example.xemphim.R;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
+
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 
@@ -27,8 +30,10 @@ public class PlayDownload extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_downloaded_movie);
-
         playerView = findViewById(R.id.playerView);
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
 
         // Lấy tên phim từ Intent
         String movieName = getIntent().getStringExtra("movie_name");

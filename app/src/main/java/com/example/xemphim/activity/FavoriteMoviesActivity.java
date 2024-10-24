@@ -24,6 +24,7 @@ import com.example.xemphim.adapter.LichSuAdapter;
 import com.example.xemphim.databinding.ActivityFavoriteMoviesBinding;
 import com.example.xemphim.databinding.ActivityLichSuXemBinding;
 import com.example.xemphim.model.MovieDetail;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -57,6 +58,9 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
         // Khởi tạo binding
         binding = ActivityFavoriteMoviesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot()); // Gán layout cho a
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
 
         apiService = ApiClient.getClient().create(ApiService.class);
 

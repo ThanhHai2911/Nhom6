@@ -25,6 +25,7 @@ import com.example.xemphim.databinding.ActivityAllMovieBinding;
 import com.example.xemphim.databinding.ActivityLichSuXemBinding;
 import com.example.xemphim.model.Movie;
 import com.example.xemphim.model.Series;
+import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
 
@@ -49,6 +50,9 @@ public class AllMovie extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAllMovieBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+        startService(serviceIntent);
 
         type = getIntent().getStringExtra("type");
         seriesList = new ArrayList<>(); // Khởi tạo danh sách series

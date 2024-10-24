@@ -19,6 +19,7 @@
     import com.example.xemphim.model.Movie;
     import com.example.xemphim.model.Phim;
     import com.example.xemphim.model.Series;
+    import com.example.xemphim.model.ThongBaoTrenManHinh;
     import com.example.xemphim.model.TruyCap;
     import com.example.xemphim.response.MovieResponse;
     import com.example.xemphim.response.SeriesResponse;
@@ -55,6 +56,7 @@
     import com.google.firebase.database.ValueEventListener;
 
     public class MainActivity extends AppCompatActivity {
+        private boolean doubleBackToExitPressedOnce = false;
         private ActivityMainBinding binding;
         private ApiService apiService;
         private SwipeRefreshLayout swipeRefreshLayout;
@@ -77,11 +79,18 @@
         // bien de kiểm tra người dùng có đang ỏ trong ứng dụng hay không
         public static Boolean truycap = false;
         private DatabaseReference databaseReference;
+
+
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
+
+            Intent serviceIntent = new Intent(this, ThongBaoTrenManHinh.class);
+            startService(serviceIntent);
+
             seriesPhimLe = new ArrayList<>();
             seriesPhimBo = new ArrayList<>();
             seriesPhimHoatHinh = new ArrayList<>();
@@ -174,8 +183,6 @@
             loadPhimHoatHinh();
 
             navigationBottom();
-
-
 
         }
          public static void kiemTraTruyCap(String idUser) {
@@ -387,13 +394,10 @@
                 // Xử lý sự kiện khi nhấn vào tìm kiếm
                 Toast.makeText(this, "Bạn muốn tìm kiếm gì", Toast.LENGTH_SHORT).show();
                 return true;
-            } else if (id == R.id.nav_phimbo) {
+            } else if (id == R.id.nav_thongBao) {
                 // Xử lý sự kiện khi nhấn vào thông báo
-                Intent a = new Intent(MainActivity.this,ThongBaoActivity.class);
-                startActivity(a);
-                Toast.makeText(this, "Thông báo được nhấn", Toast.LENGTH_SHORT).show();
-                return true;
-            }else if (id == R.id.nav_theloai) {
+                Intent intent = new Intent(MainActivity.this, ThongBaoActivity.class);
+                startActivity(intent);
                 return true;
             }
 
@@ -649,6 +653,18 @@
             // Xóa cờ giữ màn hình sáng khi ứng dụng không còn hoạt động
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
+        @Override
+        public void onBackPressed() {
+            if (doubleBackToExitPressedOnce) {
+                super.finishAffinity();  // Exit the app
+                return;
+            }
 
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Nhấn thoát thêm một lần nữa", Toast.LENGTH_SHORT).show();
+
+            // Reset the flag after 2 seconds
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+        }
 
     }

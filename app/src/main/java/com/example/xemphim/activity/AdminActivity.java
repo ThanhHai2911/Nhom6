@@ -1,7 +1,5 @@
 package com.example.xemphim.activity;
 
-import static java.lang.Double.parseDouble;
-import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 
 import android.content.Intent;
@@ -13,23 +11,18 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.PopupWindow;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.google.firebase.database.Transaction;
+
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityAdminBinding;
 import com.google.firebase.database.DataSnapshot;
@@ -210,6 +203,14 @@ public class AdminActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         // Chuyển sang trang Quản lý Quốc gia
                         Intent intent = new Intent(AdminActivity.this, QLQuocGiaActivity.class);
+                        startActivity(intent);
+                        popupWindow.dismiss();  // Đóng PopupWindow sau khi nhấn
+                    }
+                });
+                popupView.findViewById(R.id.btn_ThongBao).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(AdminActivity.this, DSThongBaoActivity.class);
                         startActivity(intent);
                         popupWindow.dismiss();  // Đóng PopupWindow sau khi nhấn
                     }

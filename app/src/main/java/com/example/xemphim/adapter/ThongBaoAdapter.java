@@ -1,5 +1,6 @@
 package com.example.xemphim.adapter;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,24 +11,26 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.R;
+import com.example.xemphim.databinding.ItemThongbaoBinding;
+import com.example.xemphim.databinding.ItemUserThongbaoBinding;
 import com.example.xemphim.model.ThongBao;
 
 import java.util.List;
 
 public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ThongBaoViewHolder> {
-
+    private Activity context;
     private List<ThongBao> thongBaoList; // Danh sách thông báo
 
-    // Constructor của adapter
-    public ThongBaoAdapter(List<ThongBao> thongBaoList) {
+    public ThongBaoAdapter(Activity context, List<ThongBao> thongBaoList) {
+        this.context = context;
         this.thongBaoList = thongBaoList;
     }
 
     @NonNull
     @Override
     public ThongBaoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_thongbao, parent, false);
-        return new ThongBaoViewHolder(view);
+        ItemThongbaoBinding binding = ItemThongbaoBinding.inflate(context.getLayoutInflater(), parent, false);
+        return new ThongBaoViewHolder(binding);
     }
 
     @Override
@@ -38,10 +41,10 @@ public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ThongB
         }
 
         // Cài đặt dữ liệu cho từng phần tử trong danh sách
-        holder.tvTitle.setText(thongBao.getTitle());
-        holder.tvTime.setText(thongBao.getTime());
-        holder.tvContent.setText(thongBao.getContent());
-        holder.imgIcon.setImageResource(R.drawable.ic_notification); // Cài đặt icon tạm thời
+        holder.binding.tvTitle.setText(thongBao.getTitle());
+        holder.binding.tvTime.setText(thongBao.getTime());
+        holder.binding.tvContent.setText(thongBao.getContent());
+        holder.binding.imgIcon.setImageResource(R.drawable.ic_notification); // Cài đặt icon tạm thời
     }
 
     @Override
@@ -53,18 +56,11 @@ public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ThongB
     }
 
     public class ThongBaoViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView tvTitle, tvTime, tvContent;
-        private ImageView imgIcon;
-
-        public ThongBaoViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            // Liên kết với view trong item_thongbao.xml
-            tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvTime = itemView.findViewById(R.id.tvTime);
-            tvContent = itemView.findViewById(R.id.tvContent);
-            imgIcon = itemView.findViewById(R.id.imgIcon);
+        ItemThongbaoBinding binding;
+        int position;
+        public ThongBaoViewHolder(@NonNull ItemThongbaoBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }
