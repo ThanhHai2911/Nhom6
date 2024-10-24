@@ -38,7 +38,6 @@ public class SeriesResponse {
     public class TheLoaiData {
         @SerializedName("name")
         private List<Series.Category> name;
-
         public List<Series.Category> getName() {
             return name;
         }

@@ -13,9 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.API.ApiClient;
+import com.example.xemphim.API.ApiService;
 import com.example.xemphim.R;
 import com.example.xemphim.adapter.ApiAdapter;
+import com.example.xemphim.adapter.SeriesAdapter;
 import com.example.xemphim.model.ApiModel;
+import com.example.xemphim.model.Series;
+import com.example.xemphim.model.Series2;
+import com.example.xemphim.response.SeriesResponse;
+import com.example.xemphim.response.SeriesResponse2;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,6 +31,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class QuanLyAPI extends AppCompatActivity {
@@ -59,6 +68,7 @@ public class QuanLyAPI extends AppCompatActivity {
                 deleteApi(api);
             }
 
+            @Override
             public void onSelectClick(ApiModel api) {
                 saveSelectedApi(api.getUrl()); // Lưu URL đã chọn
                 // Chờ một chút để đảm bảo URL đã được lưu
@@ -82,6 +92,7 @@ public class QuanLyAPI extends AppCompatActivity {
         rvApiList.setAdapter(apiAdapter);
     }
 
+
     // Lấy danh sách API từ Firebase
     private void fetchApiSources() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -102,6 +113,7 @@ public class QuanLyAPI extends AppCompatActivity {
             }
         });
     }
+
 
     // Sửa API
     private void editApi(ApiModel api) {

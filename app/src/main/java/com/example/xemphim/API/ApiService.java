@@ -3,6 +3,7 @@ package com.example.xemphim.API;
 import com.example.xemphim.model.MovieDetail;
 import com.example.xemphim.response.MovieResponse;
 import com.example.xemphim.response.SeriesResponse;
+import com.example.xemphim.response.SeriesResponse2;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -41,5 +42,7 @@ public interface ApiService {
     Call<SeriesResponse> getQuocGia(@Path("slug") String slug);
     @GET
     Call<ResponseBody> downloadMovie(@Url String movieLink);
+    @GET("v1/api/danh-sach/phim-bo")
+    Call<SeriesResponse2> getSeriesResponse2();
 }
 
