@@ -3,7 +3,20 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="DangNhapActivity">
-        <State />
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\Admin\.android\avd\Pixel_4_XL_API_30.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-10-24T08:14:40.381115Z" />
+        </State>
       </entry>
       <entry key="MainActivity">
         <State>
@@ -33,9 +46,6 @@
         </State>
       </entry>
       <entry key="QLPhimActivity">
-        <State />
-      </entry>
-      <entry key="QLUserActivity">
         <State />
       </entry>
       <entry key="ThemPhimActivity">
