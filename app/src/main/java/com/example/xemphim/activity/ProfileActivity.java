@@ -96,7 +96,6 @@ public class ProfileActivity extends AppCompatActivity {
                 binding.btnDangNhap.setVisibility(View.VISIBLE);
                 binding.btnDangNhap.setText("Admin");
             }else{
-
                 isUserLoggedIn = true; // Người dùng đã đăng nhập
                 binding.btnDangNhap.setVisibility(View.GONE);
             }
