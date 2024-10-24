@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.xemphim.R;
 import com.example.xemphim.databinding.ActivityCaiDatBinding;
 import com.example.xemphim.databinding.ActivityChinhSuaThongTinBinding;
-import com.example.xemphim.model.ThongBaoTrenManHinh;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class CaiDatActivity extends AppCompatActivity {
@@ -66,11 +65,12 @@ public class CaiDatActivity extends AppCompatActivity {
                 Toast.makeText(CaiDatActivity.this, "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
             }
         });
-        binding.tvTroGiup.setOnClickListener(new View.OnClickListener() {
+
+        binding.troGiup.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(CaiDatActivity.this, HoTroActivity.class);
-                startActivity(intent);
+            public void onClick(View v) {
+                Intent a = new Intent(CaiDatActivity.this, HoTroActivity.class);
+                startActivity(a);
             }
         });
     }

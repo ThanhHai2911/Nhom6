@@ -12,6 +12,9 @@ public class Goi {
     public int getId() {
         return id;
     }
+    // Constructor mặc định (bắt buộc phải có)
+    public Goi() {
+    }
 
     public void setId(int id) {
         this.id = id;
