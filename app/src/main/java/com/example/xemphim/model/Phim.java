@@ -17,11 +17,13 @@ public class Phim {
     private int id_kieuPhim; // ID kiểu phim
     private String ngayThemPhim; // Ngày thêm phim
     private String ngayCapNhat; // Ngày cập nhật phim
+    private String movieUrl; // URL video phim
 
     // Constructor có tham số
     public Phim(String id_movie, String name, String content, String poster_url, String thumb_url,
                 String goi, String time, String year, String tacGia, String theLoai, String dienVien,
-                String quocGia, float rating, int id_kieuPhim, String ngayThemPhim, String ngayCapNhat) {
+                String quocGia, float rating, int id_kieuPhim, String ngayThemPhim, String ngayCapNhat,
+                String movieUrl) {
         this.id_movie = id_movie;
         this.name = name;
         this.content = content;
@@ -38,6 +40,7 @@ public class Phim {
         this.id_kieuPhim = id_kieuPhim;
         this.ngayThemPhim = ngayThemPhim;
         this.ngayCapNhat = ngayCapNhat;
+        this.movieUrl = movieUrl; // Thêm movieUrl vào constructor
     }
 
     // Constructor không tham số
@@ -58,6 +61,7 @@ public class Phim {
         this.id_kieuPhim = 0;
         this.ngayThemPhim = "";
         this.ngayCapNhat = "";
+        this.movieUrl = ""; // Khởi tạo movieUrl
     }
 
     // Getter và Setter cho các thuộc tính
@@ -187,5 +191,13 @@ public class Phim {
 
     public void setNgayCapNhat(String ngayCapNhat) {
         this.ngayCapNhat = ngayCapNhat;
+    }
+
+    public String getMovieUrl() {
+        return movieUrl; // Getter cho movieUrl
+    }
+
+    public void setMovieUrl(String movieUrl) {
+        this.movieUrl = movieUrl; // Setter cho movieUrl
     }
 }

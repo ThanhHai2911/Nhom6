@@ -2,6 +2,7 @@ package com.example.xemphim.activity;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -66,6 +67,15 @@ public class QLPhimActivity extends AppCompatActivity {
                 deleteIcon.setVisibility(View.GONE); // Ẩn icon xóa nếu không có phim nào được chọn
             }
         });
+
+        // Thêm listener cho item click
+        adapter.setRecyclerViewItemClickListener((view, position) -> {
+            Phim selectedPhim = phimList.get(position);
+            Intent intent = new Intent(QLPhimActivity.this, ThemPhimActivity.class);
+            intent.putExtra("id_movie", selectedPhim.getId_movie()); // Truyền id_movie
+            startActivity(intent);
+        });
+
         recyclerView.setAdapter(adapter);
 
         // Xử lý sự kiện cho các nút

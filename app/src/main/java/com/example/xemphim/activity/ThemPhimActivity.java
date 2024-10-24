@@ -39,6 +39,20 @@ public class ThemPhimActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityThemPhimBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Nhận ID phim từ Intent
+        String idMovie = getIntent().getStringExtra("id_movie");
+        if (idMovie != null) {
+            // Nếu ID phim không null, thực hiện chức năng cập nhật
+            layDuLieuPhim(idMovie);
+            binding.submitButton.setText("Cập nhật");
+            binding.submitButton.setOnClickListener(v -> themPhimVaoFirebase());
+        } else {
+            // Nếu không, đây là chức năng thêm phim
+            binding.submitButton.setOnClickListener(v -> themPhimVaoFirebase());
+        }
+
+
         // Khởi tạo danh sách thể loại và các biến liên quan
         genres = getResources().getStringArray(R.array.genre_array); // Lấy danh sách thể loại từ resources
         selectedGenres = new boolean[genres.length]; // Khởi tạo mảng trạng thái cho các thể loại
@@ -47,10 +61,8 @@ public class ThemPhimActivity extends AppCompatActivity {
         layDuLieuQuocGia();
         layDuLieuTheLoai();
 
-        // Nút Thêm phim
-        binding.submitButton.setOnClickListener(v -> themPhimVaoFirebase());
-    }
 
+    }
     private void layDuLieuGoi() {
         DatabaseReference goiRef = FirebaseDatabase.getInstance().getReference("Goi");
         goiRef.addValueEventListener(new ValueEventListener() {
@@ -188,7 +200,7 @@ public class ThemPhimActivity extends AppCompatActivity {
         String posterUrl = binding.posterUrl.getText().toString().trim();
         String thumbUrl = binding.thumbUrl.getText().toString().trim();
         String movieUrl = binding.movieUrl.getText().toString().trim();
-// Lấy giá trị từ Spinner
+        // Lấy giá trị từ Spinner
         String goi = binding.goiSpinner.getSelectedItem().toString();
         String goiId = goiMap.get(goi); // Lấy ID từ HashMap
         // Lấy giá trị từ Spinner
@@ -215,16 +227,13 @@ public class ThemPhimActivity extends AppCompatActivity {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String ngayHienTai = dateFormat.format(Calendar.getInstance().getTime());
 
-        // Tạo ID ngẫu nhiên cho phim
-        String idPhim = FirebaseDatabase.getInstance().getReference().child("Movies").push().getKey();
-
         // Tạo đối tượng phim chứa thông tin
         Map<String, Object> movieData = new HashMap<>();
-        movieData.put("id_movie", idPhim);
         movieData.put("name", tenPhim);
         movieData.put("content", moTa);
         movieData.put("poster_url", posterUrl);
         movieData.put("thumb_url", thumbUrl);
+        movieData.put("movie_url", movieUrl);
         movieData.put("goi", goiId); // Lưu ID gói vào dữ liệu phim
         movieData.put("time", thoiLuong);
         movieData.put("year", namPhatHanh);
@@ -239,10 +248,38 @@ public class ThemPhimActivity extends AppCompatActivity {
         movieData.put("ngayThemPhim", ngayHienTai);
         movieData.put("ngayCapNhat", ngayHienTai);
 
-        // Thêm phim vào Firebase
+        // Kiểm tra xem ID phim có phải null hay không để quyết định thêm hay cập nhật
+        String idMovie = getIntent().getStringExtra("id_movie");
         DatabaseReference moviesRef = FirebaseDatabase.getInstance().getReference().child("Movies");
-        if (idPhim != null) {
-            moviesRef.child(idPhim).setValue(movieData).addOnCompleteListener(task -> {
+
+        if (idMovie != null) {
+            // Cập nhật phim
+            moviesRef.child(idMovie).child("id_movie").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    String existingIdMovie = snapshot.getValue(String.class);
+                    movieData.put("id_movie", existingIdMovie); // Ghi đè id_movie cũ vào movieData
+                    moviesRef.child(idMovie).setValue(movieData).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(ThemPhimActivity.this, "Cập nhật phim thành công!", Toast.LENGTH_SHORT).show();
+                            resetForm();
+                        } else {
+                            Toast.makeText(ThemPhimActivity.this, "Cập nhật phim thất bại!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(ThemPhimActivity.this, "Lỗi khi lấy ID phim!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Thêm phim
+            String id_Phim = moviesRef.push().getKey();
+            // Thêm idPhim vào movieData
+            movieData.put("id_movie", id_Phim);
+            moviesRef.child(id_Phim).setValue(movieData).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(ThemPhimActivity.this, "Thêm phim thành công!", Toast.LENGTH_SHORT).show();
                     resetForm();
@@ -252,6 +289,7 @@ public class ThemPhimActivity extends AppCompatActivity {
             });
         }
     }
+
 
     private void resetForm() {
         // Đặt lại các trường nhập liệu
@@ -279,5 +317,59 @@ public class ThemPhimActivity extends AppCompatActivity {
         selectedGenres = new boolean[genres.length];  // Reset các lựa chọn thể loại
     }
 
+    private void layDuLieuPhim(String idMovie) {
+        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child(idMovie);
+        movieRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Lấy thông tin phim và hiển thị lên các trường nhập liệu
+                    String tenPhim = dataSnapshot.child("name").getValue(String.class);
+                    String moTa = dataSnapshot.child("content").getValue(String.class);
+                    String dienVien = dataSnapshot.child("dienVien").getValue(String.class);
+                    String tacGia = dataSnapshot.child("tacGia").getValue(String.class);
+                    String thoiLuong = dataSnapshot.child("time").getValue(String.class);
+                    String namPhatHanh = dataSnapshot.child("year").getValue(String.class);
+                    String posterUrl = dataSnapshot.child("poster_url").getValue(String.class);
+                    String thumbUrl = dataSnapshot.child("thumb_url").getValue(String.class);
+                    String movieUrl = dataSnapshot.child("movie_url").getValue(String.class);
+                    String goiId = dataSnapshot.child("goi").getValue(String.class); // Lấy goiId
+                    String quocGia = dataSnapshot.child("quocGia").getValue(String.class);
+                    String theLoai = dataSnapshot.child("theLoai").getValue(String.class);
+
+                    // Hiển thị thông tin lên màn hình
+                    binding.title.setText(tenPhim);
+                    binding.description.setText(moTa);
+                    binding.cast.setText(dienVien);
+                    binding.actor.setText(tacGia);
+                    binding.duration.setText(thoiLuong);
+                    binding.releaseYear.setText(namPhatHanh);
+                    binding.posterUrl.setText(posterUrl);
+                    binding.thumbUrl.setText(thumbUrl);
+                    binding.movieUrl.setText(movieUrl);
+
+                    // Đặt vị trí cho Spinner dựa trên ID
+                    binding.goiSpinner.setSelection(getSpinnerPosition(binding.goiSpinner, goiId));
+                    binding.countrySpinner.setSelection(getSpinnerPosition(binding.countrySpinner, quocGia));
+                    binding.selectedGenresText.setText("Thể loại đã chọn: " + theLoai);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ThemPhimActivity.this, "Lỗi khi tải dữ liệu phim", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private int getSpinnerPosition(Spinner spinner, String id) {
+        for (int i = 0; i < spinner.getCount(); i++) {
+            String itemId = goiMap.get(spinner.getItemAtPosition(i).toString());
+            if (itemId != null && itemId.equals(id)) {
+                return i; // Trả về vị trí tìm thấy
+            }
+        }
+        return 0; // Về mặc định nếu không tìm thấy
+    }
 
 }
