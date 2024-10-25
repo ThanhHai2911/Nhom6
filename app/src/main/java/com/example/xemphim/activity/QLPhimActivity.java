@@ -33,7 +33,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class QLPhimActivity extends AppCompatActivity {
-    private Button btnNgayTao, btnNamPhatHanh, btnTrangThai;
+    private Button btnNgayTao, btnNamPhatHanh, btnTrangThai,btnAddPhim;
     private RecyclerView recyclerView;
     private QLPhimAdapter adapter;
     private List<Phim> phimList; // Danh sách phim
@@ -57,7 +57,16 @@ public class QLPhimActivity extends AppCompatActivity {
         btnNamPhatHanh = findViewById(R.id.btnnamphathanh);
         btnTrangThai = findViewById(R.id.btntrangthai);
         deleteIcon = findViewById(R.id.delete_icon); // Icon xóa
+        btnAddPhim = findViewById(R.id.btnAddPhim);
 
+        btnAddPhim.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent a = new Intent(QLPhimActivity.this  ,ThemPhimActivity.class);
+                startActivity(a);
+
+            }
+        });
         // Cài đặt RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new QLPhimAdapter(this, phimList, kieuPhimList, goiList, selectedCount -> {

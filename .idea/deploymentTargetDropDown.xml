@@ -15,7 +15,7 @@
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-10-24T08:14:40.381115Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-10-24T09:16:03.532078200Z" />
         </State>
       </entry>
       <entry key="MainActivity">
@@ -42,11 +42,27 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-10-24T04:48:33.433690500Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-10-24T09:56:14.565732200Z" />
         </State>
       </entry>
       <entry key="QLPhimActivity">
         <State />
+      </entry>
+      <entry key="QLUserActivity">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\Admin\.android\avd\Pixel_4_XL_API_30.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-10-24T09:20:23.364428700Z" />
+        </State>
       </entry>
       <entry key="ThemPhimActivity">
         <State />

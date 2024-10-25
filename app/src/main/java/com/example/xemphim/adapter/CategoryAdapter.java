@@ -6,22 +6,38 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.xemphim.R;
+import com.example.xemphim.model.Category; // Giả sử bạn đã tạo lớp Category trong package model
 
 import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    private List<String> categoryList;
+    private List<Category> categoryList;
     private Context context;
+    private OnEditClickListener onEditClickListener;
+    private OnDeleteClickListener onDeleteClickListener;
 
-    public CategoryAdapter(Context context, List<String> categoryList) {
+    // Interface để gọi lại khi người dùng nhấn vào nút chỉnh sửa
+    public interface OnEditClickListener {
+        void onEditClick(int position, Category currentCategory);
+    }
+
+    // Interface để gọi lại khi người dùng nhấn vào nút xóa
+    public interface OnDeleteClickListener {
+        void onDeleteClick(int position);
+    }
+
+    public CategoryAdapter(Context context, List<Category> categoryList,
+                           OnEditClickListener onEditClickListener, OnDeleteClickListener onDeleteClickListener) {
         this.context = context;
         this.categoryList = categoryList;
+        this.onEditClickListener = onEditClickListener;
+        this.onDeleteClickListener = onDeleteClickListener;
     }
 
     @Override
@@ -32,19 +48,31 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     @Override
     public void onBindViewHolder(CategoryViewHolder holder, int position) {
-        String category = categoryList.get(position);
-        holder.categoryName.setText(category);
+        // Lấy đối tượng Category hiện tại từ danh sách
+        Category category = categoryList.get(position);
 
-        // Sự kiện khi nhấn vào nút sửa
+        // Hiển thị tên thể loại
+        holder.categoryName.setText(category.getName());
+
+        // Xử lý sự kiện click nút chỉnh sửa
         holder.editIcon.setOnClickListener(v -> {
-            // Code chỉnh sửa thể loại
-            Toast.makeText(context, "Sửa " + category, Toast.LENGTH_SHORT).show();
+            if (onEditClickListener != null) {
+                onEditClickListener.onEditClick(position, category);  // Truyền cả đối tượng Category
+            }
         });
 
-        // Sự kiện khi nhấn vào nút xóa
+        // Xử lý sự kiện click nút xóa
         holder.deleteIcon.setOnClickListener(v -> {
-            // Code xóa thể loại
-            Toast.makeText(context, "Xóa " + category, Toast.LENGTH_SHORT).show();
+            if (onDeleteClickListener != null) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Xác nhận xóa")
+                        .setMessage("Bạn có muốn xóa thể loại này không?")
+                        .setPositiveButton("Có", (dialog, which) -> {
+                            onDeleteClickListener.onDeleteClick(position);
+                        })
+                        .setNegativeButton("Không", null)
+                        .show();
+            }
         });
     }
 
@@ -53,8 +81,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         return categoryList.size();
     }
 
+    // Lớp ViewHolder để ánh xạ các thành phần giao diện
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
-
         TextView categoryName;
         ImageView editIcon, deleteIcon;
 
@@ -66,4 +94,3 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         }
     }
 }
-
