@@ -98,6 +98,7 @@
         android:layout_margin="8dp">
         <!-- Lượt đăng ký -->
         <LinearLayout
+            android:id="@+id/btnYeuCau"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"

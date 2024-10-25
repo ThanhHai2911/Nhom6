@@ -45,14 +45,25 @@
                 android:layout_marginBottom="8dp"/>
         </LinearLayout>
 
-        <!-- Trạng thái người dùng -->
-        <TextView
-            android:id="@+id/tvUserStatus"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="online"
-            android:textSize="14sp"
-            android:layout_marginBottom="8dp"/>
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Content: "
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
+            <!-- Trạng thái người dùng -->
+            <TextView
+                android:id="@+id/tvContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FN86MT6_8ft8p"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Lựa chọn Thường hoặc VIP -->
@@ -64,10 +75,10 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tvGoi"
-            android:layout_width="80dp"
+            android:id="@+id/tvTrangThai"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="Thường"
+            android:text="Chưa xử lý"
             android:padding="8dp"
             android:textStyle="bold"
             android:background="@drawable/border_tv_goi" />

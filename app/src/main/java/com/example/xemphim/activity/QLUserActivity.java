@@ -1,5 +1,6 @@
 package com.example.xemphim.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -57,7 +58,14 @@ public class QLUserActivity extends AppCompatActivity {
         laySoLuongYeuCauHomNay();
         demSoLuongUserVip();
         loadDuLieu(); // Thêm dữ liệu người dùng vào danh sách
-
+        binding.btnYeuCau.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(QLUserActivity.this, YeuCauGoiVipActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
     private void ghiLaiTrangThai() {
         // Lấy user hiện tại
